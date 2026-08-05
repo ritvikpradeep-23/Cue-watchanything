@@ -32,3 +32,21 @@ export function toApiTitle(row: PrismaTitle) {
 export async function fetchTitleRow(id: string) {
   return prisma.title.findUnique({ where: { id } });
 }
+
+/** Same camelCase API shape as toApiTitle(), but from the in-memory TitleSeed catalog (used by the scoring engine) rather than a Prisma row. */
+export function toApiTitleFromSeed(seed: TitleSeed) {
+  return {
+    id: seed.id,
+    name: seed.name,
+    type: seed.type,
+    plotSummary: seed.plot_summary,
+    cast: seed.cast,
+    seasons: seed.seasons,
+    episodes: seed.episodes,
+    runtimeMinutes: seed.runtime_minutes,
+    releaseYear: seed.release_year,
+    platforms: seed.platforms,
+    posterUrl: seed.poster_url,
+    tags: seed.tags,
+  };
+}

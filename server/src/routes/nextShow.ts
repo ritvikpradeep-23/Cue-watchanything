@@ -1,13 +1,18 @@
 import { Router } from "express";
 import { requireAuth, AuthedRequest } from "../lib/auth";
 import { prisma } from "../lib/prisma";
-import { getAllTitleSeeds, getTitleSeedById, toApiTitle } from "../lib/titles";
+import { getAllTitleSeeds, getTitleSeedById, toApiTitle, toApiTitleFromSeed } from "../lib/titles";
 import { getLatestTagProfile, getSwipedTitleIds } from "../lib/userProfile";
-import { getNextNextShowQuestion, submitNextShow, computeNextShowDelta, NextShowContext } from "../quiz/nextShow";
-import { applyDelta } from "../scoring/delta";
-import { scoreTitle } from "../scoring/scoreTitle";
-import { passesHardFilters } from "../scoring/buildDeck";
-import { generateTagCheckQuestions } from "../scoring/tagCheckQuestion";
+import {
+  getNextNextShowQuestion,
+  submitNextShow,
+  computeNextShowDelta,
+  NextShowContext,
+  applyDelta,
+  scoreTitle,
+  passesHardFilters,
+  generateTagCheckQuestions,
+} from "@watch-recommender/shared";
 
 export const nextShowRouter = Router();
 
@@ -36,6 +41,19 @@ nextShowRouter.get("/quiz-context/:watchedTitleId", (req, res) => {
   const title = getTitleSeedById(req.params.watchedTitleId);
   if (!title) return res.status(404).json({ error: "Watched title not found" });
   res.json({ tagCheckQuestions: generateTagCheckQuestions(title) });
+});
+
+/** One-shot bundle so the client can run the whole 15-question branching flow locally, no round-trip per answer. */
+nextShowRouter.get("/context/:watchedTitleId", requireAuth, async (req: AuthedRequest, res) => {
+  const ctx = await buildContext(req.user!.userId, String(req.params.watchedTitleId));
+  if ("error" in ctx) return res.status(ctx.status).json({ error: ctx.error });
+
+  res.json({
+    baseProfile: ctx.baseProfile,
+    watchedTitle: ctx.watchedTitle,
+    allTitles: ctx.allTitles,
+    excludedIds: [...ctx.excludedIds],
+  });
 });
 
 nextShowRouter.get("/next", requireAuth, async (req: AuthedRequest, res) => {
@@ -73,7 +91,7 @@ nextShowRouter.post("/submit", requireAuth, async (req: AuthedRequest, res) => {
 
   res.json({
     picks: result.picks.map((t) => t.id),
-    titles: result.picks,
+    titles: result.picks.map(toApiTitleFromSeed),
     swappable: result.swappable,
   });
 });

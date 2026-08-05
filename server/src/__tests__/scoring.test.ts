@@ -1,10 +1,13 @@
 import { describe, expect, it } from "vitest";
 import type { TitleSeed } from "@watch-recommender/shared";
-import { scoreTitle } from "../scoring/scoreTitle";
-import { buildDeck } from "../scoring/buildDeck";
-import { buildTop3 } from "../scoring/buildTop3";
-import { applyDelta, mergeDeltas } from "../scoring/delta";
-import { generateTagCheckQuestions } from "../scoring/tagCheckQuestion";
+import {
+  scoreTitle,
+  buildDeck,
+  buildTop3,
+  applyDelta,
+  mergeDeltas,
+  generateTagCheckQuestions,
+} from "@watch-recommender/shared";
 
 function makeTitle(overrides: Partial<TitleSeed> & { id: string }): TitleSeed {
   return {

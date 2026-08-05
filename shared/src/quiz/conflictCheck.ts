@@ -1,4 +1,4 @@
-import type { Genre } from "@watch-recommender/shared";
+import type { Genre } from "../taxonomy";
 import type { Answers, QuizQuestion } from "./types";
 
 /** Which prior answers imply wanting a given genre — used to detect avoid-list contradictions. */

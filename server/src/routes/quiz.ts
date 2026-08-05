@@ -2,7 +2,7 @@ import { Router } from "express";
 import { requireAuth, AuthedRequest } from "../lib/auth";
 import { prisma } from "../lib/prisma";
 import { getAllTitleSeeds } from "../lib/titles";
-import { computeOnboardingProfile, getNextOnboardingQuestion } from "../quiz/onboarding";
+import { computeOnboardingProfile, getNextOnboardingQuestion } from "@watch-recommender/shared";
 
 export const quizRouter = Router();
 

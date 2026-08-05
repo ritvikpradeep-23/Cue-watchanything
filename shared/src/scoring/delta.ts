@@ -1,4 +1,4 @@
-import type { TagProfile } from "@watch-recommender/shared";
+import type { TagProfile } from "../types";
 
 /** Returns a new profile with weights adjusted — never mutates the input (stored profile stays intact). */
 export function applyDelta(baseProfile: TagProfile, delta: TagProfile): TagProfile {

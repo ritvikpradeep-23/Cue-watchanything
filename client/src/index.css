@@ -79,3 +79,18 @@ body {
 .poster-image.poster-image--active {
   filter: grayscale(0%) brightness(1);
 }
+
+@keyframes quiz-question-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.quiz-question-enter {
+  animation: quiz-question-in 0.18s ease-out;
+}

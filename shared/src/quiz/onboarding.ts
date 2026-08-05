@@ -6,8 +6,9 @@ import {
   PACES,
   PLATFORMS,
   TONES,
-} from "@watch-recommender/shared";
-import type { Platform, TagProfile, TitleSeed } from "@watch-recommender/shared";
+} from "../taxonomy";
+import type { Platform } from "../taxonomy";
+import type { TagProfile, TitleSeed } from "../types";
 import type { HardFilters } from "../scoring/buildDeck";
 import { mergeDeltas } from "../scoring/delta";
 import type { Answers, QuizQuestion } from "./types";

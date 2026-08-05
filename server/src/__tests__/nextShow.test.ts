@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { TITLES } from "../../prisma/seed-data/titles";
-import { getNextNextShowQuestion, submitNextShow, computeNextShowDelta, NextShowContext } from "../quiz/nextShow";
-import type { Answers } from "../quiz/types";
+import { getNextNextShowQuestion, submitNextShow, computeNextShowDelta, NextShowContext } from "@watch-recommender/shared";
+import type { Answers } from "@watch-recommender/shared";
 
 const watchedTitle = TITLES.find((t) => t.id === "breaking-bad")!;
 

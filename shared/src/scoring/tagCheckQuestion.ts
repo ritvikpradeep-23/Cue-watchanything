@@ -1,4 +1,4 @@
-import type { TitleSeed } from "@watch-recommender/shared";
+import type { TitleSeed } from "../types";
 
 export interface TagCheckQuestion {
   category: string;

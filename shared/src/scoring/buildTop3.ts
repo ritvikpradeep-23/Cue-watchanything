@@ -1,5 +1,5 @@
-import type { TagProfile, TitleSeed } from "@watch-recommender/shared";
-import { TAG_CATEGORY } from "@watch-recommender/shared";
+import type { TagProfile, TitleSeed } from "../types";
+import { TAG_CATEGORY } from "../taxonomy";
 import { HardFilters, passesHardFilters } from "./buildDeck";
 import { flattenTags, scoreTitle } from "./scoreTitle";
 

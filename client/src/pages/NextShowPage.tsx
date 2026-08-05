@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { QuizWizard, type QuizQuestion } from "../components/QuizWizard";
+import { getNextNextShowQuestion, type NextShowContext, type TagProfile, type TitleSeed } from "@watch-recommender/shared";
+import { QuizWizard } from "../components/QuizWizard";
 import { PosterImage } from "../components/ui/PosterImage";
-import { apiGet, apiPost } from "../lib/api";
+import { apiGet, apiPost, ApiError } from "../lib/api";
 import type { DeckTitle } from "../components/SwipeCard";
 
 interface SubmitResult {
@@ -11,17 +12,33 @@ interface SubmitResult {
   swappable: boolean;
 }
 
+interface ContextResponse {
+  baseProfile: TagProfile;
+  watchedTitle: TitleSeed;
+  allTitles: TitleSeed[];
+  excludedIds: string[];
+}
+
 export function NextShowPage() {
   const { watchedTitleId } = useParams<{ watchedTitleId: string }>();
+  const [ctx, setCtx] = useState<NextShowContext | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<SubmitResult | null>(null);
   const [lastAnswers, setLastAnswers] = useState<Record<string, any>>({});
 
-  async function fetchNext(answers: Record<string, any>): Promise<QuizQuestion | null> {
-    const res = await apiGet<{ question: QuizQuestion | null }>(
-      `/next-show/next?watchedTitleId=${watchedTitleId}&answers=${encodeURIComponent(JSON.stringify(answers))}`,
-    );
-    return res.question;
-  }
+  useEffect(() => {
+    if (!watchedTitleId) return;
+    apiGet<ContextResponse>(`/next-show/context/${watchedTitleId}`)
+      .then((res) =>
+        setCtx({
+          baseProfile: res.baseProfile,
+          watchedTitle: res.watchedTitle,
+          allTitles: res.allTitles,
+          excludedIds: new Set(res.excludedIds),
+        }),
+      )
+      .catch((e) => setError(e instanceof ApiError ? e.message : "Failed to load"));
+  }, [watchedTitleId]);
 
   async function handleComplete(answers: Record<string, any>) {
     setLastAnswers(answers);
@@ -79,11 +96,27 @@ export function NextShowPage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="mx-auto max-w-md px-4 py-24 text-center">
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
+  }
+
+  if (!ctx) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent-500 border-t-transparent" />
+      </div>
+    );
+  }
+
   return (
     <QuizWizard
       title="Pick next show"
       subtitle="A few quick questions about what you just watched."
-      fetchNext={fetchNext}
+      getNext={(answers) => getNextNextShowQuestion(answers, ctx)}
       onComplete={handleComplete}
     />
   );

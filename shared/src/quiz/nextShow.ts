@@ -1,5 +1,6 @@
-import { GENRES, LOVE_FACTORS, MOODS, PACES, PLATFORMS, TONES } from "@watch-recommender/shared";
-import type { Platform, TagProfile, TitleSeed } from "@watch-recommender/shared";
+import { GENRES, LOVE_FACTORS, MOODS, PACES, PLATFORMS, TONES } from "../taxonomy";
+import type { Platform } from "../taxonomy";
+import type { TagProfile, TitleSeed } from "../types";
 import { applyDelta, mergeDeltas } from "../scoring/delta";
 import { flattenTags } from "../scoring/scoreTitle";
 import { generateTagCheckQuestions } from "../scoring/tagCheckQuestion";

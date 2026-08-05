@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export interface QuizOption {
   value: string;
@@ -16,14 +16,14 @@ export interface QuizQuestion {
 interface QuizWizardProps {
   title: string;
   subtitle?: string;
-  fetchNext: (answersSoFar: Record<string, any>) => Promise<QuizQuestion | null>;
+  /** Pure, synchronous — computed entirely client-side, no network round-trip per answer. */
+  getNext: (answersSoFar: Record<string, any>) => QuizQuestion | null;
   onComplete: (answers: Record<string, any>) => Promise<void>;
 }
 
-export function QuizWizard({ title, subtitle, fetchNext, onComplete }: QuizWizardProps) {
+export function QuizWizard({ title, subtitle, getNext, onComplete }: QuizWizardProps) {
   const [answers, setAnswers] = useState<Record<string, any>>({});
-  const [question, setQuestion] = useState<QuizQuestion | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [question, setQuestion] = useState<QuizQuestion | null>(() => getNext({}));
   const [submitting, setSubmitting] = useState(false);
   const [questionNumber, setQuestionNumber] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -33,30 +33,26 @@ export function QuizWizard({ title, subtitle, fetchNext, onComplete }: QuizWizar
   const [draftText, setDraftText] = useState("");
   const [draftToggles, setDraftToggles] = useState<Record<string, string>>({});
 
-  useEffect(() => {
-    loadNext(answers, 0);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  async function advance(currentAnswers: Record<string, any>, nextNumber: number) {
+    const q = getNext(currentAnswers);
+    setDraftMulti([]);
+    setDraftText("");
+    setDraftToggles({});
 
-  async function loadNext(currentAnswers: Record<string, any>, nextNumber: number) {
-    setLoading(true);
+    if (q) {
+      setQuestion(q);
+      setQuestionNumber(nextNumber);
+      return;
+    }
+
+    setQuestion(null);
+    setSubmitting(true);
     setError(null);
     try {
-      const q = await fetchNext(currentAnswers);
-      setQuestion(q);
-      setDraftMulti([]);
-      setDraftText("");
-      setDraftToggles({});
-      if (q) {
-        setQuestionNumber(nextNumber);
-      } else {
-        setSubmitting(true);
-        await onComplete(currentAnswers);
-      }
+      await onComplete(currentAnswers);
     } catch (e: any) {
       setError(e.message ?? "Something went wrong");
-    } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   }
 
@@ -64,7 +60,7 @@ export function QuizWizard({ title, subtitle, fetchNext, onComplete }: QuizWizar
     if (!question) return;
     const next = { ...answers, [question.id]: value };
     setAnswers(next);
-    loadNext(next, questionNumber + 1);
+    advance(next, questionNumber + 1);
   }
 
   if (submitting) {
@@ -90,12 +86,11 @@ export function QuizWizard({ title, subtitle, fetchNext, onComplete }: QuizWizar
         </div>
       )}
 
-      {loading && !question ? (
-        <div className="flex justify-center py-16">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent-500 border-t-transparent" />
-        </div>
-      ) : question ? (
-        <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-elevated)] p-6 shadow-sm">
+      {question && (
+        <div
+          key={question.id}
+          className="quiz-question-enter rounded-2xl border border-[var(--border)] bg-[var(--bg-elevated)] p-6 shadow-sm"
+        >
           <h2 className="mb-5 text-xl font-semibold">{question.prompt}</h2>
 
           {question.kind === "single" && (
@@ -204,7 +199,7 @@ export function QuizWizard({ title, subtitle, fetchNext, onComplete }: QuizWizar
             </>
           )}
         </div>
-      ) : null}
+      )}
     </div>
   );
 }

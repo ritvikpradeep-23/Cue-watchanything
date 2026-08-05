@@ -1,4 +1,5 @@
-import type { Platform, TagProfile, TitleSeed } from "@watch-recommender/shared";
+import type { Platform } from "../taxonomy";
+import type { TagProfile, TitleSeed } from "../types";
 import { scoreTitle } from "./scoreTitle";
 
 export interface HardFilters {

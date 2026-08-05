@@ -1,5 +1,4 @@
-import type { TagProfile } from "@watch-recommender/shared";
-import type { HardFilters } from "../scoring/buildDeck";
+import type { TagProfile, HardFilters } from "@watch-recommender/shared";
 import { prisma } from "./prisma";
 
 export interface StoredProfile {

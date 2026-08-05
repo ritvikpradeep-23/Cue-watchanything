@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeOnboardingProfile, getNextOnboardingQuestion } from "../quiz/onboarding";
+import { computeOnboardingProfile, getNextOnboardingQuestion } from "@watch-recommender/shared";
 import { TITLES } from "../../prisma/seed-data/titles";
 
 function answerFullQuiz(overrides: Record<string, any> = {}) {

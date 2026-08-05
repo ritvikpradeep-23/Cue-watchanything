@@ -80,13 +80,11 @@ export const TITLE_TYPES = ["show", "movie", "anime"] as const;
 export const PLATFORMS = [
   "Netflix",
   "Prime Video",
+  "Disney+ Hotstar",
+  "Apple TV",
   "Hulu",
-  "Disney+",
-  "Max",
   "Crunchyroll",
-  "Apple TV+",
-  "Peacock",
-  "Paramount+",
+  "HBO Max",
 ] as const;
 
 export type Genre = (typeof GENRES)[number];

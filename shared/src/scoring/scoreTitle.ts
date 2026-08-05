@@ -1,4 +1,4 @@
-import type { TagProfile, TitleSeed, TitleTags } from "@watch-recommender/shared";
+import type { TagProfile, TitleSeed, TitleTags } from "../types";
 
 /** Flattens every tag category on a title into one list of tag strings. */
 export function flattenTags(tags: TitleTags): string[] {

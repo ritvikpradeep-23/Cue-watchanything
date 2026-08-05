@@ -6,3 +6,9 @@ build/
 *.db
 *.db-journal
 .DS_Store
+
+.vercel
+.env*
+.agents/
+.claude/skills/
+skills-lock.json

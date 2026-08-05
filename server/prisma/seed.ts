@@ -36,7 +36,14 @@ async function main() {
 
   await prisma.$transaction(
     TITLES.map((t) => {
-      const posterUrl = resolvedPosterUrls[t.id] ?? t.poster_url;
+      // poster-urls.json is gitignored (local/CI artifact, not committed) so it won't exist in
+      // environments that only have the git-tracked source, e.g. Vercel's build. In that case
+      // resolvedPosterUrls is empty — update must NOT fall back to the placeholder there, or
+      // every deploy would clobber real poster art already resolved and stored on a prior run
+      // with a live resolution file. Only overwrite posterUrl on update when we actually have a
+      // freshly resolved one; otherwise leave whatever's already in the DB alone. create has no
+      // prior value to preserve, so it still falls back to the placeholder as before.
+      const resolvedPosterUrl = resolvedPosterUrls[t.id];
       return prisma.title.upsert({
         where: { id: t.id },
         create: {
@@ -50,7 +57,7 @@ async function main() {
           runtimeMinutes: t.runtime_minutes,
           releaseYear: t.release_year,
           platforms: JSON.stringify(t.platforms),
-          posterUrl,
+          posterUrl: resolvedPosterUrl ?? t.poster_url,
           tags: JSON.stringify(t.tags),
         },
         update: {
@@ -63,7 +70,7 @@ async function main() {
           runtimeMinutes: t.runtime_minutes,
           releaseYear: t.release_year,
           platforms: JSON.stringify(t.platforms),
-          posterUrl,
+          ...(resolvedPosterUrl ? { posterUrl: resolvedPosterUrl } : {}),
           tags: JSON.stringify(t.tags),
         },
       });

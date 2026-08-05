@@ -14,8 +14,9 @@
     "test:server": "npm run test --workspace server"
   },
   "allowScripts": {
-    "@prisma/engines@7.9.1": true,
     "esbuild@0.28.1": true,
-    "prisma@7.9.1": true
+    "@prisma/client@6.19.3": true,
+    "@prisma/engines@6.19.3": true,
+    "prisma@6.19.3": true
   }
 }

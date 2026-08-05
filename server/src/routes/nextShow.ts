@@ -1,0 +1,110 @@
+import { Router } from "express";
+import { requireAuth, AuthedRequest } from "../lib/auth";
+import { prisma } from "../lib/prisma";
+import { getAllTitleSeeds, getTitleSeedById, toApiTitle } from "../lib/titles";
+import { getLatestTagProfile, getSwipedTitleIds } from "../lib/userProfile";
+import { getNextNextShowQuestion, submitNextShow, computeNextShowDelta, NextShowContext } from "../quiz/nextShow";
+import { applyDelta } from "../scoring/delta";
+import { scoreTitle } from "../scoring/scoreTitle";
+import { passesHardFilters } from "../scoring/buildDeck";
+import { generateTagCheckQuestions } from "../scoring/tagCheckQuestion";
+
+export const nextShowRouter = Router();
+
+function parseJson(raw: unknown): Record<string, any> {
+  if (typeof raw !== "string") return {};
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+async function buildContext(userId: string, watchedTitleId: string): Promise<NextShowContext | { error: string; status: number }> {
+  const watchedTitle = getTitleSeedById(watchedTitleId);
+  if (!watchedTitle) return { error: "Watched title not found", status: 404 };
+
+  const profile = await getLatestTagProfile(userId, "onboarding");
+  if (!profile) return { error: "Complete the onboarding quiz first", status: 409 };
+
+  const excludedIds = await getSwipedTitleIds(userId);
+  return { baseProfile: profile.tagProfile, watchedTitle, allTitles: getAllTitleSeeds(), excludedIds };
+}
+
+nextShowRouter.get("/quiz-context/:watchedTitleId", (req, res) => {
+  const title = getTitleSeedById(req.params.watchedTitleId);
+  if (!title) return res.status(404).json({ error: "Watched title not found" });
+  res.json({ tagCheckQuestions: generateTagCheckQuestions(title) });
+});
+
+nextShowRouter.get("/next", requireAuth, async (req: AuthedRequest, res) => {
+  const watchedTitleId = req.query.watchedTitleId;
+  if (typeof watchedTitleId !== "string") {
+    return res.status(400).json({ error: "watchedTitleId is required" });
+  }
+  const ctx = await buildContext(req.user!.userId, watchedTitleId);
+  if ("error" in ctx) return res.status(ctx.status).json({ error: ctx.error });
+
+  const answers = parseJson(req.query.answers);
+  const question = getNextNextShowQuestion(answers, ctx);
+  res.json({ question });
+});
+
+nextShowRouter.post("/submit", requireAuth, async (req: AuthedRequest, res) => {
+  const { watchedTitleId, answers } = req.body ?? {};
+  if (typeof watchedTitleId !== "string" || !answers || typeof answers !== "object") {
+    return res.status(400).json({ error: "watchedTitleId and answers are required" });
+  }
+  const ctx = await buildContext(req.user!.userId, watchedTitleId);
+  if ("error" in ctx) return res.status(ctx.status).json({ error: ctx.error });
+
+  const result = submitNextShow(answers, ctx);
+
+  await prisma.quizResponse.create({
+    data: {
+      userId: req.user!.userId,
+      kind: "next_show",
+      answers: JSON.stringify(answers),
+      resultingTagProfile: JSON.stringify({ tagProfile: result.sessionProfile }),
+      watchedTitleId,
+    },
+  });
+
+  res.json({
+    picks: result.picks.map((t) => t.id),
+    titles: result.picks,
+    swappable: result.swappable,
+  });
+});
+
+nextShowRouter.post("/swap", requireAuth, async (req: AuthedRequest, res) => {
+  const { watchedTitleId, answers, keptTitleIds, swapOutTitleId } = req.body ?? {};
+  if (
+    typeof watchedTitleId !== "string" ||
+    !answers ||
+    typeof answers !== "object" ||
+    !Array.isArray(keptTitleIds) ||
+    typeof swapOutTitleId !== "string"
+  ) {
+    return res.status(400).json({ error: "watchedTitleId, answers, keptTitleIds, swapOutTitleId are required" });
+  }
+
+  const ctx = await buildContext(req.user!.userId, watchedTitleId);
+  if ("error" in ctx) return res.status(ctx.status).json({ error: ctx.error });
+
+  const delta = computeNextShowDelta(answers, ctx.watchedTitle, ctx.allTitles);
+  const sessionProfile = applyDelta(ctx.baseProfile, delta);
+
+  const excluded = new Set([...ctx.excludedIds, watchedTitleId, swapOutTitleId, ...keptTitleIds]);
+  const eligible = ctx.allTitles.filter((t) => !excluded.has(t.id) && passesHardFilters(t, {}));
+  const ranked = eligible
+    .map((title) => ({ title, score: scoreTitle(sessionProfile, title) }))
+    .sort((a, b) => b.score - a.score);
+
+  if (ranked.length === 0) {
+    return res.status(404).json({ error: "No eligible replacement found" });
+  }
+
+  res.json({ title: toApiTitle(await prisma.title.findUniqueOrThrow({ where: { id: ranked[0].title.id } })) });
+});

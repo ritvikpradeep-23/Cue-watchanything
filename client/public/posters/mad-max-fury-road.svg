@@ -1,0 +1,13 @@
+<svg viewBox="0 0 300 450" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g" gradientTransform="rotate(335)">
+      <stop offset="0%" stop-color="#f97316" />
+      <stop offset="100%" stop-color="#7f1d1d" />
+    </linearGradient>
+  </defs>
+  <rect width="300" height="450" fill="url(#g)" />
+  <rect width="300" height="450" fill="black" opacity="0.15" />
+  <text x="150" y="208" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="26" font-weight="700" fill="white" opacity="0.96">Mad Max: Fury</text>
+    <text x="150" y="242" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="26" font-weight="700" fill="white" opacity="0.96">Road</text>
+  <text x="150" y="410" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="13" letter-spacing="2" fill="white" opacity="0.75">MOVIE • 2015</text>
+</svg>

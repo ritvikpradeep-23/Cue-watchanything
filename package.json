@@ -1,0 +1,21 @@
+{
+  "name": "watch-recommender",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "client",
+    "server",
+    "shared"
+  ],
+  "scripts": {
+    "dev:client": "npm run dev --workspace client",
+    "dev:server": "npm run dev --workspace server",
+    "seed": "npm run seed --workspace server",
+    "test:server": "npm run test --workspace server"
+  },
+  "allowScripts": {
+    "@prisma/engines@7.9.1": true,
+    "esbuild@0.28.1": true,
+    "prisma@7.9.1": true
+  }
+}

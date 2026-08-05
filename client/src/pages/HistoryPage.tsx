@@ -1,0 +1,127 @@
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { PosterImage } from "../components/ui/PosterImage";
+import { apiGet, apiPost } from "../lib/api";
+
+interface HistoryItem {
+  id: string;
+  name: string;
+  posterUrl: string;
+  plotSummary: string;
+  watchedAt: string;
+  myRating: number | null;
+  myComment: string | null;
+}
+
+export function HistoryPage() {
+  const navigate = useNavigate();
+  const [items, setItems] = useState<HistoryItem[] | null>(null);
+  const [drafts, setDrafts] = useState<Record<string, { rating: number; comment: string }>>({});
+
+  async function load() {
+    const res = await apiGet<{ items: HistoryItem[] }>("/history");
+    setItems(res.items);
+  }
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  async function submitRating(titleId: string) {
+    const draft = drafts[titleId];
+    if (!draft || draft.rating < 1) return;
+    await apiPost(`/titles/${titleId}/ratings`, { rating: draft.rating, comment: draft.comment || undefined });
+    load();
+  }
+
+  if (!items) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent-500 border-t-transparent" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="mx-auto max-w-4xl px-4 py-10">
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Watched history</h1>
+          <p className="mt-1 text-sm text-[var(--text-muted)]">Rate what you've finished, and get 3 picks for what's next.</p>
+        </div>
+        {items.length > 0 && (
+          <Link
+            to={`/next-show/${items[0].id}`}
+            className="rounded-xl bg-accent-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-accent-600"
+          >
+            Pick next show
+          </Link>
+        )}
+      </div>
+
+      {items.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-[var(--border)] p-10 text-center text-[var(--text-muted)]">
+          Nothing marked watched yet. Mark something from your{" "}
+          <button onClick={() => navigate("/watchlist")} className="text-accent-500 hover:underline">
+            watchlist
+          </button>
+          .
+        </div>
+      ) : (
+        <div className="flex flex-col gap-4">
+          {items.map((item) => {
+            const draft = drafts[item.id] ?? { rating: item.myRating ?? 0, comment: item.myComment ?? "" };
+            return (
+              <div key={item.id} className="flex gap-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-elevated)] p-4">
+                <Link to={`/titles/${item.id}`} className="shrink-0">
+                  <PosterImage src={item.posterUrl} alt={item.name} className="h-32 w-24 rounded-lg" />
+                </Link>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <Link to={`/titles/${item.id}`} className="font-semibold hover:text-accent-500">
+                      {item.name}
+                    </Link>
+                    <Link to={`/next-show/${item.id}`} className="text-xs font-medium text-accent-500 hover:underline">
+                      Pick next from this →
+                    </Link>
+                  </div>
+                  <p className="mt-1 line-clamp-2 text-sm text-[var(--text-muted)]">{item.plotSummary}</p>
+
+                  <div className="mt-3 flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <button
+                        key={n}
+                        onClick={() =>
+                          setDrafts((prev) => ({ ...prev, [item.id]: { ...draft, rating: n } }))
+                        }
+                        className={`text-xl ${n <= draft.rating ? "text-accent-500" : "text-[var(--border)]"}`}
+                      >
+                        ★
+                      </button>
+                    ))}
+                  </div>
+                  <input
+                    type="text"
+                    value={draft.comment}
+                    onChange={(e) =>
+                      setDrafts((prev) => ({ ...prev, [item.id]: { ...draft, comment: e.target.value } }))
+                    }
+                    placeholder="Optional comment"
+                    className="mt-2 w-full rounded-lg border border-[var(--border)] bg-transparent px-3 py-1.5 text-sm outline-none focus:border-accent-500"
+                  />
+                  <button
+                    onClick={() => submitRating(item.id)}
+                    disabled={draft.rating < 1}
+                    className="mt-2 rounded-lg bg-accent-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent-600 disabled:opacity-40"
+                  >
+                    {item.myRating ? "Update rating" : "Save rating"}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}

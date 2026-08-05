@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum TitleType {
+  show
+  movie
+  anime
+}
+
+enum ActionType {
+  pass
+  like
+  super_like
+  watched
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  passwordHash  String
+  createdAt     DateTime @default(now())
+  role          Role     @default(USER)
+
+  actions       UserTitleAction[]
+  ratings       Rating[]
+  quizResponses QuizResponse[]
+}
+
+model Title {
+  id              String   @id @default(uuid())
+  name            String
+  type            TitleType
+  plotSummary     String
+  cast            String   // JSON-encoded string[] (SQLite has no native array type)
+  seasons         Int?
+  episodes        Int?
+  runtimeMinutes  Int?
+  releaseYear     Int
+  platforms       String   // JSON-encoded string[]
+  posterUrl       String
+  tags            String   // JSON-encoded TitleTags object
+
+  actions         UserTitleAction[]
+  ratings         Rating[]
+
+  @@index([type])
+}
+
+model UserTitleAction {
+  id        String     @id @default(uuid())
+  userId    String
+  titleId   String
+  action    ActionType
+  createdAt DateTime   @default(now())
+
+  user      User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     Title @relation(fields: [titleId], references: [id], onDelete: Cascade)
+
+  @@index([userId, action])
+  @@index([titleId])
+}
+
+model Rating {
+  id        String   @id @default(uuid())
+  userId    String
+  titleId   String
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+
+  user      User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     Title @relation(fields: [titleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, titleId])
+  @@index([titleId])
+}
+
+model QuizResponse {
+  id                  String   @id @default(uuid())
+  userId              String
+  kind                String   // "onboarding" | "next_show"
+  answers             String   // JSON-encoded question_id -> answer
+  resultingTagProfile String   // JSON-encoded tag -> weight
+  watchedTitleId      String?  // set for next_show responses
+  createdAt           DateTime @default(now())
+
+  user                User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, kind, createdAt])
+}

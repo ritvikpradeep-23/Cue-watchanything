@@ -1,0 +1,12 @@
+<svg viewBox="0 0 300 450" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g" gradientTransform="rotate(324)">
+      <stop offset="0%" stop-color="#06b6d4" />
+      <stop offset="100%" stop-color="#4c1d95" />
+    </linearGradient>
+  </defs>
+  <rect width="300" height="450" fill="url(#g)" />
+  <rect width="300" height="450" fill="black" opacity="0.15" />
+  <text x="150" y="225" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="26" font-weight="700" fill="white" opacity="0.96">Cowboy Bebop</text>
+  <text x="150" y="410" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="13" letter-spacing="2" fill="white" opacity="0.75">ANIME • 1998</text>
+</svg>

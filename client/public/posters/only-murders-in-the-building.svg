@@ -1,13 +1,19 @@
 <svg viewBox="0 0 300 450" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="g" gradientTransform="rotate(46)">
-      <stop offset="0%" stop-color="#f59e0b" />
-      <stop offset="100%" stop-color="#ec4899" />
-    </linearGradient>
+    <pattern id="dots-only-murders-in-the-building" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(6)">
+      <circle cx="2" cy="2" r="1.3" fill="#1a1410" opacity="0.16" />
+    </pattern>
   </defs>
-  <rect width="300" height="450" fill="url(#g)" />
-  <rect width="300" height="450" fill="black" opacity="0.15" />
-  <text x="150" y="208" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="26" font-weight="700" fill="white" opacity="0.96">Only Murders in</text>
-    <text x="150" y="242" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="26" font-weight="700" fill="white" opacity="0.96">the Building</text>
-  <text x="150" y="410" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="13" letter-spacing="2" fill="white" opacity="0.75">SHOW • 2021</text>
+  <rect width="300" height="450" fill="#fbf3ea" />
+  <rect width="300" height="300" fill="#f97316" />
+  <rect width="300" height="300" fill="url(#dots-only-murders-in-the-building)" />
+  <rect x="0" y="294" width="300" height="6" fill="#1a1410" />
+  <rect width="300" height="450" fill="none" stroke="#1a1410" stroke-width="10" />
+  <circle cx="252" cy="48" r="30" fill="#fbf3ea" stroke="#1a1410" stroke-width="4" />
+  <text x="252" y="59" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="30" font-weight="900" fill="#1a1410">O</text>
+  <rect width="300" height="150" y="300" fill="#1a1410" />
+  <text x="24" y="316" font-family="'Segoe UI', Arial, sans-serif" font-size="25" font-weight="900" letter-spacing="-0.5" fill="#fbf3ea">ONLY MURDERS</text>
+    <text x="24" y="346" font-family="'Segoe UI', Arial, sans-serif" font-size="25" font-weight="900" letter-spacing="-0.5" fill="#fbf3ea">IN THE</text>
+    <text x="24" y="376" font-family="'Segoe UI', Arial, sans-serif" font-size="25" font-weight="900" letter-spacing="-0.5" fill="#fbf3ea">BUILDING</text>
+  <text x="24" y="420" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" letter-spacing="2" fill="#f97316">SHOW • 2021</text>
 </svg>

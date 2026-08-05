@@ -49,20 +49,20 @@ export function SwipePage() {
 
   return (
     <div className="mx-auto flex max-w-md flex-col items-center px-4 py-10">
-      <h1 className="mb-1 text-2xl font-bold">Swipe deck</h1>
-      <p className="mb-8 text-sm text-[var(--text-muted)]">
+      <h1 className="mb-1 text-3xl font-black uppercase">Swipe deck</h1>
+      <p className="mb-8 text-sm font-bold text-[var(--text-muted)]">
         {deck.length > 0 ? `${deck.length} left in this batch` : "You've been through the whole batch"}
       </p>
 
       <div className="relative h-[520px] w-full">
         {deck.length === 0 ? (
-          <div className="flex h-full flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--border)] p-8 text-center">
-            <p className="mb-4 text-[var(--text-muted)]">
+          <div className="pop-panel flex h-full flex-col items-center justify-center p-8 text-center">
+            <p className="mb-4 font-semibold text-[var(--text-muted)]">
               That's everything scored highly for your taste profile right now.
             </p>
             <button
               onClick={() => navigate("/watchlist")}
-              className="rounded-xl bg-accent-500 px-5 py-2.5 font-semibold text-white hover:bg-accent-600"
+              className="pop-pressable bg-accent-500 px-5 py-2.5 font-black uppercase text-[var(--ink)]"
             >
               View watchlist
             </button>
@@ -88,21 +88,21 @@ export function SwipePage() {
           <button
             onClick={() => handleSwipe("pass")}
             aria-label="Pass"
-            className="flex h-14 w-14 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--bg-elevated)] text-2xl text-rose-500 shadow-md hover:scale-105 transition-transform"
+            className="pop-pressable flex h-14 w-14 items-center justify-center rounded-full bg-[var(--bg-elevated)] text-2xl text-rose-500"
           >
             ✕
           </button>
           <button
             onClick={() => handleSwipe("super_like")}
             aria-label="Super like"
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--bg-elevated)] text-xl text-amber-400 shadow-md hover:scale-105 transition-transform"
+            className="pop-pressable flex h-12 w-12 items-center justify-center rounded-full bg-[var(--bg-elevated)] text-xl text-amber-500"
           >
             ★
           </button>
           <button
             onClick={() => handleSwipe("like")}
             aria-label="Like"
-            className="flex h-14 w-14 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--bg-elevated)] text-2xl text-emerald-500 shadow-md hover:scale-105 transition-transform"
+            className="pop-pressable flex h-14 w-14 items-center justify-center rounded-full bg-accent-500 text-2xl text-[var(--ink)]"
           >
             ♥
           </button>

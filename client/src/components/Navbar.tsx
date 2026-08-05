@@ -4,14 +4,14 @@ import { useAuth } from "../lib/auth-context";
 import { useTheme } from "../lib/theme-context";
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  `px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+  `px-3 py-1.5 rounded-full text-sm font-bold uppercase tracking-wide transition-colors border-2 ${
     isActive
-      ? "text-accent-500 bg-[var(--bg-sunken)]"
-      : "text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--bg-sunken)]"
+      ? "text-[var(--bg-elevated)] bg-[var(--ink)] border-[var(--ink)]"
+      : "text-[var(--text)] border-transparent hover:border-[var(--ink)]"
   }`;
 
 export function Navbar() {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -22,6 +22,7 @@ export function Navbar() {
         { to: "/watchlist", label: "Watchlist" },
         { to: "/history", label: "History" },
         { to: "/profile", label: "Profile" },
+        ...(user?.role === "ADMIN" ? [{ to: "/admin/add-title", label: "Add title" }] : []),
       ]
     : [];
 
@@ -31,11 +32,14 @@ export function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--bg-elevated)]/90 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b-[3px] border-[var(--ink)] bg-[var(--bg-elevated)]">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        <Link to="/" className="flex items-center gap-2 text-lg font-bold tracking-tight">
-          <span className="inline-block h-6 w-6 rounded-md bg-gradient-to-br from-accent-400 to-accent-700" />
-          What Should I Watch
+        <Link to="/" className="flex items-center gap-2.5 text-lg font-black uppercase tracking-tight">
+          <span className="pop-panel flex h-8 w-8 items-center justify-center bg-accent-500 text-sm font-black text-[var(--ink)]">
+            ?
+          </span>
+          <span className="hidden sm:inline">What Should I Watch</span>
+          <span className="sm:hidden">WSIW</span>
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
@@ -47,14 +51,14 @@ export function Navbar() {
           <button
             onClick={toggleTheme}
             aria-label="Toggle theme"
-            className="ml-2 rounded-lg border border-[var(--border)] px-3 py-2 text-sm text-[var(--text-muted)] hover:text-[var(--text)]"
+            className="pop-pressable ml-2 bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-bold uppercase text-[var(--text)]"
           >
             {theme === "dark" ? "Light" : "Dark"}
           </button>
           {isAuthenticated ? (
             <button
               onClick={handleLogout}
-              className="ml-1 rounded-lg bg-[var(--bg-sunken)] px-3 py-2 text-sm font-medium hover:opacity-80"
+              className="pop-pressable ml-1 bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-bold uppercase text-[var(--text)]"
             >
               Log out
             </button>
@@ -65,7 +69,7 @@ export function Navbar() {
               </NavLink>
               <Link
                 to="/signup"
-                className="ml-1 rounded-lg bg-accent-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-accent-600"
+                className="pop-pressable ml-1 bg-accent-500 px-4 py-1.5 text-xs font-black uppercase text-[var(--ink)]"
               >
                 Get started
               </Link>
@@ -74,7 +78,7 @@ export function Navbar() {
         </nav>
 
         <button
-          className="rounded-lg border border-[var(--border)] p-2 md:hidden"
+          className="pop-pressable p-2 md:hidden"
           aria-label="Toggle menu"
           onClick={() => setOpen((o) => !o)}
         >
@@ -85,7 +89,7 @@ export function Navbar() {
       </div>
 
       {open && (
-        <nav className="flex flex-col gap-1 border-t border-[var(--border)] px-4 py-3 md:hidden">
+        <nav className="flex flex-col gap-2 border-t-[3px] border-[var(--ink)] px-4 py-3 md:hidden">
           {links.map((l) => (
             <NavLink key={l.to} to={l.to} className={navLinkClass} onClick={() => setOpen(false)}>
               {l.label}
@@ -96,7 +100,7 @@ export function Navbar() {
               toggleTheme();
               setOpen(false);
             }}
-            className="rounded-lg px-3 py-2 text-left text-sm text-[var(--text-muted)]"
+            className="pop-pressable bg-[var(--bg-elevated)] px-3 py-2 text-left text-sm font-bold uppercase"
           >
             {theme === "dark" ? "Switch to light" : "Switch to dark"}
           </button>
@@ -106,7 +110,7 @@ export function Navbar() {
                 handleLogout();
                 setOpen(false);
               }}
-              className="rounded-lg bg-[var(--bg-sunken)] px-3 py-2 text-left text-sm font-medium"
+              className="pop-pressable bg-[var(--bg-elevated)] px-3 py-2 text-left text-sm font-bold uppercase"
             >
               Log out
             </button>
@@ -118,7 +122,7 @@ export function Navbar() {
               <Link
                 to="/signup"
                 onClick={() => setOpen(false)}
-                className="rounded-lg bg-accent-500 px-3 py-2 text-center text-sm font-semibold text-white"
+                className="pop-pressable bg-accent-500 px-3 py-2 text-center text-sm font-black uppercase text-[var(--ink)]"
               >
                 Get started
               </Link>

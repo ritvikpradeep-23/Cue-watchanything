@@ -27,18 +27,18 @@ function parseJson(raw: unknown): Record<string, any> {
 }
 
 async function buildContext(userId: string, watchedTitleId: string): Promise<NextShowContext | { error: string; status: number }> {
-  const watchedTitle = getTitleSeedById(watchedTitleId);
+  const watchedTitle = await getTitleSeedById(watchedTitleId);
   if (!watchedTitle) return { error: "Watched title not found", status: 404 };
 
   const profile = await getLatestTagProfile(userId, "onboarding");
   if (!profile) return { error: "Complete the onboarding quiz first", status: 409 };
 
   const excludedIds = await getSwipedTitleIds(userId);
-  return { baseProfile: profile.tagProfile, watchedTitle, allTitles: getAllTitleSeeds(), excludedIds };
+  return { baseProfile: profile.tagProfile, watchedTitle, allTitles: await getAllTitleSeeds(), excludedIds };
 }
 
-nextShowRouter.get("/quiz-context/:watchedTitleId", (req, res) => {
-  const title = getTitleSeedById(req.params.watchedTitleId);
+nextShowRouter.get("/quiz-context/:watchedTitleId", async (req, res) => {
+  const title = await getTitleSeedById(String(req.params.watchedTitleId));
   if (!title) return res.status(404).json({ error: "Watched title not found" });
   res.json({ tagCheckQuestions: generateTagCheckQuestions(title) });
 });

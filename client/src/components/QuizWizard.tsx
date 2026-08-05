@@ -75,23 +75,20 @@ export function QuizWizard({ title, subtitle, getNext, onComplete }: QuizWizardP
   return (
     <div className="mx-auto max-w-xl px-4 py-10">
       <div className="mb-6 text-center">
-        <p className="text-sm font-medium uppercase tracking-wider text-accent-500">{title}</p>
-        {subtitle && <p className="mt-1 text-sm text-[var(--text-muted)]">{subtitle}</p>}
-        <p className="mt-3 text-xs text-[var(--text-muted)]">Question {questionNumber + 1}</p>
+        <p className="pop-badge inline-flex bg-accent-500 px-3 py-1 text-xs text-[var(--ink)]">{title}</p>
+        {subtitle && <p className="mt-2 text-sm font-medium text-[var(--text-muted)]">{subtitle}</p>}
+        <p className="mt-3 text-xs font-bold uppercase text-[var(--text-muted)]">Question {questionNumber + 1}</p>
       </div>
 
       {error && (
-        <div className="mb-4 rounded-lg border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-500">
+        <div className="pop-panel mb-4 bg-red-100 px-4 py-3 text-sm font-bold text-red-700">
           {error}
         </div>
       )}
 
       {question && (
-        <div
-          key={question.id}
-          className="quiz-question-enter rounded-2xl border border-[var(--border)] bg-[var(--bg-elevated)] p-6 shadow-sm"
-        >
-          <h2 className="mb-5 text-xl font-semibold">{question.prompt}</h2>
+        <div key={question.id} className="quiz-question-enter pop-panel bg-[var(--bg-elevated)] p-6">
+          <h2 className="mb-5 text-2xl font-black uppercase leading-tight">{question.prompt}</h2>
 
           {question.kind === "single" && (
             <div className="flex flex-col gap-2">
@@ -99,7 +96,7 @@ export function QuizWizard({ title, subtitle, getNext, onComplete }: QuizWizardP
                 <button
                   key={o.value}
                   onClick={() => submitAnswer(o.value)}
-                  className="rounded-xl border border-[var(--border)] px-4 py-3 text-left text-sm font-medium transition-colors hover:border-accent-500 hover:bg-[var(--bg-sunken)]"
+                  className="pop-pressable bg-[var(--bg-elevated)] px-4 py-3 text-left text-sm font-bold hover:bg-accent-500 hover:text-[var(--ink)]"
                 >
                   {o.label}
                 </button>
@@ -120,10 +117,8 @@ export function QuizWizard({ title, subtitle, getNext, onComplete }: QuizWizardP
                           selected ? prev.filter((v) => v !== o.value) : [...prev, o.value],
                         )
                       }
-                      className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
-                        selected
-                          ? "border-accent-500 bg-accent-500 text-white"
-                          : "border-[var(--border)] hover:border-accent-500"
+                      className={`pop-badge px-4 py-2 text-sm ${
+                        selected ? "bg-accent-500 text-[var(--ink)]" : "bg-[var(--bg-elevated)] text-[var(--text)]"
                       }`}
                     >
                       {o.label}
@@ -133,7 +128,7 @@ export function QuizWizard({ title, subtitle, getNext, onComplete }: QuizWizardP
               </div>
               <button
                 onClick={() => submitAnswer(draftMulti)}
-                className="mt-6 w-full rounded-xl bg-accent-500 px-4 py-3 font-semibold text-white hover:bg-accent-600"
+                className="pop-pressable mt-6 w-full bg-accent-500 px-4 py-3 font-black uppercase text-[var(--ink)]"
               >
                 Continue
               </button>
@@ -147,7 +142,7 @@ export function QuizWizard({ title, subtitle, getNext, onComplete }: QuizWizardP
                 value={draftText}
                 onChange={(e) => setDraftText(e.target.value)}
                 placeholder="Comma-separated, e.g. Breaking Bad, Parasite"
-                className="w-full rounded-xl border border-[var(--border)] bg-transparent px-4 py-3 text-sm outline-none focus:border-accent-500"
+                className="w-full rounded-xl border-2 border-[var(--ink)] bg-transparent px-4 py-3 text-sm outline-none"
               />
               <button
                 onClick={() =>
@@ -158,7 +153,7 @@ export function QuizWizard({ title, subtitle, getNext, onComplete }: QuizWizardP
                       .filter(Boolean),
                   )
                 }
-                className="mt-4 w-full rounded-xl bg-accent-500 px-4 py-3 font-semibold text-white hover:bg-accent-600"
+                className="pop-pressable mt-4 w-full bg-accent-500 px-4 py-3 font-black uppercase text-[var(--ink)]"
               >
                 Continue
               </button>
@@ -170,16 +165,16 @@ export function QuizWizard({ title, subtitle, getNext, onComplete }: QuizWizardP
               <div className="flex flex-col gap-4">
                 {question.toggles?.map((t) => (
                   <div key={t.key}>
-                    <p className="mb-2 text-sm text-[var(--text-muted)]">{t.label}</p>
+                    <p className="mb-2 text-sm font-bold text-[var(--text-muted)]">{t.label}</p>
                     <div className="flex gap-2">
                       {t.options.map((o) => (
                         <button
                           key={o.value}
                           onClick={() => setDraftToggles((prev) => ({ ...prev, [t.key]: o.value }))}
-                          className={`rounded-full border px-4 py-2 text-sm font-medium ${
+                          className={`pop-badge px-4 py-2 text-sm ${
                             draftToggles[t.key] === o.value
-                              ? "border-accent-500 bg-accent-500 text-white"
-                              : "border-[var(--border)] hover:border-accent-500"
+                              ? "bg-accent-500 text-[var(--ink)]"
+                              : "bg-[var(--bg-elevated)] text-[var(--text)]"
                           }`}
                         >
                           {o.label}
@@ -192,7 +187,7 @@ export function QuizWizard({ title, subtitle, getNext, onComplete }: QuizWizardP
               <button
                 disabled={!question.toggles?.every((t) => draftToggles[t.key])}
                 onClick={() => submitAnswer(draftToggles)}
-                className="mt-6 w-full rounded-xl bg-accent-500 px-4 py-3 font-semibold text-white hover:bg-accent-600 disabled:opacity-40"
+                className="pop-pressable mt-6 w-full bg-accent-500 px-4 py-3 font-black uppercase text-[var(--ink)] disabled:opacity-40"
               >
                 Continue
               </button>

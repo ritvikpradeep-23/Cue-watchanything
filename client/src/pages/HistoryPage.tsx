@@ -46,13 +46,13 @@ export function HistoryPage() {
     <div className="mx-auto max-w-4xl px-4 py-10">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Watched history</h1>
-          <p className="mt-1 text-sm text-[var(--text-muted)]">Rate what you've finished, and get 3 picks for what's next.</p>
+          <h1 className="text-3xl font-black uppercase">Watched history</h1>
+          <p className="mt-1 text-sm font-bold text-[var(--text-muted)]">Rate what you've finished, and get 3 picks for what's next.</p>
         </div>
         {items.length > 0 && (
           <Link
             to={`/next-show/${items[0].id}`}
-            className="rounded-xl bg-accent-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-accent-600"
+            className="pop-pressable bg-accent-500 px-4 py-2.5 text-sm font-black uppercase text-[var(--ink)]"
           >
             Pick next show
           </Link>
@@ -60,9 +60,9 @@ export function HistoryPage() {
       </div>
 
       {items.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-[var(--border)] p-10 text-center text-[var(--text-muted)]">
+        <div className="pop-panel p-10 text-center font-semibold text-[var(--text-muted)]">
           Nothing marked watched yet. Mark something from your{" "}
-          <button onClick={() => navigate("/watchlist")} className="text-accent-500 hover:underline">
+          <button onClick={() => navigate("/watchlist")} className="font-black text-accent-600 hover:underline">
             watchlist
           </button>
           .
@@ -72,16 +72,16 @@ export function HistoryPage() {
           {items.map((item) => {
             const draft = drafts[item.id] ?? { rating: item.myRating ?? 0, comment: item.myComment ?? "" };
             return (
-              <div key={item.id} className="flex gap-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-elevated)] p-4">
+              <div key={item.id} className="pop-panel flex gap-4 bg-[var(--bg-elevated)] p-4">
                 <Link to={`/titles/${item.id}`} className="shrink-0">
-                  <PosterImage src={item.posterUrl} alt={item.name} className="h-32 w-24 rounded-lg" />
+                  <PosterImage src={item.posterUrl} alt={item.name} className="h-32 w-24 rounded-lg border-2 border-[var(--ink)]" />
                 </Link>
                 <div className="flex-1">
                   <div className="flex items-center justify-between gap-2">
-                    <Link to={`/titles/${item.id}`} className="font-semibold hover:text-accent-500">
+                    <Link to={`/titles/${item.id}`} className="font-black uppercase hover:text-accent-600">
                       {item.name}
                     </Link>
-                    <Link to={`/next-show/${item.id}`} className="text-xs font-medium text-accent-500 hover:underline">
+                    <Link to={`/next-show/${item.id}`} className="text-xs font-bold text-accent-600 hover:underline">
                       Pick next from this →
                     </Link>
                   </div>
@@ -107,12 +107,12 @@ export function HistoryPage() {
                       setDrafts((prev) => ({ ...prev, [item.id]: { ...draft, comment: e.target.value } }))
                     }
                     placeholder="Optional comment"
-                    className="mt-2 w-full rounded-lg border border-[var(--border)] bg-transparent px-3 py-1.5 text-sm outline-none focus:border-accent-500"
+                    className="mt-2 w-full rounded-lg border-2 border-[var(--ink)] bg-transparent px-3 py-1.5 text-sm outline-none"
                   />
                   <button
                     onClick={() => submitRating(item.id)}
                     disabled={draft.rating < 1}
-                    className="mt-2 rounded-lg bg-accent-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent-600 disabled:opacity-40"
+                    className="pop-pressable mt-2 bg-accent-500 px-3 py-1.5 text-xs font-black uppercase text-[var(--ink)] disabled:opacity-40"
                   >
                     {item.myRating ? "Update rating" : "Save rating"}
                   </button>

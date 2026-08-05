@@ -28,7 +28,7 @@ quizRouter.post("/submit", requireAuth, async (req: AuthedRequest, res) => {
     return res.status(400).json({ error: "answers object is required" });
   }
 
-  const { tagProfile, filters } = computeOnboardingProfile(answers, getAllTitleSeeds());
+  const { tagProfile, filters } = computeOnboardingProfile(answers, await getAllTitleSeeds());
 
   await prisma.quizResponse.create({
     data: {

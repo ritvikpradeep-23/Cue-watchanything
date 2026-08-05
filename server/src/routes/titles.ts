@@ -5,6 +5,12 @@ import { toApiTitle } from "../lib/titles";
 
 export const titlesRouter = Router();
 
+/** Full catalog, lightweight — used to build the dashboard's category carousels (no scoring/auth needed). */
+titlesRouter.get("/", async (_req, res) => {
+  const titles = await prisma.title.findMany({ orderBy: { name: "asc" } });
+  res.json({ titles: titles.map(toApiTitle) });
+});
+
 async function ratingSummary(titleId: string) {
   const agg = await prisma.rating.aggregate({
     where: { titleId },

@@ -7,8 +7,9 @@ export interface DeckTitle {
   type: string;
   plotSummary: string;
   posterUrl: string;
-  tags: { genre: string[] };
+  tags: { genre: string[]; recency?: string[] };
   releaseYear: number;
+  platforms?: string[];
 }
 
 type SwipeDirection = "pass" | "like" | "super_like";
@@ -107,7 +108,7 @@ export function SwipeCard({ title, stackIndex, onSwipe, onOpenDetail }: SwipeCar
       onPointerCancel={handlePointerUp}
       onClick={handleClick}
     >
-      <div className="relative flex h-full w-full flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-elevated)] shadow-xl">
+      <div className="pop-panel relative flex h-full w-full flex-col overflow-hidden bg-[var(--bg-elevated)]">
         <div className="relative flex-1 overflow-hidden">
           <PosterImage
             src={title.posterUrl}
@@ -152,14 +153,14 @@ export function SwipeCard({ title, stackIndex, onSwipe, onOpenDetail }: SwipeCar
             </>
           )}
 
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent p-4">
-            <h3 className="text-lg font-bold text-white">{title.name}</h3>
-            <p className="mt-1 line-clamp-2 text-sm text-white/80">{title.plotSummary}</p>
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-4 pt-10">
+            <h3 className="text-xl font-black uppercase tracking-tight text-white">{title.name}</h3>
+            <p className="mt-1 line-clamp-2 text-sm font-medium text-white/85">{title.plotSummary}</p>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {title.tags.genre.slice(0, 3).map((g) => (
                 <span
                   key={g}
-                  className="rounded-full bg-white/15 px-2 py-0.5 text-xs font-medium capitalize text-white"
+                  className="pop-badge border-white/70 bg-accent-500 px-2 py-0.5 text-[10px] text-[var(--ink)]"
                 >
                   {g}
                 </span>

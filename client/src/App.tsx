@@ -1,7 +1,8 @@
 import { Routes, Route } from "react-router-dom";
 import { Navbar } from "./components/Navbar";
+import { NotSureFab } from "./components/NotSureFab";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import { LandingPage } from "./pages/LandingPage";
+import { HomeRoute } from "./pages/HomeRoute";
 import { SignupPage } from "./pages/SignupPage";
 import { LoginPage } from "./pages/LoginPage";
 import { QuizPage } from "./pages/QuizPage";
@@ -11,6 +12,7 @@ import { WatchlistPage } from "./pages/WatchlistPage";
 import { HistoryPage } from "./pages/HistoryPage";
 import { NextShowPage } from "./pages/NextShowPage";
 import { ProfilePage } from "./pages/ProfilePage";
+import { AdminAddTitlePage } from "./pages/AdminAddTitlePage";
 
 function App() {
   return (
@@ -18,7 +20,7 @@ function App() {
       <Navbar />
       <main className="flex-1">
         <Routes>
-          <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={<HomeRoute />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/titles/:id" element={<TitleDetailPage />} />
@@ -70,8 +72,17 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/admin/add-title"
+            element={
+              <ProtectedRoute>
+                <AdminAddTitlePage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </main>
+      <NotSureFab />
     </div>
   );
 }

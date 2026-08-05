@@ -13,7 +13,7 @@ deckRouter.get("/", requireAuth, async (req: AuthedRequest, res) => {
   }
 
   const excludedIds = await getSwipedTitleIds(req.user!.userId);
-  const deck = buildDeck(profile.tagProfile, getAllTitleSeeds(), {
+  const deck = buildDeck(profile.tagProfile, await getAllTitleSeeds(), {
     excludedIds,
     filters: profile.filters,
   });

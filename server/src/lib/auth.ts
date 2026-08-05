@@ -47,3 +47,13 @@ export function requireAuth(req: AuthedRequest, res: Response, next: NextFunctio
     res.status(401).json({ error: "Invalid or expired token" });
   }
 }
+
+/** Must run after requireAuth. Role is baked into the JWT at login time — a freshly
+ * promoted admin needs to log out/in again before this passes. */
+export function requireAdmin(req: AuthedRequest, res: Response, next: NextFunction) {
+  if (req.user?.role !== "ADMIN") {
+    res.status(403).json({ error: "Admin access required" });
+    return;
+  }
+  next();
+}

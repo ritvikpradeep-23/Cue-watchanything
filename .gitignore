@@ -12,3 +12,4 @@ build/
 .agents/
 .claude/skills/
 skills-lock.json
+server/scripts/poster-urls.json

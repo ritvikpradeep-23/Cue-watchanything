@@ -4,7 +4,9 @@ import type {
   ContentRating,
   EraSetting,
   Genre,
+  Industry,
   Intensity,
+  Language,
   LengthBucket,
   LoveFactor,
   Mood,
@@ -34,6 +36,10 @@ export interface RawTitle {
   runtime?: number;
   year: number;
   platforms: Platform[];
+  /** original/audio language(s) — defaults to ["English"], or the anime default below, when omitted */
+  language?: Language[];
+  /** regional film/TV industry — defaults to ["Hollywood"], or the anime default below, when omitted */
+  industry?: Industry[];
   genre: Genre[];
   mood: Mood[];
   pace: Pace[];
@@ -50,6 +56,22 @@ export interface RawTitle {
   love: LoveFactor[];
 }
 
+/** Default language/industry when a raw title doesn't specify one — anime defaults to
+ * Japanese-language / Japanese Animation (plus English audio if dubbed), everything else
+ * defaults to English/Hollywood. Exceptions (Korean, Indian, and other non-English titles)
+ * are tagged explicitly per-entry in the batch files that introduce them. */
+function defaultLanguage(r: RawTitle): Language[] {
+  if (r.type === "anime") {
+    return r.sub_dub?.includes("dub-available") ? ["Japanese", "English"] : ["Japanese"];
+  }
+  return ["English"];
+}
+
+function defaultIndustry(r: RawTitle): Industry[] {
+  if (r.type === "anime") return ["Japanese Animation"];
+  return ["Hollywood"];
+}
+
 export function build(r: RawTitle): TitleSeed {
   return {
     id: r.id,
@@ -62,6 +84,7 @@ export function build(r: RawTitle): TitleSeed {
     runtime_minutes: r.runtime ?? null,
     release_year: r.year,
     platforms: r.platforms,
+    languages: r.language ?? defaultLanguage(r),
     poster_url: `/posters/${r.id}.svg`,
     tags: {
       genre: r.genre,
@@ -78,6 +101,7 @@ export function build(r: RawTitle): TitleSeed {
       recency: r.recency,
       length_bucket: r.length,
       love_factor: r.love,
+      industry: r.industry ?? defaultIndustry(r),
     },
   };
 }

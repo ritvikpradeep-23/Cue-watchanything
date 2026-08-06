@@ -87,6 +87,36 @@ export const PLATFORMS = [
   "HBO Max",
 ] as const;
 
+/** Original/audio language a title is available in — a HARD FILTER (see scoring/buildDeck),
+ * never a weighted tag. "any" is a quiz-only sentinel meaning "don't filter by language". */
+export const LANGUAGES = [
+  "English",
+  "Hindi",
+  "Telugu",
+  "Tamil",
+  "Malayalam",
+  "Korean",
+  "Japanese",
+  "Spanish",
+  "German",
+  "French",
+] as const;
+
+/** Regional film/TV industry a title was produced in — a soft weighted preference (see
+ * TitleTags.industry), same pattern as genre. */
+export const INDUSTRIES = [
+  "Hollywood",
+  "Bollywood",
+  "Tollywood",
+  "Kollywood",
+  "Mollywood",
+  "Korean Cinema",
+  "Japanese Cinema",
+  "Japanese Animation",
+  "European Cinema",
+  "Latin American Cinema",
+] as const;
+
 export type Genre = (typeof GENRES)[number];
 export type Mood = (typeof MOODS)[number];
 export type Pace = (typeof PACES)[number];
@@ -103,6 +133,8 @@ export type LengthBucket = (typeof LENGTH_BUCKETS)[number];
 export type LoveFactor = (typeof LOVE_FACTORS)[number];
 export type TitleType = (typeof TITLE_TYPES)[number];
 export type Platform = (typeof PLATFORMS)[number];
+export type Language = (typeof LANGUAGES)[number];
+export type Industry = (typeof INDUSTRIES)[number];
 
 /** Every valid tag string across every category, flattened — used for delta/weight maps. */
 export type Tag =
@@ -119,7 +151,8 @@ export type Tag =
   | CompletionStatus
   | Recency
   | LengthBucket
-  | LoveFactor;
+  | LoveFactor
+  | Industry;
 
 export const ALL_TAGS: Tag[] = [
   ...GENRES,
@@ -136,6 +169,7 @@ export const ALL_TAGS: Tag[] = [
   ...RECENCIES,
   ...LENGTH_BUCKETS,
   ...LOVE_FACTORS,
+  ...INDUSTRIES,
 ];
 
 /** tag -> which taxonomy category it belongs to (used by tag-check question generation) */
@@ -154,4 +188,5 @@ export const TAG_CATEGORY: Record<string, string> = {
   ...Object.fromEntries(RECENCIES.map((t) => [t, "recency"])),
   ...Object.fromEntries(LENGTH_BUCKETS.map((t) => [t, "length_bucket"])),
   ...Object.fromEntries(LOVE_FACTORS.map((t) => [t, "love_factor"])),
+  ...Object.fromEntries(INDUSTRIES.map((t) => [t, "industry"])),
 };

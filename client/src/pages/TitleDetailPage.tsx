@@ -71,10 +71,10 @@ export function TitleDetailPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-10">
       <div className="grid gap-8 sm:grid-cols-[280px_1fr]">
-        <PosterImage src={title.posterUrl} alt={title.name} active className="pop-panel w-full" />
+        <PosterImage src={title.posterUrl} alt={title.name} active className="pop-panel aspect-[2/3] w-full object-cover" />
 
         <div>
-          <h1 className="text-4xl font-black uppercase">{title.name}</h1>
+          <h1 className="text-3xl font-black uppercase sm:text-4xl">{title.name}</h1>
           <p className="mt-1 text-sm font-bold text-[var(--text-muted)]">
             {title.releaseYear} · {title.type.toUpperCase()}
             {title.seasons ? ` · ${title.seasons} season${title.seasons > 1 ? "s" : ""}` : ""}
@@ -147,7 +147,7 @@ export function TitleDetailPage() {
 
       {isAuthenticated && (
         <div className="pop-panel mt-10 bg-[var(--bg-elevated)] p-6">
-          <h2 className="mb-3 text-xl font-black uppercase">Rate & review</h2>
+          <h2 className="mb-3 text-xl font-black uppercase tracking-tight sm:text-2xl">Rate & review</h2>
           <div className="flex gap-1">
             {[1, 2, 3, 4, 5].map((n) => (
               <button
@@ -178,7 +178,7 @@ export function TitleDetailPage() {
       )}
 
       <div className="mt-10">
-        <h2 className="mb-4 text-xl font-black uppercase">Reviews</h2>
+        <h2 className="mb-4 text-xl font-black uppercase tracking-tight sm:text-2xl">Reviews</h2>
         {reviews.length === 0 ? (
           <p className="text-sm text-[var(--text-muted)]">No reviews yet — be the first.</p>
         ) : (

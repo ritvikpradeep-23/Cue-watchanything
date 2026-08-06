@@ -20,6 +20,7 @@ function makeTitle(overrides: Partial<TitleSeed> & { id: string }): TitleSeed {
     runtime_minutes: null,
     release_year: 2020,
     platforms: ["Netflix"],
+    languages: ["English"],
     poster_url: "/posters/placeholder.jpg",
     tags: {
       genre: [],
@@ -36,6 +37,7 @@ function makeTitle(overrides: Partial<TitleSeed> & { id: string }): TitleSeed {
       recency: ["classic"],
       length_bucket: ["short-binge"],
       love_factor: ["characters"],
+      industry: [],
     },
     ...overrides,
   };
@@ -94,6 +96,46 @@ describe("buildDeck", () => {
   it("sorts by score descending", () => {
     const deck = buildDeck({ comedy: 5, drama: 1 }, titles);
     expect(deck.map((t) => t.id).slice(0, 2).sort()).toEqual(["a", "c"]);
+  });
+
+  it("hard-excludes titles primarily tagged with an avoided genre, not just down-weights them", () => {
+    const deck = buildDeck(
+      { comedy: 5, drama: 5 },
+      titles,
+      { filters: { avoidGenres: ["drama"] } },
+    );
+    expect(deck.find((t) => t.id === "b")).toBeUndefined();
+  });
+
+  it("filters titles to those intersecting the user's language selection", () => {
+    const withLang = [
+      makeTitle({ id: "en", languages: ["English"], tags: { ...makeTitle({ id: "en" }).tags, genre: ["comedy"] } }),
+      makeTitle({ id: "ko", languages: ["Korean"], tags: { ...makeTitle({ id: "ko" }).tags, genre: ["comedy"] } }),
+    ];
+    const deck = buildDeck({ comedy: 1 }, withLang, { filters: { languages: ["English"] } });
+    expect(deck.map((t) => t.id)).toEqual(["en"]);
+  });
+
+  it("skips the language filter entirely when 'any' is selected", () => {
+    const withLang = [
+      makeTitle({ id: "en", languages: ["English"], tags: { ...makeTitle({ id: "en" }).tags, genre: ["comedy"] } }),
+      makeTitle({ id: "ko", languages: ["Korean"], tags: { ...makeTitle({ id: "ko" }).tags, genre: ["comedy"] } }),
+    ];
+    const deck = buildDeck({ comedy: 1 }, withLang, { filters: { languages: ["any" as any] } });
+    expect(deck.map((t) => t.id).sort()).toEqual(["en", "ko"]);
+  });
+
+  it("shrinks the deck below the old 30-title floor when only a few titles are actually relevant", () => {
+    const sparse = [
+      makeTitle({ id: "great", tags: { ...makeTitle({ id: "great" }).tags, genre: ["comedy"], mood: ["funny-witty"] } }),
+      makeTitle({ id: "weak", tags: { ...makeTitle({ id: "weak" }).tags, genre: ["horror"] } }),
+      ...Array.from({ length: 20 }, (_, i) =>
+        makeTitle({ id: `filler-${i}`, tags: { ...makeTitle({ id: `filler-${i}` }).tags, genre: [] } }),
+      ),
+    ];
+    const deck = buildDeck({ comedy: 5, "funny-witty": 5 }, sparse);
+    expect(deck.length).toBeLessThan(22);
+    expect(deck[0].id).toBe("great");
   });
 });
 

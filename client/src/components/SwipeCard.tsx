@@ -7,9 +7,13 @@ export interface DeckTitle {
   type: string;
   plotSummary: string;
   posterUrl: string;
-  tags: { genre: string[]; recency?: string[] };
+  tags: { genre: string[]; recency?: string[]; industry?: string[] };
   releaseYear: number;
   platforms?: string[];
+  languages?: string[];
+  cast?: string[];
+  dateAdded?: string;
+  trending?: { likeRatio: number; sampleSize: number } | null;
 }
 
 type SwipeDirection = "pass" | "like" | "super_like";
@@ -101,6 +105,7 @@ export function SwipeCard({ title, stackIndex, onSwipe, onOpenDetail }: SwipeCar
         opacity: exiting ? 0 : 1,
         zIndex: 10 - stackIndex,
         touchAction: "none",
+        cursor: isFront ? (drag.active ? "grabbing" : "grab") : "default",
       }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}

@@ -8,7 +8,7 @@ export interface QuizOption {
 export interface QuizQuestion {
   id: string;
   prompt: string;
-  kind: "single" | "multi" | "text" | "toggle-pair";
+  kind: "single" | "multi" | "text" | "text3" | "toggle-pair";
   options?: QuizOption[];
   toggles?: { key: string; label: string; options: [QuizOption, QuizOption] }[];
 }
@@ -31,12 +31,14 @@ export function QuizWizard({ title, subtitle, getNext, onComplete }: QuizWizardP
   // draft state for multi/text/toggle-pair before the user hits Continue
   const [draftMulti, setDraftMulti] = useState<string[]>([]);
   const [draftText, setDraftText] = useState("");
+  const [draftText3, setDraftText3] = useState<[string, string, string]>(["", "", ""]);
   const [draftToggles, setDraftToggles] = useState<Record<string, string>>({});
 
   async function advance(currentAnswers: Record<string, any>, nextNumber: number) {
     const q = getNext(currentAnswers);
     setDraftMulti([]);
     setDraftText("");
+    setDraftText3(["", "", ""]);
     setDraftToggles({});
 
     if (q) {
@@ -153,6 +155,35 @@ export function QuizWizard({ title, subtitle, getNext, onComplete }: QuizWizardP
                       .filter(Boolean),
                   )
                 }
+                className="pop-pressable mt-4 w-full bg-accent-500 px-4 py-3 font-black uppercase text-[var(--ink)]"
+              >
+                Continue
+              </button>
+            </>
+          )}
+
+          {question.kind === "text3" && (
+            <>
+              <div className="flex flex-col gap-2">
+                {[0, 1, 2].map((i) => (
+                  <input
+                    key={i}
+                    type="text"
+                    value={draftText3[i]}
+                    onChange={(e) =>
+                      setDraftText3((prev) => {
+                        const next = [...prev] as [string, string, string];
+                        next[i] = e.target.value;
+                        return next;
+                      })
+                    }
+                    placeholder={`Favorite title #${i + 1}${i > 0 ? " (optional)" : ""}`}
+                    className="w-full rounded-xl border-2 border-[var(--ink)] bg-transparent px-4 py-3 text-sm outline-none"
+                  />
+                ))}
+              </div>
+              <button
+                onClick={() => submitAnswer(draftText3.map((s) => s.trim()).filter(Boolean))}
                 className="pop-pressable mt-4 w-full bg-accent-500 px-4 py-3 font-black uppercase text-[var(--ink)]"
               >
                 Continue

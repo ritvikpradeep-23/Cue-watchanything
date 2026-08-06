@@ -8,6 +8,7 @@ const watchedTitle = TITLES.find((t) => t.id === "breaking-bad")!;
 function baseCtx(overrides: Partial<NextShowContext> = {}): NextShowContext {
   return {
     baseProfile: { drama: 5, thriller: 3 },
+    baseFilters: {},
     watchedTitle,
     allTitles: TITLES,
     excludedIds: new Set(),

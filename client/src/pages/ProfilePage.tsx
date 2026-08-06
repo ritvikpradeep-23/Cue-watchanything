@@ -25,11 +25,11 @@ export function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10">
-      <h1 className="mb-1 text-3xl font-black uppercase">Profile</h1>
+      <h1 className="mb-1 text-3xl font-black uppercase sm:text-4xl">Profile</h1>
       <p className="mb-8 text-sm font-bold text-[var(--text-muted)]">{data.user.email}</p>
 
       <div className="pop-panel bg-[var(--bg-elevated)] p-6">
-        <h2 className="mb-3 text-xl font-black uppercase">Your taste profile</h2>
+        <h2 className="mb-3 text-xl font-black uppercase tracking-tight sm:text-2xl">Your taste profile</h2>
         {data.topTags.length === 0 ? (
           <p className="text-sm text-[var(--text-muted)]">Take the quiz to build a taste profile.</p>
         ) : (
@@ -50,7 +50,7 @@ export function ProfilePage() {
       </div>
 
       <div className="pop-panel mt-6 bg-[var(--bg-elevated)] p-6">
-        <h2 className="mb-3 text-xl font-black uppercase">Quiz history</h2>
+        <h2 className="mb-3 text-xl font-black uppercase tracking-tight sm:text-2xl">Quiz history</h2>
         {data.quizHistory.length === 0 ? (
           <p className="text-sm text-[var(--text-muted)]">No quizzes taken yet.</p>
         ) : (

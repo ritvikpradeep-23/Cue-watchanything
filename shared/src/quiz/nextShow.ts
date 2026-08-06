@@ -32,6 +32,9 @@ const RECALIBRATION_TAG_OPTIONS = [...GENRES, ...MOODS, ...PACES, ...TONES, ...L
 
 export interface NextShowContext {
   baseProfile: TagProfile;
+  /** carried forward unchanged from onboarding — this quiz only rechecks platforms/length,
+   * it never re-asks genres_avoid or languages */
+  baseFilters: HardFilters;
   watchedTitle: TitleSeed;
   allTitles: TitleSeed[];
   excludedIds: Set<string>;
@@ -255,9 +258,10 @@ export function computeNextShowDelta(answers: Answers, watchedTitle: TitleSeed, 
   return mergeDeltas(...deltas);
 }
 
-function buildFilters(answers: Answers): HardFilters {
+function buildFilters(answers: Answers, baseFilters: HardFilters): HardFilters {
   const platforms: Platform[] = answers["platforms_recheck"] ?? [];
   return {
+    ...baseFilters,
     platforms,
     lengthPreference: mapLengthCommitment(answers["length_commitment_recheck"]),
   };
@@ -272,7 +276,7 @@ function runBuildTop3(answers: Answers, ctx: NextShowContext): BuildTop3Result {
 
   return buildTop3(sessionProfile, ctx.allTitles, {
     excludedIds,
-    filters: buildFilters(answers),
+    filters: buildFilters(answers, ctx.baseFilters),
     exploreExploitDial: dial,
     tieBreakWinnerId: answers["tie_breaker"],
   });

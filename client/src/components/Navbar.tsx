@@ -22,7 +22,12 @@ export function Navbar() {
         { to: "/watchlist", label: "Watchlist" },
         { to: "/history", label: "History" },
         { to: "/profile", label: "Profile" },
-        ...(user?.role === "ADMIN" ? [{ to: "/admin/add-title", label: "Add title" }] : []),
+        ...(user?.role === "ADMIN"
+          ? [
+              { to: "/admin/dashboard", label: "Admin" },
+              { to: "/admin/add-title", label: "Add title" },
+            ]
+          : []),
       ]
     : [];
 

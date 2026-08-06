@@ -5,7 +5,7 @@ export interface QuizOption {
   label: string;
 }
 
-export type QuestionKind = "single" | "multi" | "text" | "toggle-pair";
+export type QuestionKind = "single" | "multi" | "text" | "text3" | "toggle-pair";
 
 export interface QuizQuestion {
   id: string;

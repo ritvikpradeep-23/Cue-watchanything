@@ -2,13 +2,21 @@ import { Router } from "express";
 import { requireAuth, AuthedRequest } from "../lib/auth";
 import { prisma } from "../lib/prisma";
 import { toApiTitle } from "../lib/titles";
+import { getTrendingStats } from "../lib/trending";
 
 export const titlesRouter = Router();
 
 /** Full catalog, lightweight — used to build the dashboard's category carousels (no scoring/auth needed). */
 titlesRouter.get("/", async (_req, res) => {
   const titles = await prisma.title.findMany({ orderBy: { name: "asc" } });
-  res.json({ titles: titles.map(toApiTitle) });
+  const trending = await getTrendingStats();
+  res.json({
+    titles: titles.map((t) => ({
+      ...toApiTitle(t),
+      dateAdded: t.dateAdded,
+      trending: trending.get(t.id) ?? null,
+    })),
+  });
 });
 
 async function ratingSummary(titleId: string) {

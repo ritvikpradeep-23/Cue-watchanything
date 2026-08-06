@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SwipeCard, type DeckTitle } from "../components/SwipeCard";
 import { apiGet, apiPost, ApiError } from "../lib/api";
@@ -20,16 +20,28 @@ export function SwipePage() {
       });
   }, [navigate]);
 
-  async function handleSwipe(direction: "pass" | "like" | "super_like") {
-    if (!deck || deck.length === 0) return;
-    const [current, ...rest] = deck;
-    setDeck(rest);
-    try {
-      await apiPost("/actions", { titleId: current.id, action: direction });
-    } catch {
-      // best-effort — the swipe already committed visually; a failed log shouldn't block the session
+  const handleSwipe = useCallback(async (direction: "pass" | "like" | "super_like") => {
+    setDeck((prev) => {
+      if (!prev || prev.length === 0) return prev;
+      const [current, ...rest] = prev;
+      apiPost("/actions", { titleId: current.id, action: direction }).catch(() => {
+        // best-effort — the swipe already committed visually; a failed log shouldn't block the session
+      });
+      return rest;
+    });
+  }, []);
+
+  // Supplementary control for keyboard/desktop users alongside mouse drag (Pointer Events on
+  // SwipeCard already handle drag for both mouse and touch) and the on-screen buttons below.
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "ArrowLeft") handleSwipe("pass");
+      else if (e.key === "ArrowRight") handleSwipe("like");
+      else if (e.key === "ArrowUp") handleSwipe("super_like");
     }
-  }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [handleSwipe]);
 
   if (error) {
     return (
@@ -49,9 +61,12 @@ export function SwipePage() {
 
   return (
     <div className="mx-auto flex max-w-md flex-col items-center px-4 py-10">
-      <h1 className="mb-1 text-3xl font-black uppercase">Swipe deck</h1>
-      <p className="mb-8 text-sm font-bold text-[var(--text-muted)]">
+      <h1 className="mb-1 text-3xl font-black uppercase sm:text-4xl">Swipe deck</h1>
+      <p className="mb-1 text-sm font-bold text-[var(--text-muted)]">
         {deck.length > 0 ? `${deck.length} left in this batch` : "You've been through the whole batch"}
+      </p>
+      <p className="mb-8 text-xs font-semibold text-[var(--text-muted)]">
+        Drag the card, use the buttons below, or the arrow keys.
       </p>
 
       <div className="relative h-[520px] w-full">

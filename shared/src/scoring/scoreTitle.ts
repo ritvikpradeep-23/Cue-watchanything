@@ -17,6 +17,7 @@ export function flattenTags(tags: TitleTags): string[] {
     ...tags.recency,
     ...tags.length_bucket,
     ...tags.love_factor,
+    ...tags.industry,
   ];
 }
 

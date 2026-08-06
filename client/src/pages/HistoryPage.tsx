@@ -46,7 +46,7 @@ export function HistoryPage() {
     <div className="mx-auto max-w-4xl px-4 py-10">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-black uppercase">Watched history</h1>
+          <h1 className="text-3xl font-black uppercase sm:text-4xl">Watched history</h1>
           <p className="mt-1 text-sm font-bold text-[var(--text-muted)]">Rate what you've finished, and get 3 picks for what's next.</p>
         </div>
         {items.length > 0 && (
@@ -74,7 +74,7 @@ export function HistoryPage() {
             return (
               <div key={item.id} className="pop-panel flex gap-4 bg-[var(--bg-elevated)] p-4">
                 <Link to={`/titles/${item.id}`} className="shrink-0">
-                  <PosterImage src={item.posterUrl} alt={item.name} className="h-32 w-24 rounded-lg border-2 border-[var(--ink)]" />
+                  <PosterImage src={item.posterUrl} alt={item.name} className="aspect-[2/3] w-24 rounded-lg border-2 border-[var(--ink)] object-cover" />
                 </Link>
                 <div className="flex-1">
                   <div className="flex items-center justify-between gap-2">

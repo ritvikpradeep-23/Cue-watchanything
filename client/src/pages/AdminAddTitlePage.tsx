@@ -14,7 +14,9 @@ import {
   RECENCIES,
   LENGTH_BUCKETS,
   LOVE_FACTORS,
+  INDUSTRIES,
   PLATFORMS,
+  LANGUAGES,
   TITLE_TYPES,
 } from "@watch-recommender/shared";
 import { useAuth } from "../lib/auth-context";
@@ -35,6 +37,7 @@ const TAG_SECTIONS: { key: string; label: string; options: readonly string[] }[]
   { key: "recency", label: "Recency", options: RECENCIES },
   { key: "length_bucket", label: "Length bucket", options: LENGTH_BUCKETS },
   { key: "love_factor", label: "Love factor", options: LOVE_FACTORS },
+  { key: "industry", label: "Industry", options: INDUSTRIES },
 ];
 
 function label(s: string) {
@@ -87,6 +90,7 @@ export function AdminAddTitlePage() {
   const [year, setYear] = useState("");
   const [posterUrl, setPosterUrl] = useState("");
   const [platforms, setPlatforms] = useState<string[]>([]);
+  const [languages, setLanguages] = useState<string[]>(["English"]);
   const [tags, setTags] = useState<Record<string, string[]>>(
     Object.fromEntries(TAG_SECTIONS.map((s) => [s.key, []])),
   );
@@ -115,6 +119,10 @@ export function AdminAddTitlePage() {
     setPlatforms((prev) => (prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]));
   }
 
+  function toggleLanguage(value: string) {
+    setLanguages((prev) => (prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]));
+  }
+
   async function handleSubmit() {
     setStatus(null);
     if (!name.trim() || !plot.trim() || platforms.length === 0 || !year) {
@@ -133,6 +141,7 @@ export function AdminAddTitlePage() {
         runtime_minutes: runtime ? Number(runtime) : undefined,
         release_year: Number(year),
         platforms,
+        languages,
         poster_url: posterUrl || undefined,
         tags,
       });
@@ -146,6 +155,7 @@ export function AdminAddTitlePage() {
       setYear("");
       setPosterUrl("");
       setPlatforms([]);
+      setLanguages(["English"]);
       setTags(Object.fromEntries(TAG_SECTIONS.map((s) => [s.key, []])));
     } catch (e) {
       setStatus({ kind: "error", message: e instanceof ApiError ? e.message : "Something went wrong" });
@@ -156,7 +166,7 @@ export function AdminAddTitlePage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
-      <h1 className="mb-1 text-2xl font-black uppercase">Add a title</h1>
+      <h1 className="mb-1 text-3xl font-black uppercase sm:text-4xl">Add a title</h1>
       <p className="mb-6 text-sm text-[var(--text-muted)]">
         Inserted straight into the catalog — no seed rebuild or redeploy needed.
       </p>
@@ -270,6 +280,24 @@ export function AdminAddTitlePage() {
                 }`}
               >
                 {p}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <p className="mb-1.5 text-xs font-black uppercase tracking-wide">Languages</p>
+          <div className="flex flex-wrap gap-1.5">
+            {LANGUAGES.map((l) => (
+              <button
+                key={l}
+                type="button"
+                onClick={() => toggleLanguage(l)}
+                className={`pop-badge px-2.5 py-1 text-[11px] ${
+                  languages.includes(l) ? "bg-accent-500 text-[var(--ink)]" : "bg-[var(--bg-elevated)] text-[var(--text)]"
+                }`}
+              >
+                {l}
               </button>
             ))}
           </div>

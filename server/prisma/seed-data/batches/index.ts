@@ -43,6 +43,8 @@ import { RAW as BATCH_032 } from "./032-more-prime-small";
 import { RAW as BATCH_033 } from "./033-disney-small";
 import { RAW as BATCH_034 } from "./034-hulu-small-2";
 import { RAW as BATCH_035 } from "./035-mixed-medium";
+import { RAW as BATCH_036 } from "./036-multilingual-expansion";
+import { RAW as BATCH_037 } from "./037-multilingual-expansion-2";
 
 const ALL_RAW: RawTitle[] = [
   ...BATCH_001,
@@ -80,6 +82,8 @@ const ALL_RAW: RawTitle[] = [
   ...BATCH_033,
   ...BATCH_034,
   ...BATCH_035,
+  ...BATCH_036,
+  ...BATCH_037,
 ];
 
 export const BATCH_TITLES: TitleSeed[] = ALL_RAW.map(build);

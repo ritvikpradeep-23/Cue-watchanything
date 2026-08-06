@@ -49,8 +49,10 @@ model Title {
   runtimeMinutes  Int?
   releaseYear     Int
   platforms       String   // JSON-encoded string[]
+  languages       String   @default("[\"English\"]") // JSON-encoded string[] — hard filter, see buildDeck
   posterUrl       String
-  tags            String   // JSON-encoded TitleTags object
+  tags            String   // JSON-encoded TitleTags object (includes industry)
+  dateAdded       DateTime @default(now())
 
   actions         UserTitleAction[]
   ratings         Rating[]

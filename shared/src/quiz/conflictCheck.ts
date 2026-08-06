@@ -92,3 +92,30 @@ export function resolveConflictDelta(conflict: GenreConflict, resolutionValue: s
   delta[conflict.avoidedGenre] = resolutionValue === "open-to-it" ? 0 : -1;
   return delta;
 }
+
+/** Genres from the avoid-list (Q13) that should be a HARD FILTER (excluded from the deck
+ * outright), not just a soft down-weight. A genre that was flagged as a conflict gets rerouted
+ * to a softer tag instead (see resolveConflictDelta) — comedy conflicts always reroute (the
+ * user is nuancing, not blanket-avoiding), generic conflicts only stay hard-filtered if the
+ * user explicitly reaffirmed "still avoid it". Genres with no contradicting earlier signal are
+ * the straightforward case and are hard-filtered directly. */
+export function computeAvoidGenreFilter(answers: Answers): Genre[] {
+  const genresAvoid: string[] = answers["genres_avoid"] ?? [];
+  if (genresAvoid.length === 0) return [];
+
+  const conflicts = detectGenreConflicts(answers);
+  const result: Genre[] = [];
+
+  for (const g of genresAvoid) {
+    const conflictIdx = conflicts.findIndex((c) => c.avoidedGenre === g);
+    if (conflictIdx === -1) {
+      result.push(g as Genre);
+      continue;
+    }
+    if (g === "comedy") continue; // always reroutes to a softer tag, never hard-filtered
+    const resolution = answers[`conflict_${conflictIdx}_${g}`];
+    if (resolution === "still-avoid") result.push(g as Genre);
+  }
+
+  return result;
+}

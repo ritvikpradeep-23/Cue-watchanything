@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getNextNextShowQuestion, type NextShowContext, type TagProfile, type TitleSeed } from "@watch-recommender/shared";
+import { getNextNextShowQuestion, type NextShowContext, type HardFilters, type TagProfile, type TitleSeed } from "@watch-recommender/shared";
 import { QuizWizard } from "../components/QuizWizard";
 import { PosterImage } from "../components/ui/PosterImage";
 import { apiGet, apiPost, ApiError } from "../lib/api";
@@ -14,6 +14,7 @@ interface SubmitResult {
 
 interface ContextResponse {
   baseProfile: TagProfile;
+  baseFilters: HardFilters;
   watchedTitle: TitleSeed;
   allTitles: TitleSeed[];
   excludedIds: string[];
@@ -32,6 +33,7 @@ export function NextShowPage() {
       .then((res) =>
         setCtx({
           baseProfile: res.baseProfile,
+          baseFilters: res.baseFilters,
           watchedTitle: res.watchedTitle,
           allTitles: res.allTitles,
           excludedIds: new Set(res.excludedIds),
@@ -64,7 +66,7 @@ export function NextShowPage() {
   if (result) {
     return (
       <div className="mx-auto max-w-4xl px-4 py-10">
-        <h1 className="mb-1 text-3xl font-black uppercase">Your next 3</h1>
+        <h1 className="mb-1 text-3xl font-black uppercase sm:text-4xl">Your next 3</h1>
         <p className="mb-8 text-sm font-bold text-[var(--text-muted)]">
           {result.swappable ? "Not feeling one? Swap it out." : "Locked in — no swapping this round."}
         </p>
@@ -73,7 +75,7 @@ export function NextShowPage() {
           {result.titles.map((t) => (
             <div key={t.id} className="pop-panel flex flex-col overflow-hidden bg-[var(--bg-elevated)]">
               <Link to={`/titles/${t.id}`}>
-                <PosterImage src={t.posterUrl} alt={t.name} active className="h-64 w-full" />
+                <PosterImage src={t.posterUrl} alt={t.name} active className="aspect-[2/3] w-full" />
               </Link>
               <div className="flex flex-1 flex-col border-t-[3px] border-[var(--ink)] p-4">
                 <Link to={`/titles/${t.id}`} className="font-black uppercase hover:text-accent-600">

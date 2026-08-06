@@ -13,6 +13,7 @@ import { HistoryPage } from "./pages/HistoryPage";
 import { NextShowPage } from "./pages/NextShowPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { AdminAddTitlePage } from "./pages/AdminAddTitlePage";
+import { AdminDashboardPage } from "./pages/AdminDashboardPage";
 
 function App() {
   return (
@@ -75,8 +76,16 @@ function App() {
           <Route
             path="/admin/add-title"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute adminOnly>
                 <AdminAddTitlePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminDashboardPage />
               </ProtectedRoute>
             }
           />

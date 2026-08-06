@@ -2,17 +2,51 @@ import {
   CONTENT_RATINGS,
   ERA_SETTINGS,
   GENRES,
+  INDUSTRIES,
+  LANGUAGES,
   LOVE_FACTORS,
   PACES,
   PLATFORMS,
   TONES,
 } from "../taxonomy";
-import type { Platform } from "../taxonomy";
+import type { Language, Platform } from "../taxonomy";
 import type { TagProfile, TitleSeed } from "../types";
 import type { HardFilters } from "../scoring/buildDeck";
 import { mergeDeltas } from "../scoring/delta";
 import type { Answers, QuizQuestion } from "./types";
-import { buildConflictQuestion, detectGenreConflicts, resolveConflictDelta } from "./conflictCheck";
+import {
+  buildConflictQuestion,
+  computeAvoidGenreFilter,
+  detectGenreConflicts,
+  resolveConflictDelta,
+} from "./conflictCheck";
+
+/**
+ * Per-answer weight scale. Real user testing showed a ~3-4-out-of-40 hit rate in the swipe
+ * deck — everything was weighted too evenly, diluting the signal from the answers that
+ * actually predict taste. Genre / mood / content-comfort are high-signal and weight heavily;
+ * era/setting and new-vs-classic are low-signal and weight lightly.
+ */
+const WEIGHT = {
+  genre: 3,
+  mood: 1.5,
+  moodFollowup: 3,
+  contentComfort: 3,
+  intensityOk: 1.5,
+  intensityNotOk: -3,
+  familyFollowup: 1.5,
+  pace: 2,
+  tone: 2,
+  castStyle: 1.5,
+  structureFollowup: 1.5,
+  animeFollowup: 1,
+  loveFactor: 2,
+  industry: 1.5,
+  eraSetting: 0.75, // low-signal
+  recency: 0.75, // low-signal
+  timeNow: 0.5,
+  favoriteSeed: 0.5,
+} as const;
 
 const label = (s: string) => s.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
@@ -97,8 +131,8 @@ const BASELINE_QUESTIONS: QuizQuestion[] = [
 const CLOSING_QUESTIONS: QuizQuestion[] = [
   {
     id: "favorite_titles",
-    prompt: "Name 3-5 titles you love (we'll match what we recognize).",
-    kind: "text",
+    prompt: "Name up to 3 titles you love (we'll match what we recognize).",
+    kind: "text3",
   },
   {
     id: "love_factor",
@@ -120,6 +154,24 @@ const CLOSING_QUESTIONS: QuizQuestion[] = [
     prompt: "Which platforms do you have access to?",
     kind: "multi",
     options: PLATFORMS.map((p) => ({ value: p, label: p })),
+  },
+  {
+    id: "languages",
+    prompt: "Which language(s) do you want to watch in?",
+    kind: "multi",
+    options: [
+      ...LANGUAGES.map((l) => ({ value: l, label: l })),
+      { value: "any", label: "Any language, I don't mind subtitles" },
+    ],
+  },
+  {
+    id: "industry",
+    prompt: "Any particular film industries you're drawn to?",
+    kind: "multi",
+    options: [
+      ...INDUSTRIES.map((i) => ({ value: i, label: i })),
+      { value: "no-preference", label: "No preference" },
+    ],
   },
   {
     id: "length_commitment",
@@ -313,37 +365,39 @@ export function getNextOnboardingQuestion(answers: Answers): QuizQuestion | null
 
 export function moodBaseDelta(moodNow: string): TagProfile {
   const d: TagProfile = {};
-  if (moodNow === "think") d["cerebral-ideas"] = 1;
-  if (moodNow === "switch-off") d["comfort-background"] = 1;
-  if (moodNow === "feel-something") d["feel-good"] = 1;
-  if (moodNow === "laugh") d["funny-witty"] = 1;
+  if (moodNow === "think") d["cerebral-ideas"] = WEIGHT.mood;
+  if (moodNow === "switch-off") d["comfort-background"] = WEIGHT.mood;
+  if (moodNow === "feel-something") d["feel-good"] = WEIGHT.mood;
+  if (moodNow === "laugh") d["funny-witty"] = WEIGHT.mood;
   return d;
 }
 
 function moodFollowupDelta(moodNow: string, followupValue: string): TagProfile {
   const d: TagProfile = {};
+  const w = WEIGHT.moodFollowup;
   if (moodNow === "feel-something") {
-    if (followupValue === "happy") { d["feel-good"] = 2; d["intense"] = 1; }
-    if (followupValue === "sad") { d["dark"] = 1; d["intense"] = 2; }
+    if (followupValue === "happy") { d["feel-good"] = w; d["intense"] = w / 2; }
+    if (followupValue === "sad") { d["dark"] = w / 2; d["intense"] = w; }
   } else if (moodNow === "laugh") {
-    if (followupValue === "witty") d["funny-witty"] = 2;
-    if (followupValue === "silly") d["funny-silly"] = 2;
+    if (followupValue === "witty") d["funny-witty"] = w;
+    if (followupValue === "silly") d["funny-silly"] = w;
   } else if (moodNow === "think") {
-    if (followupValue === "mystery") d["cerebral-mystery"] = 2;
-    if (followupValue === "ideas") d["cerebral-ideas"] = 2;
+    if (followupValue === "mystery") d["cerebral-mystery"] = w;
+    if (followupValue === "ideas") d["cerebral-ideas"] = w;
   } else if (moodNow === "switch-off") {
-    if (followupValue === "background") d["comfort-background"] = 2;
-    if (followupValue === "escapism") d["comfort-escapist"] = 2;
+    if (followupValue === "background") d["comfort-background"] = w;
+    if (followupValue === "escapism") d["comfort-escapist"] = w;
   }
   return d;
 }
 
 export function timeNowDelta(value: string): TagProfile {
   const d: TagProfile = {};
-  if (value === "one-episode") d["short-binge"] = 0.5;
-  if (value === "a-movie") d["single-sitting"] = 0.5;
-  if (value === "ready-to-binge") d["multi-season"] = 0.5;
-  if (value === "no-limit") d["long-runner"] = 0.5;
+  const w = WEIGHT.timeNow;
+  if (value === "one-episode") d["short-binge"] = w;
+  if (value === "a-movie") d["single-sitting"] = w;
+  if (value === "ready-to-binge") d["multi-season"] = w;
+  if (value === "no-limit") d["long-runner"] = w;
   return d;
 }
 
@@ -363,45 +417,43 @@ export function computeOnboardingProfile(answers: Answers, allTitles: TitleSeed[
     deltas.push(moodFollowupDelta(answers["mood_now"], answers[moodFollowupId]));
   }
 
-  if (answers["pace"]) deltas.push({ [answers["pace"]]: 2 });
-  if (answers["tone"]) deltas.push({ [answers["tone"]]: 2 });
-  if (answers["cast_style"]) deltas.push({ [answers["cast_style"]]: 2 });
-  if (answers["content_comfort"]) deltas.push({ [answers["content_comfort"]]: 2 });
+  if (answers["pace"]) deltas.push({ [answers["pace"]]: WEIGHT.pace });
+  if (answers["tone"]) deltas.push({ [answers["tone"]]: WEIGHT.tone });
+  if (answers["cast_style"]) deltas.push({ [answers["cast_style"]]: WEIGHT.castStyle });
+  if (answers["content_comfort"]) deltas.push({ [answers["content_comfort"]]: WEIGHT.contentComfort });
   if (answers["setting"] && answers["setting"] !== "no-preference") {
-    deltas.push({ [answers["setting"]]: 2 });
+    deltas.push({ [answers["setting"]]: WEIGHT.eraSetting });
   }
 
   if (answers["mature_followup"]) {
     const { graphic_violence_ok, heavy_themes_ok } = answers["mature_followup"];
     deltas.push({
-      "graphic-violence": graphic_violence_ok === "ok" ? 1 : -2,
-      "heavy-themes": heavy_themes_ok === "ok" ? 1 : -2,
+      "graphic-violence": graphic_violence_ok === "ok" ? WEIGHT.intensityOk : WEIGHT.intensityNotOk,
+      "heavy-themes": heavy_themes_ok === "ok" ? WEIGHT.intensityOk : WEIGHT.intensityNotOk,
     });
   }
   if (answers["family_followup"]) {
-    deltas.push({ [answers["family_followup"] === "yes" ? "family" : "teen"]: 1 });
+    deltas.push({ [answers["family_followup"] === "yes" ? "family" : "teen"]: WEIGHT.familyFollowup });
   }
 
-  if (answers["show_structure_followup"]) deltas.push({ [answers["show_structure_followup"]]: 2 });
-  if (answers["movie_structure_followup"]) deltas.push({ [answers["movie_structure_followup"]]: 2 });
+  if (answers["show_structure_followup"]) deltas.push({ [answers["show_structure_followup"]]: WEIGHT.structureFollowup });
+  if (answers["movie_structure_followup"]) deltas.push({ [answers["movie_structure_followup"]]: WEIGHT.structureFollowup });
   if (answers["anime_followup"]) {
     const { sub_or_dub, ongoing_ok } = answers["anime_followup"];
     const d: TagProfile = {};
-    if (sub_or_dub === "sub") d["sub-available"] = 1;
-    if (sub_or_dub === "dub") d["dub-available"] = 1;
-    if (ongoing_ok === "ongoing") d["ongoing"] = 1;
-    if (ongoing_ok === "completed") d["completed"] = 1;
+    if (sub_or_dub === "sub") d["sub-available"] = WEIGHT.animeFollowup;
+    if (sub_or_dub === "dub") d["dub-available"] = WEIGHT.animeFollowup;
+    if (ongoing_ok === "ongoing") d["ongoing"] = WEIGHT.animeFollowup;
+    if (ongoing_ok === "completed") d["completed"] = WEIGHT.animeFollowup;
     deltas.push(d);
   }
 
   const genresEnjoy: string[] = answers["genres_enjoy"] ?? [];
-  const genresAvoid: string[] = answers["genres_avoid"] ?? [];
   const enjoyDelta: TagProfile = {};
-  for (const g of genresEnjoy) enjoyDelta[g] = 2;
+  for (const g of genresEnjoy) enjoyDelta[g] = WEIGHT.genre;
   deltas.push(enjoyDelta);
-  const avoidDelta: TagProfile = {};
-  for (const g of genresAvoid) avoidDelta[g] = -2;
-  deltas.push(avoidDelta);
+  // genres_avoid is now a HARD FILTER (see filters.avoidGenres below), not a soft down-weight —
+  // a loosely-avoided genre no longer just gets outscored, it's excluded from the deck outright.
 
   const conflicts = detectGenreConflicts(answers);
   conflicts.forEach((conflict, i) => {
@@ -412,10 +464,15 @@ export function computeOnboardingProfile(answers: Answers, allTitles: TitleSeed[
     }
   });
 
-  if (answers["love_factor"]) deltas.push({ [answers["love_factor"]]: 2 });
-  if (answers["recency"]) deltas.push({ [answers["recency"]]: 2 });
+  if (answers["love_factor"]) deltas.push({ [answers["love_factor"]]: WEIGHT.loveFactor });
+  if (answers["recency"]) deltas.push({ [answers["recency"]]: WEIGHT.recency });
 
-  const favoriteTitles: string[] = answers["favorite_titles"] ?? [];
+  const industryPrefs: string[] = (answers["industry"] ?? []).filter((i: string) => i !== "no-preference");
+  const industryDelta: TagProfile = {};
+  for (const i of industryPrefs) industryDelta[i] = WEIGHT.industry;
+  deltas.push(industryDelta);
+
+  const favoriteTitles: string[] = (answers["favorite_titles"] ?? []).filter(Boolean);
   if (favoriteTitles.length > 0) {
     const normalized = favoriteTitles.map((t) => t.trim().toLowerCase()).filter(Boolean);
     for (const title of allTitles) {
@@ -428,18 +485,20 @@ export function computeOnboardingProfile(answers: Answers, allTitles: TitleSeed[
           ...title.tags.tone,
           ...title.tags.love_factor,
         ];
-        for (const tag of allTags) seedDelta[tag] = (seedDelta[tag] ?? 0) + 0.5;
+        for (const tag of allTags) seedDelta[tag] = (seedDelta[tag] ?? 0) + WEIGHT.favoriteSeed;
         deltas.push(seedDelta);
       }
     }
   }
 
   const platforms: Platform[] = answers["platforms"] ?? [];
+  const languages: Language[] = answers["languages"] ?? [];
+  const avoidGenres = computeAvoidGenreFilter(answers);
   const lengthPreference = mapLengthCommitment(answers["length_commitment"]);
 
   return {
     tagProfile: mergeDeltas(...deltas),
-    filters: { platforms, lengthPreference },
+    filters: { platforms, languages, avoidGenres, lengthPreference },
   };
 }
 

@@ -44,7 +44,7 @@ export function WatchlistPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10">
-      <h1 className="mb-1 text-3xl font-black uppercase">Watchlist</h1>
+      <h1 className="mb-1 text-3xl font-black uppercase sm:text-4xl">Watchlist</h1>
       <p className="mb-8 text-sm font-bold text-[var(--text-muted)]">Everything you've liked or super-liked, super-likes first.</p>
 
       {items.length === 0 ? (
@@ -60,7 +60,7 @@ export function WatchlistPage() {
           {items.map((item) => (
             <div key={item.id} className="pop-panel flex gap-4 bg-[var(--bg-elevated)] p-4">
               <Link to={`/titles/${item.id}`} className="shrink-0">
-                <PosterImage src={item.posterUrl} alt={item.name} className="h-32 w-24 rounded-lg border-2 border-[var(--ink)]" />
+                <PosterImage src={item.posterUrl} alt={item.name} className="aspect-[2/3] w-24 rounded-lg border-2 border-[var(--ink)] object-cover" />
               </Link>
               <div className="flex-1">
                 <div className="flex items-start justify-between gap-2">

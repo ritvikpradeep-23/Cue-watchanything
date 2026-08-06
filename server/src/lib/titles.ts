@@ -14,6 +14,7 @@ function titleSeedFromRow(row: PrismaTitle): TitleSeed {
     runtime_minutes: row.runtimeMinutes,
     release_year: row.releaseYear,
     platforms: JSON.parse(row.platforms) as TitleSeed["platforms"],
+    languages: JSON.parse(row.languages) as TitleSeed["languages"],
     poster_url: row.posterUrl,
     tags: JSON.parse(row.tags),
   };
@@ -42,8 +43,10 @@ export function toApiTitle(row: PrismaTitle) {
     runtimeMinutes: row.runtimeMinutes,
     releaseYear: row.releaseYear,
     platforms: JSON.parse(row.platforms) as string[],
+    languages: JSON.parse(row.languages) as string[],
     posterUrl: row.posterUrl,
     tags: JSON.parse(row.tags),
+    dateAdded: row.dateAdded,
   };
 }
 
@@ -64,6 +67,7 @@ export function toApiTitleFromSeed(seed: TitleSeed) {
     runtimeMinutes: seed.runtime_minutes,
     releaseYear: seed.release_year,
     platforms: seed.platforms,
+    languages: seed.languages,
     posterUrl: seed.poster_url,
     tags: seed.tags,
   };

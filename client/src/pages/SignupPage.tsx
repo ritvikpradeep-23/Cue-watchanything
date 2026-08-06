@@ -27,7 +27,7 @@ export function SignupPage() {
 
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-sm flex-col justify-center px-4 py-16">
-      <h1 className="mb-1 text-3xl font-black uppercase">Create your account</h1>
+      <h1 className="mb-1 text-3xl font-black uppercase sm:text-4xl">Create your account</h1>
       <p className="mb-6 text-sm font-bold text-[var(--text-muted)]">Takes a minute. No credit card, no third-party login.</p>
 
       <form onSubmit={handleSubmit} className="pop-panel flex flex-col gap-4 bg-[var(--bg-elevated)] p-6">

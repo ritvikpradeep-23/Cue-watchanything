@@ -3,7 +3,7 @@ import { requireAuth, requireAdmin, AuthedRequest } from "../lib/auth";
 import { prisma } from "../lib/prisma";
 import { toApiTitle } from "../lib/titles";
 import { buildPosterSvg, posterSvgToDataUri } from "../lib/posterArt";
-import { PLATFORMS, TITLE_TYPES } from "@watch-recommender/shared";
+import { LANGUAGES, PLATFORMS, TITLE_TYPES } from "@watch-recommender/shared";
 
 export const adminRouter = Router();
 
@@ -22,6 +22,7 @@ const TAG_CATEGORIES = [
   "recency",
   "length_bucket",
   "love_factor",
+  "industry",
 ] as const;
 
 function slugify(name: string): string {
@@ -48,6 +49,10 @@ adminRouter.post("/titles", requireAuth, requireAdmin, async (req: AuthedRequest
   }
   if (!Array.isArray(platforms) || platforms.length === 0 || !platforms.every((p) => PLATFORMS.includes(p))) {
     return res.status(400).json({ error: `platforms must be a non-empty array from ${PLATFORMS.join(", ")}` });
+  }
+  const languages = Array.isArray(body.languages) && body.languages.length > 0 ? body.languages : ["English"];
+  if (!languages.every((l: string) => LANGUAGES.includes(l as any))) {
+    return res.status(400).json({ error: `languages must be from ${LANGUAGES.join(", ")}` });
   }
   if (!tags || typeof tags !== "object") {
     return res.status(400).json({ error: "tags object is required" });
@@ -86,10 +91,72 @@ adminRouter.post("/titles", requireAuth, requireAdmin, async (req: AuthedRequest
       runtimeMinutes: typeof runtime_minutes === "number" ? runtime_minutes : null,
       releaseYear: release_year,
       platforms: JSON.stringify(platforms),
+      languages: JSON.stringify(languages),
       posterUrl,
       tags: JSON.stringify(tags),
     },
   });
 
   res.status(201).json({ title: toApiTitle(created) });
+});
+
+/** Internal-only stats dashboard — no public-facing equivalent. Every figure here is derived
+ * straight from existing tables, nothing fabricated. */
+adminRouter.get("/stats", requireAuth, requireAdmin, async (_req, res) => {
+  const [totalUsers, totalTitles, actionCounts, ratingAgg, reviewCount, onboardingUserIds, recentSignups] =
+    await Promise.all([
+      prisma.user.count(),
+      prisma.title.count(),
+      prisma.userTitleAction.groupBy({ by: ["action"], _count: { _all: true } }),
+      prisma.rating.aggregate({ _count: { _all: true } }),
+      prisma.rating.count({ where: { comment: { not: null } } }),
+      prisma.quizResponse.findMany({ where: { kind: "onboarding" }, distinct: ["userId"], select: { userId: true } }),
+      prisma.user.findMany({ select: { createdAt: true }, orderBy: { createdAt: "asc" } }),
+    ]);
+
+  const actionByType = Object.fromEntries(actionCounts.map((a) => [a.action, a._count._all])) as Record<string, number>;
+
+  // signups bucketed by day — cheap enough client-side-free, and the dataset is small
+  const signupsByDay = new Map<string, number>();
+  for (const u of recentSignups) {
+    const day = u.createdAt.toISOString().slice(0, 10);
+    signupsByDay.set(day, (signupsByDay.get(day) ?? 0) + 1);
+  }
+
+  const likeCounts = await prisma.userTitleAction.groupBy({
+    by: ["titleId"],
+    where: { action: { in: ["like", "super_like"] } },
+    _count: { _all: true },
+    orderBy: { _count: { titleId: "desc" } },
+    take: 10,
+  });
+  const watchedCounts = await prisma.userTitleAction.groupBy({
+    by: ["titleId"],
+    where: { action: "watched" },
+    _count: { _all: true },
+    orderBy: { _count: { titleId: "desc" } },
+    take: 10,
+  });
+  const titleIds = [...new Set([...likeCounts.map((r) => r.titleId), ...watchedCounts.map((r) => r.titleId)])];
+  const titleRows = await prisma.title.findMany({ where: { id: { in: titleIds } }, select: { id: true, name: true } });
+  const nameById = new Map(titleRows.map((t) => [t.id, t.name]));
+
+  res.json({
+    totalUsers,
+    totalTitles,
+    signupsByDay: [...signupsByDay.entries()].map(([day, count]) => ({ day, count })),
+    quizCompletion: {
+      usersCompleted: onboardingUserIds.length,
+      totalUsers,
+      rate: totalUsers > 0 ? onboardingUserIds.length / totalUsers : 0,
+    },
+    activity: {
+      swipes: (actionByType.pass ?? 0) + (actionByType.like ?? 0) + (actionByType.super_like ?? 0),
+      watched: actionByType.watched ?? 0,
+      ratings: ratingAgg._count._all,
+      reviews: reviewCount,
+    },
+    mostLiked: likeCounts.map((r) => ({ titleId: r.titleId, name: nameById.get(r.titleId) ?? r.titleId, count: r._count._all })),
+    mostWatched: watchedCounts.map((r) => ({ titleId: r.titleId, name: nameById.get(r.titleId) ?? r.titleId, count: r._count._all })),
+  });
 });

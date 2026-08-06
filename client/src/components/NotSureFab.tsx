@@ -4,6 +4,7 @@ import {
   getNextOnboardingQuestion,
   getNextNextShowQuestion,
   type NextShowContext,
+  type HardFilters,
   type TagProfile,
   type TitleSeed,
 } from "@watch-recommender/shared";
@@ -15,6 +16,7 @@ import type { DeckTitle } from "./SwipeCard";
 
 interface ContextResponse {
   baseProfile: TagProfile;
+  baseFilters: HardFilters;
   watchedTitle: TitleSeed;
   allTitles: TitleSeed[];
   excludedIds: string[];
@@ -54,6 +56,7 @@ export function NotSureFab() {
         const ctxRes = await apiGet<ContextResponse>(`/next-show/context/${titleId}`);
         setNextShowCtx({
           baseProfile: ctxRes.baseProfile,
+          baseFilters: ctxRes.baseFilters,
           watchedTitle: ctxRes.watchedTitle,
           allTitles: ctxRes.allTitles,
           excludedIds: new Set(ctxRes.excludedIds),
@@ -97,7 +100,7 @@ export function NotSureFab() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="pop-pressable fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-accent-500 px-5 py-3.5 font-black uppercase text-[var(--ink)] shadow-lg"
+        className="fab pop-pressable flex items-center gap-2 bg-accent-500 px-5 py-3 font-black uppercase text-[var(--ink)]"
       >
         <span className="text-xl">🤔</span>
         <span className="hidden sm:inline">Not sure what to watch?</span>

@@ -4,7 +4,9 @@ import type {
   ContentRating,
   EraSetting,
   Genre,
+  Industry,
   Intensity,
+  Language,
   LengthBucket,
   LoveFactor,
   Mood,
@@ -33,6 +35,8 @@ export interface TitleTags {
   recency: Recency[];
   length_bucket: LengthBucket[];
   love_factor: LoveFactor[];
+  /** regional film/TV industry — soft weighted preference, same pattern as genre */
+  industry: Industry[];
 }
 
 export interface TitleSeed {
@@ -46,6 +50,8 @@ export interface TitleSeed {
   runtime_minutes: number | null;
   release_year: number;
   platforms: Platform[];
+  /** original/audio language(s) available — HARD FILTER (see buildDeck), never weighted */
+  languages: Language[];
   poster_url: string;
   tags: TitleTags;
 }

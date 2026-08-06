@@ -14,7 +14,7 @@ function answerFullQuiz(overrides: Record<string, any> = {}) {
     }
     if (q.kind === "single") answers[q.id] = q.options![0].value;
     else if (q.kind === "multi") answers[q.id] = [];
-    else if (q.kind === "text") answers[q.id] = [];
+    else if (q.kind === "text" || q.kind === "text3") answers[q.id] = [];
     else if (q.kind === "toggle-pair") {
       const t: Record<string, any> = {};
       for (const tg of q.toggles!) t[tg.key] = tg.options[0].value;
@@ -90,8 +90,10 @@ describe("computeOnboardingProfile", () => {
     const conflictKey = Object.keys(answers).find((k) => k.startsWith("conflict_"))!;
     answers[conflictKey] = "mixed-into-drama";
 
-    const { tagProfile } = computeOnboardingProfile(answers, TITLES);
-    // avoid (-2) + conflict reroute (-1.5) = -3.5, but drama/funny-witty should have picked up weight
+    const { tagProfile, filters } = computeOnboardingProfile(answers, TITLES);
+    // comedy conflicts always reroute to a softer tag rather than hard-filtering (see
+    // computeAvoidGenreFilter) — drama/funny-witty should have picked up weight instead
+    expect(filters.avoidGenres).not.toContain("comedy");
     expect(tagProfile["drama"]).toBeGreaterThan(0);
     expect(tagProfile["funny-witty"]).toBeGreaterThan(0);
   });
@@ -108,5 +110,24 @@ describe("computeOnboardingProfile", () => {
     expect(filters.platforms).toEqual(["Netflix", "Hulu"]);
     expect(filters.lengthPreference).toBe("single-sitting");
     expect(tagProfile["Netflix"]).toBeUndefined();
+  });
+
+  it("hard-filters a straightforward avoided genre with no contradicting earlier signal", () => {
+    const answers = answerFullQuiz({ mood_now: "think", genres_avoid: ["horror"] });
+    const { filters } = computeOnboardingProfile(answers, TITLES);
+    expect(filters.avoidGenres).toContain("horror");
+  });
+
+  it("carries the language selection through as a hard filter, not a weighted tag", () => {
+    const answers = answerFullQuiz({ languages: ["Korean"] });
+    const { filters, tagProfile } = computeOnboardingProfile(answers, TITLES);
+    expect(filters.languages).toEqual(["Korean"]);
+    expect(tagProfile["Korean"]).toBeUndefined();
+  });
+
+  it("weights an industry preference as a soft tag, same pattern as genre", () => {
+    const answers = answerFullQuiz({ industry: ["Korean Cinema"] });
+    const { tagProfile } = computeOnboardingProfile(answers, TITLES);
+    expect(tagProfile["Korean Cinema"]).toBeGreaterThan(0);
   });
 });

@@ -27,7 +27,7 @@ export function LoginPage() {
 
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-sm flex-col justify-center px-4 py-16">
-      <h1 className="mb-1 text-3xl font-black uppercase">Welcome back</h1>
+      <h1 className="mb-1 text-3xl font-black uppercase sm:text-4xl">Welcome back</h1>
       <p className="mb-6 text-sm font-bold text-[var(--text-muted)]">Log in to pick up your watchlist.</p>
 
       <form onSubmit={handleSubmit} className="pop-panel flex flex-col gap-4 bg-[var(--bg-elevated)] p-6">

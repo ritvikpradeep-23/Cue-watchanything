@@ -34,7 +34,13 @@ async function buildContext(userId: string, watchedTitleId: string): Promise<Nex
   if (!profile) return { error: "Complete the onboarding quiz first", status: 409 };
 
   const excludedIds = await getSwipedTitleIds(userId);
-  return { baseProfile: profile.tagProfile, watchedTitle, allTitles: await getAllTitleSeeds(), excludedIds };
+  return {
+    baseProfile: profile.tagProfile,
+    baseFilters: profile.filters,
+    watchedTitle,
+    allTitles: await getAllTitleSeeds(),
+    excludedIds,
+  };
 }
 
 nextShowRouter.get("/quiz-context/:watchedTitleId", async (req, res) => {
@@ -50,6 +56,7 @@ nextShowRouter.get("/context/:watchedTitleId", requireAuth, async (req: AuthedRe
 
   res.json({
     baseProfile: ctx.baseProfile,
+    baseFilters: ctx.baseFilters,
     watchedTitle: ctx.watchedTitle,
     allTitles: ctx.allTitles,
     excludedIds: [...ctx.excludedIds],
@@ -115,7 +122,7 @@ nextShowRouter.post("/swap", requireAuth, async (req: AuthedRequest, res) => {
   const sessionProfile = applyDelta(ctx.baseProfile, delta);
 
   const excluded = new Set([...ctx.excludedIds, watchedTitleId, swapOutTitleId, ...keptTitleIds]);
-  const eligible = ctx.allTitles.filter((t) => !excluded.has(t.id) && passesHardFilters(t, {}));
+  const eligible = ctx.allTitles.filter((t) => !excluded.has(t.id) && passesHardFilters(t, ctx.baseFilters));
   const ranked = eligible
     .map((title) => ({ title, score: scoreTitle(sessionProfile, title) }))
     .sort((a, b) => b.score - a.score);

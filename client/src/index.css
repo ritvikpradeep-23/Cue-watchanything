@@ -4,29 +4,41 @@
   --font-sans: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-display: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 
-  /* warm orange — softer than red, the app's single accent color */
-  --color-accent-50: #fff7ed;
-  --color-accent-100: #ffedd5;
-  --color-accent-200: #fed7aa;
-  --color-accent-300: #fdba74;
-  --color-accent-400: #fb923c;
-  --color-accent-500: #f97316;
-  --color-accent-600: #ea580c;
-  --color-accent-700: #c2410c;
-  --color-accent-800: #9a3412;
-  --color-accent-900: #7c2d12;
+  /* deep crimson/red — the app's single accent color (this has changed twice now: purple ->
+   * orange -> this; there is deliberately only ever ONE color variable scale for it, so a
+   * future change is a single edit here, not a find-and-replace across components) */
+  --color-accent-50: #fdf2f4;
+  --color-accent-100: #fce4e8;
+  --color-accent-200: #f9c9d2;
+  --color-accent-300: #f3a0b0;
+  --color-accent-400: #e85d7a;
+  --color-accent-500: #c81e3a;
+  --color-accent-600: #a5142c;
+  --color-accent-700: #841024;
+  --color-accent-800: #5e0c1a;
+  --color-accent-900: #3d0810;
 }
 
 :root {
   --bg: #faf6ef;
   --bg-elevated: #fffdf9;
-  --bg-sunken: #fdead9;
+  --bg-sunken: #fbe6e6;
   --text: #1a1410;
   --text-muted: #6b5f52;
   --border: #1a1410;
   --ink: #1a1410;
   --ring: var(--color-accent-600);
   --shadow-offset: 5px;
+
+  /* ---------- spacing scale — 4/8/12/16/24/32/48px steps, single source of truth for any
+   * custom CSS (Tailwind utilities already follow this scale natively: p-1..p-12 etc.) ---------- */
+  --space-1: 0.25rem; /* 4px */
+  --space-2: 0.5rem; /* 8px */
+  --space-3: 0.75rem; /* 12px */
+  --space-4: 1rem; /* 16px */
+  --space-6: 1.5rem; /* 24px */
+  --space-8: 2rem; /* 32px */
+  --space-12: 3rem; /* 48px */
 }
 
 :root[data-theme="dark"] {
@@ -44,7 +56,7 @@
   :root:not([data-theme="light"]) {
     --bg: #14100c;
     --bg-elevated: #1e1812;
-    --bg-sunken: #2a2016;
+    --bg-sunken: #2a1416;
     --text: #fbf3ea;
     --text-muted: #b8a996;
     --border: #fbf3ea;
@@ -70,6 +82,16 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ---------- type scale — the fixed set of size/weight combos every page should reach for.
+ * Expressed as Tailwind class conventions (not CSS, since components are utility-first) —
+ * documented here as the single source of truth to audit against:
+ *   hero / landing headline   text-5xl sm:text-7xl font-black uppercase leading-[0.95] tracking-tight
+ *   page title (h1)           text-3xl sm:text-4xl font-black uppercase
+ *   section header (h2)       text-xl sm:text-2xl font-black uppercase tracking-tight
+ *   card title (h3)           text-sm font-black uppercase
+ *   body text                 text-sm font-medium (font-semibold for emphasis)
+ *   caption / meta            text-xs font-bold uppercase (tracking-wide for labels)
+ * ---------------------------------------------------------------------------------------- */
 h1, h2, h3 {
   font-family: var(--font-display);
   font-weight: 900;
@@ -90,6 +112,20 @@ h1, h2, h3 {
 .poster-image:focus-visible,
 .poster-image.poster-image--active {
   filter: grayscale(0%) brightness(1);
+}
+
+/* Every text input/textarea/select in the app pairs `outline-none` with the pop-styled
+ * border-2 border-[var(--ink)] box, but relied on the browser's default outline for focus —
+ * which outline-none also removes. Applied globally so no individual field can be missed. */
+input, textarea, select {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  border-color: var(--color-accent-500);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 45%, transparent);
 }
 
 @keyframes quiz-question-in {
@@ -135,7 +171,13 @@ h1, h2, h3 {
   box-shadow: 0 0 0 0 var(--ink);
 }
 
-/* bold rotated "stamp" badge for tags/labels */
+.pop-pressable:focus-visible {
+  outline: 3px solid var(--color-accent-500);
+  outline-offset: 2px;
+}
+
+/* bold rotated "stamp" badge for tags/labels — also used as an interactive multi-select
+ * chip (quiz options, industry filter), so it needs its own focus-visible treatment too. */
 .pop-badge {
   display: inline-flex;
   align-items: center;
@@ -144,6 +186,16 @@ h1, h2, h3 {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
+  transition: transform 0.12s ease;
+}
+
+button.pop-badge:hover {
+  transform: translateY(-1px);
+}
+
+button.pop-badge:focus-visible {
+  outline: 3px solid var(--color-accent-500);
+  outline-offset: 2px;
 }
 
 /* subtle halftone dot texture for decorative panels/heroes */
@@ -164,18 +216,52 @@ h1, h2, h3 {
   );
 }
 
-/* horizontal carousels — snap scroll, hidden scrollbar */
+/* floating action button — a consistent offset from the viewport edge on narrow/medium
+ * screens, but on very wide screens the page content lives in a centered max-w-6xl column, so
+ * anchoring purely to the viewport edge leaves the FAB drifting in empty margin, disconnected
+ * from the layout. Align its right edge with the content column's right edge instead once the
+ * viewport is wider than that column. */
+.fab {
+  position: fixed;
+  bottom: max(var(--space-6), env(safe-area-inset-bottom, 0px));
+  right: max(var(--space-6), calc((100vw - 72rem) / 2 + var(--space-6)));
+  z-index: 50;
+}
+
+/* horizontal carousels — snap scroll, with a real (thin, styled) scrollbar on desktop rather
+ * than hiding it outright: touch/trackpad users never notice it, but mouse users need a visible,
+ * grabbable affordance to know the row scrolls at all. */
 .carousel-row {
   display: flex;
-  gap: 1rem;
+  gap: var(--space-4);
   overflow-x: auto;
   scroll-snap-type: x proximity;
-  padding-bottom: 0.5rem;
-  scrollbar-width: none;
+  padding-bottom: var(--space-3);
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-accent-500) transparent;
+  cursor: grab;
+}
+
+.carousel-row:active {
+  cursor: grabbing;
 }
 
 .carousel-row::-webkit-scrollbar {
-  display: none;
+  height: 8px;
+}
+
+.carousel-row::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.carousel-row::-webkit-scrollbar-thumb {
+  background: var(--color-accent-500);
+  border-radius: 999px;
+  border: 2px solid var(--bg);
+}
+
+.carousel-row::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent-600);
 }
 
 .carousel-row > * {

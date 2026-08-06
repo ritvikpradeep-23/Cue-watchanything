@@ -21,12 +21,15 @@
  * posterUrl in the output file. Safe, and often necessary, to run more than once.
  */
 import "dotenv/config";
-import { existsSync, readFileSync, writeFileSync } from "fs";
-import path from "path";
+import { writeFileSync } from "fs";
 import { TITLES } from "../prisma/seed-data/titles";
+import { BATCH_TITLES } from "../prisma/seed-data/batches";
+import { POSTER_URLS_FILE, loadPosterResults, type PosterResult } from "./lib/posterUrls";
+
+const ALL_TITLES = [...TITLES, ...BATCH_TITLES];
 
 const USER_AGENT = "WhatShouldIWatch-PosterFetch/1.0 (educational demo project; contact: n/a)";
-const OUT_FILE = path.resolve(__dirname, "poster-urls.json");
+const OUT_FILE = POSTER_URLS_FILE;
 const TMDB_API_KEY = process.env.TMDB_API_KEY;
 const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/w500";
 
@@ -54,6 +57,19 @@ function typeHint(type: string, year: number): string {
   if (type === "show") return "TV series";
   if (type === "anime") return "anime";
   return "";
+}
+
+function normalize(s: string): string {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+// Wikipedia's search-relevance ranking can surface an entirely different title as the top hit
+// for a generic/short query (e.g. "Kingdom" -> "Animal Kingdom (TV series)") rather than a
+// disambiguated version of the query itself (e.g. "You" -> "You (TV series)", which is fine).
+// Reject anything whose article title doesn't actually contain our title as a substring, so a
+// mismatch falls through to TMDB instead of silently attaching the wrong poster.
+function isPlausibleMatch(titleName: string, articleTitle: string): boolean {
+  return normalize(articleTitle).includes(normalize(titleName));
 }
 
 // Both Wikipedia helpers swallow their own network errors (returning null) rather than
@@ -125,8 +141,6 @@ async function fetchTmdbPoster(
   }
 }
 
-type PosterResult = { posterUrl: string | null; source: "wikipedia" | "tmdb" | null; articleTitle: string | null };
-
 async function main() {
   if (!TMDB_API_KEY) {
     console.warn(
@@ -137,16 +151,16 @@ async function main() {
   // Incremental: this environment's connection resets mean a single pass never resolves 100%
   // by chance alone. Titles already resolved in a prior run are kept as-is and skipped —
   // only titles still missing a poster are (re)attempted — so repeated runs converge instead
-  // of re-rolling every title's network luck each time.
-  const results: Record<string, PosterResult> = existsSync(OUT_FILE)
-    ? (JSON.parse(readFileSync(OUT_FILE, "utf-8")) as Record<string, PosterResult>)
-    : {};
+  // of re-rolling every title's network luck each time. Also covers every batch under
+  // seed-data/batches/, not just the core seed, so a fresh batch's posters resolve in the same
+  // pass without a separate step.
+  const results: Record<string, PosterResult> = loadPosterResults();
   let foundWikipedia = 0;
   let foundTmdb = 0;
   let missing = 0;
   let skipped = 0;
 
-  for (const [i, title] of TITLES.entries()) {
+  for (const [i, title] of ALL_TITLES.entries()) {
     const existing = results[title.id];
     if (existing?.posterUrl) {
       if (existing.source === "wikipedia") foundWikipedia++;
@@ -157,7 +171,10 @@ async function main() {
 
     const hint = typeHint(title.type, title.release_year);
     try {
-      const articleTitle = await searchArticleTitle(title.name, hint);
+      let articleTitle = await searchArticleTitle(title.name, hint);
+      if (articleTitle && !isPlausibleMatch(title.name, articleTitle)) {
+        articleTitle = null;
+      }
       let posterUrl: string | null = null;
       if (articleTitle) {
         posterUrl = await fetchPageImage(articleTitle);
@@ -166,22 +183,22 @@ async function main() {
       if (posterUrl) {
         results[title.id] = { posterUrl, source: "wikipedia", articleTitle };
         foundWikipedia++;
-        console.log(`[${i + 1}/${TITLES.length}] ${title.name} -> wikipedia (${articleTitle})`);
+        console.log(`[${i + 1}/${ALL_TITLES.length}] ${title.name} -> wikipedia (${articleTitle})`);
       } else {
         const isSeries = title.seasons != null || title.episodes != null;
         const tmdbUrl = await fetchTmdbPoster(title.name, title.type, title.release_year, isSeries);
         if (tmdbUrl) {
           results[title.id] = { posterUrl: tmdbUrl, source: "tmdb", articleTitle };
           foundTmdb++;
-          console.log(`[${i + 1}/${TITLES.length}] ${title.name} -> tmdb`);
+          console.log(`[${i + 1}/${ALL_TITLES.length}] ${title.name} -> tmdb`);
         } else {
           results[title.id] = { posterUrl: null, source: null, articleTitle };
           missing++;
-          console.log(`[${i + 1}/${TITLES.length}] ${title.name} -> NOT FOUND (placeholder will be used)`);
+          console.log(`[${i + 1}/${ALL_TITLES.length}] ${title.name} -> NOT FOUND (placeholder will be used)`);
         }
       }
     } catch (e: any) {
-      console.error(`[${i + 1}/${TITLES.length}] ${title.name} -> ERROR: ${e.message}`);
+      console.error(`[${i + 1}/${ALL_TITLES.length}] ${title.name} -> ERROR: ${e.message}`);
       results[title.id] = { posterUrl: null, source: null, articleTitle: null };
       missing++;
     }

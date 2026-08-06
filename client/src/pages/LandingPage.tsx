@@ -24,7 +24,7 @@ export function LandingPage() {
           <h1 className="text-5xl font-black uppercase leading-[0.95] tracking-tight sm:text-7xl">
             Stop scrolling.
             <br />
-            <span className="bg-accent-500 px-2 text-[var(--ink)]">Start watching.</span>
+            <span className="bg-accent-500 px-2 text-[var(--on-accent)]">Start watching.</span>
           </h1>
           <p className="mt-6 max-w-xl text-lg font-semibold text-[var(--text-muted)]">
             A quick quiz, a swipe deck, and a running list of what you actually want to watch —
@@ -33,12 +33,12 @@ export function LandingPage() {
           </p>
           <div className="mt-8 flex gap-3">
             {isAuthenticated ? (
-              <Link to="/swipe" className="pop-pressable bg-accent-500 px-6 py-3 font-black uppercase text-[var(--ink)]">
+              <Link to="/swipe" className="pop-pressable bg-accent-500 px-6 py-3 font-black uppercase text-[var(--on-accent)]">
                 Go to swipe deck
               </Link>
             ) : (
               <>
-                <Link to="/signup" className="pop-pressable bg-accent-500 px-6 py-3 font-black uppercase text-[var(--ink)]">
+                <Link to="/signup" className="pop-pressable bg-accent-500 px-6 py-3 font-black uppercase text-[var(--on-accent)]">
                   Get started
                 </Link>
                 <Link to="/login" className="pop-pressable bg-[var(--bg-elevated)] px-6 py-3 font-black uppercase">

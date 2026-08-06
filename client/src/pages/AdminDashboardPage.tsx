@@ -33,7 +33,7 @@ function RankedList({ title, items }: { title: string; items: { name: string; co
               <span className="font-bold">
                 {i + 1}. {item.name}
               </span>
-              <span className="pop-badge bg-accent-500 px-2 py-0.5 text-[10px] text-[var(--ink)]">{item.count}</span>
+              <span className="pop-badge bg-accent-500 px-2 py-0.5 text-[10px] text-[var(--on-accent)]">{item.count}</span>
             </li>
           ))}
         </ol>

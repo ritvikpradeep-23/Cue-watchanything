@@ -84,6 +84,7 @@ export const PLATFORMS = [
   "Apple TV",
   "Hulu",
   "Crunchyroll",
+  "HIDIVE",
   "HBO Max",
 ] as const;
 

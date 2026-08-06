@@ -45,7 +45,7 @@ function CarouselCard({ title }: { title: DeckTitle }) {
       <div className="relative aspect-[2/3] w-full overflow-hidden">
         <PosterImage src={title.posterUrl} alt={title.name} className="h-full w-full transition-transform duration-300 group-hover:scale-105" />
         {title.trending && (
-          <span className="pop-badge absolute left-1.5 top-1.5 bg-accent-500 px-1.5 py-0.5 text-[9px] text-[var(--ink)]">
+          <span className="pop-badge absolute left-1.5 top-1.5 bg-accent-500 px-1.5 py-0.5 text-[9px] text-[var(--on-accent)]">
             {Math.round(title.trending.likeRatio * 100)}% liked
           </span>
         )}

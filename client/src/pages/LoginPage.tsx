@@ -57,7 +57,7 @@ export function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="pop-pressable mt-2 bg-accent-500 px-4 py-3 font-black uppercase text-[var(--ink)] disabled:opacity-50"
+          className="pop-pressable mt-2 bg-accent-500 px-4 py-3 font-black uppercase text-[var(--on-accent)] disabled:opacity-50"
         >
           {loading ? "Logging in…" : "Log in"}
         </button>

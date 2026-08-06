@@ -45,6 +45,7 @@ import { RAW as BATCH_034 } from "./034-hulu-small-2";
 import { RAW as BATCH_035 } from "./035-mixed-medium";
 import { RAW as BATCH_036 } from "./036-multilingual-expansion";
 import { RAW as BATCH_037 } from "./037-multilingual-expansion-2";
+import { RAW as BATCH_038 } from "./038-malayalam-tamil-priority";
 
 const ALL_RAW: RawTitle[] = [
   ...BATCH_001,
@@ -84,6 +85,7 @@ const ALL_RAW: RawTitle[] = [
   ...BATCH_035,
   ...BATCH_036,
   ...BATCH_037,
+  ...BATCH_038,
 ];
 
 export const BATCH_TITLES: TitleSeed[] = ALL_RAW.map(build);

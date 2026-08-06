@@ -77,7 +77,7 @@ export function QuizWizard({ title, subtitle, getNext, onComplete }: QuizWizardP
   return (
     <div className="mx-auto max-w-xl px-4 py-10">
       <div className="mb-6 text-center">
-        <p className="pop-badge inline-flex bg-accent-500 px-3 py-1 text-xs text-[var(--ink)]">{title}</p>
+        <p className="pop-badge inline-flex bg-accent-500 px-3 py-1 text-xs text-[var(--on-accent)]">{title}</p>
         {subtitle && <p className="mt-2 text-sm font-medium text-[var(--text-muted)]">{subtitle}</p>}
         <p className="mt-3 text-xs font-bold uppercase text-[var(--text-muted)]">Question {questionNumber + 1}</p>
       </div>
@@ -98,7 +98,7 @@ export function QuizWizard({ title, subtitle, getNext, onComplete }: QuizWizardP
                 <button
                   key={o.value}
                   onClick={() => submitAnswer(o.value)}
-                  className="pop-pressable bg-[var(--bg-elevated)] px-4 py-3 text-left text-sm font-bold hover:bg-accent-500 hover:text-[var(--ink)]"
+                  className="pop-pressable bg-[var(--bg-elevated)] px-4 py-3 text-left text-sm font-bold hover:bg-accent-500 hover:text-[var(--on-accent)]"
                 >
                   {o.label}
                 </button>
@@ -120,7 +120,7 @@ export function QuizWizard({ title, subtitle, getNext, onComplete }: QuizWizardP
                         )
                       }
                       className={`pop-badge px-4 py-2 text-sm ${
-                        selected ? "bg-accent-500 text-[var(--ink)]" : "bg-[var(--bg-elevated)] text-[var(--text)]"
+                        selected ? "bg-accent-500 text-[var(--on-accent)]" : "bg-[var(--bg-elevated)] text-[var(--text)]"
                       }`}
                     >
                       {o.label}
@@ -130,7 +130,7 @@ export function QuizWizard({ title, subtitle, getNext, onComplete }: QuizWizardP
               </div>
               <button
                 onClick={() => submitAnswer(draftMulti)}
-                className="pop-pressable mt-6 w-full bg-accent-500 px-4 py-3 font-black uppercase text-[var(--ink)]"
+                className="pop-pressable mt-6 w-full bg-accent-500 px-4 py-3 font-black uppercase text-[var(--on-accent)]"
               >
                 Continue
               </button>
@@ -155,7 +155,7 @@ export function QuizWizard({ title, subtitle, getNext, onComplete }: QuizWizardP
                       .filter(Boolean),
                   )
                 }
-                className="pop-pressable mt-4 w-full bg-accent-500 px-4 py-3 font-black uppercase text-[var(--ink)]"
+                className="pop-pressable mt-4 w-full bg-accent-500 px-4 py-3 font-black uppercase text-[var(--on-accent)]"
               >
                 Continue
               </button>
@@ -184,7 +184,7 @@ export function QuizWizard({ title, subtitle, getNext, onComplete }: QuizWizardP
               </div>
               <button
                 onClick={() => submitAnswer(draftText3.map((s) => s.trim()).filter(Boolean))}
-                className="pop-pressable mt-4 w-full bg-accent-500 px-4 py-3 font-black uppercase text-[var(--ink)]"
+                className="pop-pressable mt-4 w-full bg-accent-500 px-4 py-3 font-black uppercase text-[var(--on-accent)]"
               >
                 Continue
               </button>
@@ -204,7 +204,7 @@ export function QuizWizard({ title, subtitle, getNext, onComplete }: QuizWizardP
                           onClick={() => setDraftToggles((prev) => ({ ...prev, [t.key]: o.value }))}
                           className={`pop-badge px-4 py-2 text-sm ${
                             draftToggles[t.key] === o.value
-                              ? "bg-accent-500 text-[var(--ink)]"
+                              ? "bg-accent-500 text-[var(--on-accent)]"
                               : "bg-[var(--bg-elevated)] text-[var(--text)]"
                           }`}
                         >
@@ -218,7 +218,7 @@ export function QuizWizard({ title, subtitle, getNext, onComplete }: QuizWizardP
               <button
                 disabled={!question.toggles?.every((t) => draftToggles[t.key])}
                 onClick={() => submitAnswer(draftToggles)}
-                className="pop-pressable mt-6 w-full bg-accent-500 px-4 py-3 font-black uppercase text-[var(--ink)] disabled:opacity-40"
+                className="pop-pressable mt-6 w-full bg-accent-500 px-4 py-3 font-black uppercase text-[var(--on-accent)] disabled:opacity-40"
               >
                 Continue
               </button>

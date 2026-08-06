@@ -168,7 +168,7 @@ export const RAW: RawTitle[] = [
     id: "fire-force", name: "Fire Force", type: "anime",
     plot: "In a world where people can spontaneously combust into fire-wielding infernals, a special fire brigade of pyrokinetic soldiers investigates the true cause of the epidemic while battling the infernals it creates.",
     cast: ["Gakuto Kajiwara", "Kengo Kawanishi"], seasons: 2, episodes: 48, year: 2019,
-    platforms: ["Crunchyroll"], genre: ["action", "fantasy"], mood: ["intense", "funny-witty"], pace: ["fast-paced"],
+    platforms: ["Crunchyroll", "HIDIVE"], genre: ["action", "fantasy"], mood: ["intense", "funny-witty"], pace: ["fast-paced"],
     tone: ["mixed"], cast_style: ["ensemble"], content_rating: ["teen"], intensity: ["graphic-violence"],
     era: ["sci-fi-future"], structure: ["serialized"], sub_dub: ["sub-available", "dub-available"], completion: ["completed"], recency: ["hidden-gem"],
     length: ["short-binge"], love: ["world-building", "characters"],

@@ -100,7 +100,7 @@ export function NotSureFab() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="fab pop-pressable flex items-center gap-2 bg-accent-500 px-5 py-3 font-black uppercase text-[var(--ink)]"
+        className="fab pop-pressable flex items-center gap-2 bg-accent-500 px-5 py-3 font-black uppercase text-[var(--on-accent)]"
       >
         <span className="text-xl">🤔</span>
         <span className="hidden sm:inline">Not sure what to watch?</span>
@@ -144,7 +144,7 @@ export function NotSureFab() {
                 <Link
                   to="/swipe"
                   onClick={() => setOpen(false)}
-                  className="pop-pressable bg-accent-500 px-5 py-2.5 font-black uppercase text-[var(--ink)]"
+                  className="pop-pressable bg-accent-500 px-5 py-2.5 font-black uppercase text-[var(--on-accent)]"
                 >
                   Go swipe
                 </Link>

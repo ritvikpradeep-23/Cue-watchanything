@@ -40,7 +40,7 @@ export function Navbar() {
     <header className="sticky top-0 z-40 border-b-[3px] border-[var(--ink)] bg-[var(--bg-elevated)]">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
         <Link to="/" className="flex items-center gap-2.5 text-lg font-black uppercase tracking-tight">
-          <span className="pop-panel flex h-8 w-8 items-center justify-center bg-accent-500 text-sm font-black text-[var(--ink)]">
+          <span className="pop-panel flex h-8 w-8 items-center justify-center bg-accent-500 text-sm font-black text-[var(--on-accent)]">
             ?
           </span>
           <span className="hidden sm:inline">What Should I Watch</span>
@@ -74,7 +74,7 @@ export function Navbar() {
               </NavLink>
               <Link
                 to="/signup"
-                className="pop-pressable ml-1 bg-accent-500 px-4 py-1.5 text-xs font-black uppercase text-[var(--ink)]"
+                className="pop-pressable ml-1 bg-accent-500 px-4 py-1.5 text-xs font-black uppercase text-[var(--on-accent)]"
               >
                 Get started
               </Link>
@@ -127,7 +127,7 @@ export function Navbar() {
               <Link
                 to="/signup"
                 onClick={() => setOpen(false)}
-                className="pop-pressable bg-accent-500 px-3 py-2 text-center text-sm font-black uppercase text-[var(--ink)]"
+                className="pop-pressable bg-accent-500 px-3 py-2 text-center text-sm font-black uppercase text-[var(--on-accent)]"
               >
                 Get started
               </Link>

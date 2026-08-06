@@ -77,7 +77,7 @@ export function WatchlistPage() {
                 </p>
                 <button
                   onClick={() => markWatched(item.id)}
-                  className="pop-pressable mt-3 bg-accent-500 px-3 py-1.5 text-xs font-black uppercase text-[var(--ink)]"
+                  className="pop-pressable mt-3 bg-accent-500 px-3 py-1.5 text-xs font-black uppercase text-[var(--on-accent)]"
                 >
                   Mark as watched
                 </button>

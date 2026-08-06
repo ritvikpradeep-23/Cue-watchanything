@@ -11,10 +11,13 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 const THEME_KEY = "watchrec_theme";
 
+/** Dark is the default on first load, full stop — not tied to OS preference. Only an explicit
+ * toggle earns a persisted override (see index.html's inline pre-paint script for the same
+ * logic applied before React even mounts, so there's no flash of the wrong theme). */
 function getInitialTheme(): Theme {
   const stored = localStorage.getItem(THEME_KEY);
   if (stored === "light" || stored === "dark") return stored;
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  return "dark";
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
@@ -22,10 +25,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem(THEME_KEY, theme);
   }, [theme]);
 
-  const toggleTheme = () => setTheme((t) => (t === "light" ? "dark" : "light"));
+  const toggleTheme = () =>
+    setTheme((t) => {
+      const next = t === "light" ? "dark" : "light";
+      localStorage.setItem(THEME_KEY, next); // only persist once the user has actually chosen
+      return next;
+    });
 
   return <ThemeContext.Provider value={{ theme, toggleTheme }}>{children}</ThemeContext.Provider>;
 }

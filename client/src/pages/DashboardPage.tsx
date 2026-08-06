@@ -56,8 +56,8 @@ export function DashboardPage() {
       <div className="pop-panel stripe-bg relative mb-10 overflow-hidden p-6 sm:p-8">
         <div className="halftone-bg absolute inset-0" />
         <div className="relative">
-          <h1 className="text-3xl font-black uppercase text-[var(--ink)] sm:text-4xl">Welcome back</h1>
-          <p className="mt-1 max-w-lg font-semibold text-[var(--ink)]/80">
+          <h1 className="text-3xl font-black uppercase text-[var(--on-accent)] sm:text-4xl">Welcome back</h1>
+          <p className="mt-1 max-w-lg font-semibold text-[var(--on-accent)]/80">
             Not sure what to watch? Hit the button in the corner, or browse below.
           </p>
         </div>
@@ -77,7 +77,7 @@ export function DashboardPage() {
           <button
             onClick={() => setIndustryFilter(null)}
             className={`pop-badge px-3 py-1 text-[11px] ${
-              industryFilter === null ? "bg-accent-500 text-[var(--ink)]" : "bg-[var(--bg-elevated)] text-[var(--text)]"
+              industryFilter === null ? "bg-accent-500 text-[var(--on-accent)]" : "bg-[var(--bg-elevated)] text-[var(--text)]"
             }`}
           >
             All industries
@@ -87,7 +87,7 @@ export function DashboardPage() {
               key={i}
               onClick={() => setIndustryFilter((prev) => (prev === i ? null : i))}
               className={`pop-badge px-3 py-1 text-[11px] ${
-                industryFilter === i ? "bg-accent-500 text-[var(--ink)]" : "bg-[var(--bg-elevated)] text-[var(--text)]"
+                industryFilter === i ? "bg-accent-500 text-[var(--on-accent)]" : "bg-[var(--bg-elevated)] text-[var(--text)]"
               }`}
             >
               {i}
@@ -125,7 +125,7 @@ export function DashboardPage() {
         <section className="mb-10">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-xl font-black uppercase tracking-tight sm:text-2xl">Your watchlist</h2>
-            <Link to="/watchlist" className="pop-badge bg-accent-500 px-3 py-1 text-xs text-[var(--ink)]">
+            <Link to="/watchlist" className="pop-badge bg-accent-500 px-3 py-1 text-xs text-[var(--on-accent)]">
               View all →
             </Link>
           </div>

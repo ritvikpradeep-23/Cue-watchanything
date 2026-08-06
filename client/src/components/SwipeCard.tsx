@@ -165,7 +165,7 @@ export function SwipeCard({ title, stackIndex, onSwipe, onOpenDetail }: SwipeCar
               {title.tags.genre.slice(0, 3).map((g) => (
                 <span
                   key={g}
-                  className="pop-badge border-white/70 bg-accent-500 px-2 py-0.5 text-[10px] text-[var(--ink)]"
+                  className="pop-badge border-white/70 bg-accent-500 px-2 py-0.5 text-[10px] text-[var(--on-accent)]"
                 >
                   {g}
                 </span>

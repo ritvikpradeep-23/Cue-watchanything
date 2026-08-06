@@ -65,7 +65,7 @@ function TagPicker({
               type="button"
               onClick={() => onToggle(opt)}
               className={`pop-badge px-2.5 py-1 text-[11px] ${
-                isSelected ? "bg-accent-500 text-[var(--ink)]" : "bg-[var(--bg-elevated)] text-[var(--text)]"
+                isSelected ? "bg-accent-500 text-[var(--on-accent)]" : "bg-[var(--bg-elevated)] text-[var(--text)]"
               }`}
             >
               {label(opt)}
@@ -276,7 +276,7 @@ export function AdminAddTitlePage() {
                 type="button"
                 onClick={() => togglePlatform(p)}
                 className={`pop-badge px-2.5 py-1 text-[11px] ${
-                  platforms.includes(p) ? "bg-accent-500 text-[var(--ink)]" : "bg-[var(--bg-elevated)] text-[var(--text)]"
+                  platforms.includes(p) ? "bg-accent-500 text-[var(--on-accent)]" : "bg-[var(--bg-elevated)] text-[var(--text)]"
                 }`}
               >
                 {p}
@@ -294,7 +294,7 @@ export function AdminAddTitlePage() {
                 type="button"
                 onClick={() => toggleLanguage(l)}
                 className={`pop-badge px-2.5 py-1 text-[11px] ${
-                  languages.includes(l) ? "bg-accent-500 text-[var(--ink)]" : "bg-[var(--bg-elevated)] text-[var(--text)]"
+                  languages.includes(l) ? "bg-accent-500 text-[var(--on-accent)]" : "bg-[var(--bg-elevated)] text-[var(--text)]"
                 }`}
               >
                 {l}
@@ -323,7 +323,7 @@ export function AdminAddTitlePage() {
         <button
           onClick={handleSubmit}
           disabled={submitting}
-          className="pop-pressable bg-accent-500 px-5 py-2.5 font-black uppercase text-[var(--ink)] disabled:opacity-50"
+          className="pop-pressable bg-accent-500 px-5 py-2.5 font-black uppercase text-[var(--on-accent)] disabled:opacity-50"
         >
           {submitting ? "Adding…" : "Add title"}
         </button>

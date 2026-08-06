@@ -84,7 +84,7 @@ export function TitleDetailPage() {
 
           <div className="mt-3 flex flex-wrap gap-2">
             {title.tags.genre?.map((g) => (
-              <span key={g} className="pop-badge bg-accent-500 px-3 py-1 text-xs text-[var(--ink)]">
+              <span key={g} className="pop-badge bg-accent-500 px-3 py-1 text-xs text-[var(--on-accent)]">
                 {g}
               </span>
             ))}
@@ -123,7 +123,7 @@ export function TitleDetailPage() {
             <div className="mt-6 flex flex-wrap gap-3">
               <button
                 onClick={() => handleAction("like")}
-                className="pop-pressable bg-accent-500 px-4 py-2.5 text-sm font-black uppercase text-[var(--ink)]"
+                className="pop-pressable bg-accent-500 px-4 py-2.5 text-sm font-black uppercase text-[var(--on-accent)]"
               >
                 Add to watchlist
               </button>
@@ -170,7 +170,7 @@ export function TitleDetailPage() {
           <button
             onClick={handleRate}
             disabled={myRating < 1}
-            className="pop-pressable mt-3 bg-accent-500 px-4 py-2.5 text-sm font-black uppercase text-[var(--ink)] disabled:opacity-40"
+            className="pop-pressable mt-3 bg-accent-500 px-4 py-2.5 text-sm font-black uppercase text-[var(--on-accent)] disabled:opacity-40"
           >
             Submit rating
           </button>

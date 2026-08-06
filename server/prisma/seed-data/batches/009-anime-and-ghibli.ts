@@ -88,7 +88,7 @@ export const RAW: RawTitle[] = [
     id: "the-ancient-magus-bride", name: "The Ancient Magus' Bride", type: "anime",
     plot: "An orphaned girl with a rare magical gift is sold at auction to a nonhuman mage with a skull for a head, who names her both his apprentice and his future bride, and neither of them fully knows what that means yet.",
     cast: ["Atsumi Tanezaki", "Ryōta Takeuchi"], seasons: 2, episodes: 36, year: 2017,
-    platforms: ["Crunchyroll"], genre: ["fantasy", "romance"], mood: ["cerebral-ideas", "dark"], pace: ["slow-burn"],
+    platforms: ["Crunchyroll", "HIDIVE"], genre: ["fantasy", "romance"], mood: ["cerebral-ideas", "dark"], pace: ["slow-burn"],
     tone: ["mixed"], cast_style: ["ensemble"], content_rating: ["teen"], intensity: ["heavy-themes"],
     era: ["fantasy-world"], structure: ["serialized"], sub_dub: ["sub-available", "dub-available"], completion: ["completed"], recency: ["hidden-gem"],
     length: ["short-binge"], love: ["world-building", "emotional-weight"],

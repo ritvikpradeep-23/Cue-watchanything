@@ -20,15 +20,24 @@
 }
 
 :root {
-  --bg: #faf6ef;
+  /* light mode: warm, slightly deeper cream than before for better separation from elevated
+   * panels, and darkened --text-muted a notch for real body-text contrast against it */
+  --bg: #f5efe3;
   --bg-elevated: #fffdf9;
-  --bg-sunken: #fbe6e6;
+  --bg-sunken: #f8dfe1;
   --text: #1a1410;
-  --text-muted: #6b5f52;
+  --text-muted: #5c5044;
   --border: #1a1410;
   --ink: #1a1410;
   --ring: var(--color-accent-600);
   --shadow-offset: 5px;
+  color-scheme: light;
+  /* text color for anything sitting on a solid/striped accent background (buttons, badges,
+   * the hero stripe). Accent-500/600 are dark-ish saturated reds in BOTH themes, so this is a
+   * fixed light color rather than something that flips with --ink — near-black text on crimson
+   * reads at ~2:1 contrast in light mode, which is the real reason accent buttons were
+   * illegible; light text reads correctly against the accent in both themes. */
+  --on-accent: #fef7f8;
 
   /* ---------- spacing scale — 4/8/12/16/24/32/48px steps, single source of truth for any
    * custom CSS (Tailwind utilities already follow this scale natively: p-1..p-12 etc.) ---------- */
@@ -42,35 +51,39 @@
 }
 
 :root[data-theme="dark"] {
-  --bg: #14100c;
-  --bg-elevated: #1e1812;
-  --bg-sunken: #2a2016;
-  --text: #fbf3ea;
-  --text-muted: #b8a996;
-  --border: #fbf3ea;
-  --ink: #fbf3ea;
+  /* genuinely near-black, not dark gray — a faint warm/red undertone rather than flat neutral,
+   * so the crimson accent and the atmospheric glow (below) both feel like they belong on it */
+  --bg: #07090b;
+  --bg-elevated: #14171b;
+  --bg-sunken: #241318;
+  --text: #f3ede6;
+  --text-muted: #ad9fa8;
+  --border: #f3ede6;
+  --ink: #f3ede6;
   --ring: var(--color-accent-400);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #14100c;
-    --bg-elevated: #1e1812;
-    --bg-sunken: #2a1416;
-    --text: #fbf3ea;
-    --text-muted: #b8a996;
-    --border: #fbf3ea;
-    --ink: #fbf3ea;
-    --ring: var(--color-accent-400);
-  }
+  color-scheme: dark;
 }
 
 * {
   border-color: var(--border);
 }
 
-html {
-  color-scheme: light dark;
+/* Atmospheric depth for dark mode — subtle radial glows in the accent's hues, fixed to the
+ * viewport so they don't repeat/tile awkwardly as the page scrolls. A flat single-tone dark
+ * background was the actual reason the crimson accent read as flat/muddy: nothing behind it
+ * gave the eye a sense of depth for the accent to pop against. Kept low-opacity and far apart
+ * so it stays moody rather than becoming its own competing pattern. Light mode intentionally
+ * gets no equivalent — it should read as a bright, plain daylight surface, not a tinted one. */
+:root[data-theme="dark"]::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(1100px 750px at 10% -12%, color-mix(in srgb, var(--color-accent-700) 32%, transparent), transparent 62%),
+    radial-gradient(950px 800px at 108% 8%, color-mix(in srgb, var(--color-accent-900) 55%, transparent), transparent 65%),
+    radial-gradient(1300px 950px at 50% 118%, color-mix(in srgb, #2a0812 65%, transparent), transparent 70%);
 }
 
 body {

@@ -77,7 +77,7 @@ export function SwipePage() {
             </p>
             <button
               onClick={() => navigate("/watchlist")}
-              className="pop-pressable bg-accent-500 px-5 py-2.5 font-black uppercase text-[var(--ink)]"
+              className="pop-pressable bg-accent-500 px-5 py-2.5 font-black uppercase text-[var(--on-accent)]"
             >
               View watchlist
             </button>
@@ -117,7 +117,7 @@ export function SwipePage() {
           <button
             onClick={() => handleSwipe("like")}
             aria-label="Like"
-            className="pop-pressable flex h-14 w-14 items-center justify-center rounded-full bg-accent-500 text-2xl text-[var(--ink)]"
+            className="pop-pressable flex h-14 w-14 items-center justify-center rounded-full bg-accent-500 text-2xl text-[var(--on-accent)]"
           >
             ♥
           </button>

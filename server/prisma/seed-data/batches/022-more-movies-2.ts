@@ -12,15 +12,6 @@ export const RAW: RawTitle[] = [
     length: ["single-sitting"], love: ["characters", "emotional-weight"],
   },
   {
-    id: "past-lives-2023", name: "Past Lives", type: "movie",
-    plot: "Two childhood friends from Korea, separated when one emigrates, reconnect decades later in New York, and have to reckon with what might have been against the lives they've each actually built.",
-    cast: ["Greta Lee", "Teo Yoo", "John Magaro"], runtime: 105, year: 2023,
-    platforms: ["Prime Video"], genre: ["romance", "drama"], mood: ["feel-good", "cerebral-ideas"], pace: ["slow-burn"],
-    tone: ["hopeful"], cast_style: ["ensemble"], content_rating: ["teen"],
-    era: ["modern"], structure: ["standalone"], recency: ["hidden-gem"],
-    length: ["single-sitting"], love: ["emotional-weight", "characters"],
-  },
-  {
     id: "the-farewell", name: "The Farewell", type: "movie",
     plot: "A Chinese-American woman returns to China to say goodbye to her dying grandmother, who doesn't know she's terminally ill — the family has decided not to tell her, and stages a fake wedding as an excuse for everyone to gather.",
     cast: ["Awkwafina", "Shuzhen Zhao", "X Mayo"], runtime: 100, year: 2019,

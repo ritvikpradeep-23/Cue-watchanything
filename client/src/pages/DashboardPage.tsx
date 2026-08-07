@@ -51,21 +51,42 @@ export function DashboardPage() {
     });
   }, [catalog, actorQuery, industryFilter, activeSearch]);
 
-  return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
-      <div className="pop-panel stripe-bg relative mb-10 overflow-hidden p-6 sm:p-8">
-        <div className="halftone-bg absolute inset-0" />
-        <div className="relative">
-          <h1 className="text-3xl font-black uppercase text-[var(--on-accent)] sm:text-4xl">Welcome back</h1>
-          <p className="mt-1 max-w-lg font-semibold text-[var(--on-accent)]/80">
-            Not sure what to watch? Hit the button in the corner, or browse below.
-          </p>
-        </div>
-      </div>
+  const heroPosters = (recommended && recommended.length > 0 ? recommended : catalog)?.slice(0, 10) ?? [];
 
-      <section className="mb-10">
+  return (
+    <div>
+      <section className="hero-backdrop relative -mt-16 h-[70vh] min-h-[420px] overflow-hidden pt-16">
+        {heroPosters.length > 0 && (
+          <div className="absolute inset-0 -z-10 grid grid-cols-5 gap-1 opacity-70">
+            {heroPosters.map((t) => (
+              <img key={t.id} src={t.posterUrl} alt="" className="h-full w-full object-cover" />
+            ))}
+          </div>
+        )}
+        <div className="relative mx-auto flex h-full max-w-6xl flex-col justify-end px-4 pb-12">
+          <h1 className="max-w-lg text-3xl font-semibold sm:text-5xl">Welcome back</h1>
+          <p className="mt-3 max-w-md text-sm text-[var(--text-muted)] sm:text-base">
+            Pick up where you left off, or let us find something new — your taste profile keeps
+            getting sharper with every swipe.
+          </p>
+          <div className="mt-5 flex gap-3">
+            <Link
+              to="/swipe"
+              className="surface-interactive bg-accent-500 px-5 py-2.5 text-sm font-semibold text-[var(--on-accent)]"
+            >
+              Go to swipe deck
+            </Link>
+            <Link to="/watchlist" className="surface-interactive bg-[var(--bg-elevated)] px-5 py-2.5 text-sm font-semibold">
+              My watchlist
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <div className="mx-auto max-w-6xl px-4 pb-8">
+      <section className="mb-10 pt-8">
         <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="text-xl font-black uppercase tracking-tight sm:text-2xl">Browse</h2>
+          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Browse</h2>
           <input
             value={actorQuery}
             onChange={(e) => setActorQuery(e.target.value)}
@@ -76,7 +97,7 @@ export function DashboardPage() {
         <div className="flex flex-wrap gap-1.5">
           <button
             onClick={() => setIndustryFilter(null)}
-            className={`pop-badge px-3 py-1 text-[11px] ${
+            className={`chip px-3 py-1 text-[11px] ${
               industryFilter === null ? "bg-accent-500 text-[var(--on-accent)]" : "bg-[var(--bg-elevated)] text-[var(--text)]"
             }`}
           >
@@ -86,7 +107,7 @@ export function DashboardPage() {
             <button
               key={i}
               onClick={() => setIndustryFilter((prev) => (prev === i ? null : i))}
-              className={`pop-badge px-3 py-1 text-[11px] ${
+              className={`chip px-3 py-1 text-[11px] ${
                 industryFilter === i ? "bg-accent-500 text-[var(--on-accent)]" : "bg-[var(--bg-elevated)] text-[var(--text)]"
               }`}
             >
@@ -98,20 +119,20 @@ export function DashboardPage() {
         {activeSearch && (
           <div className="mt-4">
             {searchResults.length === 0 ? (
-              <p className="pop-panel p-4 text-sm font-semibold text-[var(--text-muted)]">No titles match.</p>
+              <p className="surface p-4 text-sm font-semibold text-[var(--text-muted)]">No titles match.</p>
             ) : (
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-6">
                 {searchResults.slice(0, 24).map((t) => (
                   <Link
                     key={t.id}
                     to={`/titles/${t.id}`}
-                    className="pop-pressable block overflow-hidden bg-[var(--bg-elevated)]"
+                    className="surface-interactive block overflow-hidden bg-[var(--bg-elevated)]"
                   >
                     <div className="aspect-[2/3] w-full overflow-hidden">
                       <PosterImage src={t.posterUrl} alt={t.name} className="h-full w-full" />
                     </div>
-                    <div className="border-t-[3px] border-[var(--ink)] p-1.5">
-                      <p className="truncate text-xs font-black uppercase">{t.name}</p>
+                    <div className="border-t border-[var(--border)]/10 p-1.5">
+                      <p className="truncate text-xs font-semibold">{t.name}</p>
                     </div>
                   </Link>
                 ))}
@@ -124,8 +145,8 @@ export function DashboardPage() {
       {watchlist && watchlist.length > 0 && (
         <section className="mb-10">
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-xl font-black uppercase tracking-tight sm:text-2xl">Your watchlist</h2>
-            <Link to="/watchlist" className="pop-badge bg-accent-500 px-3 py-1 text-xs text-[var(--on-accent)]">
+            <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Your watchlist</h2>
+            <Link to="/watchlist" className="chip bg-accent-500 px-3 py-1 text-xs text-[var(--on-accent)]">
               View all →
             </Link>
           </div>
@@ -142,14 +163,14 @@ export function DashboardPage() {
               <Link
                 key={t.id}
                 to={`/titles/${t.id}`}
-                className="pop-pressable group block w-28 shrink-0 overflow-hidden bg-[var(--bg-elevated)] sm:w-32"
+                className="surface-interactive group block w-28 shrink-0 overflow-hidden bg-[var(--bg-elevated)] sm:w-32"
               >
                 <div className="aspect-[2/3] w-full overflow-hidden">
                   <PosterImage src={t.posterUrl} alt={t.name} className="h-full w-full" />
                 </div>
-                <div className="border-t-[3px] border-[var(--ink)] p-1.5">
-                  <p className="truncate text-xs font-black uppercase">{t.name}</p>
-                  <p className="truncate text-[10px] font-bold text-accent-600">{t.platforms?.[0] ?? "—"}</p>
+                <div className="border-t border-[var(--border)]/10 p-1.5">
+                  <p className="truncate text-xs font-semibold">{t.name}</p>
+                  <p className="truncate text-[10px] font-bold text-[var(--text-accent)]">{t.platforms?.[0] ?? "—"}</p>
                 </div>
               </Link>
             ))}
@@ -158,10 +179,10 @@ export function DashboardPage() {
       )}
 
       {watchlist && watchlist.length === 0 && (
-        <div className="pop-panel mb-10 p-6 text-center">
+        <div className="surface mb-10 p-6 text-center">
           <p className="font-semibold text-[var(--text-muted)]">
             Nothing in your watchlist yet.{" "}
-            <Link to="/swipe" className="font-bold text-accent-600 underline">
+            <Link to="/swipe" className="font-bold text-[var(--text-accent)] underline">
               Go swipe
             </Link>{" "}
             to start saving titles.
@@ -190,6 +211,7 @@ export function DashboardPage() {
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-accent-500 border-t-transparent" />
         </div>
       )}
+      </div>
     </div>
   );
 }

@@ -55,7 +55,7 @@ function TagPicker({
 }) {
   return (
     <div className="mb-3">
-      <p className="mb-1.5 text-xs font-black uppercase tracking-wide text-[var(--text-muted)]">{section.label}</p>
+      <p className="mb-1.5 text-xs font-semibold tracking-wide text-[var(--text-muted)]">{section.label}</p>
       <div className="flex flex-wrap gap-1.5">
         {section.options.map((opt) => {
           const isSelected = selected.includes(opt);
@@ -64,7 +64,7 @@ function TagPicker({
               key={opt}
               type="button"
               onClick={() => onToggle(opt)}
-              className={`pop-badge px-2.5 py-1 text-[11px] ${
+              className={`chip px-2.5 py-1 text-[11px] ${
                 isSelected ? "bg-accent-500 text-[var(--on-accent)]" : "bg-[var(--bg-elevated)] text-[var(--text)]"
               }`}
             >
@@ -100,7 +100,7 @@ export function AdminAddTitlePage() {
   if (user?.role !== "ADMIN") {
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center">
-        <p className="pop-panel p-6 font-bold">Admin access required.</p>
+        <p className="surface p-6 font-bold">Admin access required.</p>
       </div>
     );
   }
@@ -166,15 +166,15 @@ export function AdminAddTitlePage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
-      <h1 className="mb-1 text-3xl font-black uppercase sm:text-4xl">Add a title</h1>
+      <h1 className="mb-1 text-3xl font-semibold sm:text-4xl">Add a title</h1>
       <p className="mb-6 text-sm text-[var(--text-muted)]">
         Inserted straight into the catalog — no seed rebuild or redeploy needed.
       </p>
 
-      <div className="pop-panel flex flex-col gap-4 p-6">
+      <div className="surface flex flex-col gap-4 p-6">
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="mb-1 block text-xs font-black uppercase">Name</label>
+            <label className="mb-1 block text-xs font-semibold">Name</label>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -182,7 +182,7 @@ export function AdminAddTitlePage() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-black uppercase">Type</label>
+            <label className="mb-1 block text-xs font-semibold">Type</label>
             <select
               value={type}
               onChange={(e) => setType(e.target.value)}
@@ -198,7 +198,7 @@ export function AdminAddTitlePage() {
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-black uppercase">Plot summary</label>
+          <label className="mb-1 block text-xs font-semibold">Plot summary</label>
           <textarea
             value={plot}
             onChange={(e) => setPlot(e.target.value)}
@@ -208,7 +208,7 @@ export function AdminAddTitlePage() {
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-black uppercase">Cast (comma-separated)</label>
+          <label className="mb-1 block text-xs font-semibold">Cast (comma-separated)</label>
           <input
             value={cast}
             onChange={(e) => setCast(e.target.value)}
@@ -218,7 +218,7 @@ export function AdminAddTitlePage() {
 
         <div className="grid gap-4 sm:grid-cols-4">
           <div>
-            <label className="mb-1 block text-xs font-black uppercase">Year</label>
+            <label className="mb-1 block text-xs font-semibold">Year</label>
             <input
               type="number"
               value={year}
@@ -227,7 +227,7 @@ export function AdminAddTitlePage() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-black uppercase">Seasons</label>
+            <label className="mb-1 block text-xs font-semibold">Seasons</label>
             <input
               type="number"
               value={seasons}
@@ -236,7 +236,7 @@ export function AdminAddTitlePage() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-black uppercase">Episodes</label>
+            <label className="mb-1 block text-xs font-semibold">Episodes</label>
             <input
               type="number"
               value={episodes}
@@ -245,7 +245,7 @@ export function AdminAddTitlePage() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-black uppercase">Runtime (min)</label>
+            <label className="mb-1 block text-xs font-semibold">Runtime (min)</label>
             <input
               type="number"
               value={runtime}
@@ -256,7 +256,7 @@ export function AdminAddTitlePage() {
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-black uppercase">
+          <label className="mb-1 block text-xs font-semibold">
             Poster URL <span className="normal-case text-[var(--text-muted)]">(optional — a retro placeholder is generated if left blank)</span>
           </label>
           <input
@@ -268,14 +268,14 @@ export function AdminAddTitlePage() {
         </div>
 
         <div>
-          <p className="mb-1.5 text-xs font-black uppercase tracking-wide">Platforms</p>
+          <p className="mb-1.5 text-xs font-semibold tracking-wide">Platforms</p>
           <div className="flex flex-wrap gap-1.5">
             {PLATFORMS.map((p) => (
               <button
                 key={p}
                 type="button"
                 onClick={() => togglePlatform(p)}
-                className={`pop-badge px-2.5 py-1 text-[11px] ${
+                className={`chip px-2.5 py-1 text-[11px] ${
                   platforms.includes(p) ? "bg-accent-500 text-[var(--on-accent)]" : "bg-[var(--bg-elevated)] text-[var(--text)]"
                 }`}
               >
@@ -286,14 +286,14 @@ export function AdminAddTitlePage() {
         </div>
 
         <div>
-          <p className="mb-1.5 text-xs font-black uppercase tracking-wide">Languages</p>
+          <p className="mb-1.5 text-xs font-semibold tracking-wide">Languages</p>
           <div className="flex flex-wrap gap-1.5">
             {LANGUAGES.map((l) => (
               <button
                 key={l}
                 type="button"
                 onClick={() => toggleLanguage(l)}
-                className={`pop-badge px-2.5 py-1 text-[11px] ${
+                className={`chip px-2.5 py-1 text-[11px] ${
                   languages.includes(l) ? "bg-accent-500 text-[var(--on-accent)]" : "bg-[var(--bg-elevated)] text-[var(--text)]"
                 }`}
               >
@@ -304,7 +304,7 @@ export function AdminAddTitlePage() {
         </div>
 
         <hr className="border-[var(--border)]" />
-        <p className="text-sm font-black uppercase">Tags</p>
+        <p className="text-sm font-semibold">Tags</p>
         {TAG_SECTIONS.map((section) => (
           <TagPicker
             key={section.key}
@@ -323,7 +323,7 @@ export function AdminAddTitlePage() {
         <button
           onClick={handleSubmit}
           disabled={submitting}
-          className="pop-pressable bg-accent-500 px-5 py-2.5 font-black uppercase text-[var(--on-accent)] disabled:opacity-50"
+          className="surface-interactive bg-accent-500 px-5 py-2.5 font-semibold text-[var(--on-accent)] disabled:opacity-50"
         >
           {submitting ? "Adding…" : "Add title"}
         </button>

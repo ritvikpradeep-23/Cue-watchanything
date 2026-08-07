@@ -61,7 +61,7 @@ export function SwipePage() {
 
   return (
     <div className="mx-auto flex max-w-md flex-col items-center px-4 py-10">
-      <h1 className="mb-1 text-3xl font-black uppercase sm:text-4xl">Swipe deck</h1>
+      <h1 className="mb-1 text-3xl font-semibold sm:text-4xl">Swipe deck</h1>
       <p className="mb-1 text-sm font-bold text-[var(--text-muted)]">
         {deck.length > 0 ? `${deck.length} left in this batch` : "You've been through the whole batch"}
       </p>
@@ -71,13 +71,13 @@ export function SwipePage() {
 
       <div className="relative h-[520px] w-full">
         {deck.length === 0 ? (
-          <div className="pop-panel flex h-full flex-col items-center justify-center p-8 text-center">
+          <div className="surface flex h-full flex-col items-center justify-center p-8 text-center">
             <p className="mb-4 font-semibold text-[var(--text-muted)]">
               That's everything scored highly for your taste profile right now.
             </p>
             <button
               onClick={() => navigate("/watchlist")}
-              className="pop-pressable bg-accent-500 px-5 py-2.5 font-black uppercase text-[var(--on-accent)]"
+              className="surface-interactive bg-accent-500 px-5 py-2.5 font-semibold text-[var(--on-accent)]"
             >
               View watchlist
             </button>
@@ -103,21 +103,21 @@ export function SwipePage() {
           <button
             onClick={() => handleSwipe("pass")}
             aria-label="Pass"
-            className="pop-pressable flex h-14 w-14 items-center justify-center rounded-full bg-[var(--bg-elevated)] text-2xl text-rose-500"
+            className="surface-interactive flex h-14 w-14 items-center justify-center rounded-full bg-[var(--bg-elevated)] text-2xl text-rose-500"
           >
             ✕
           </button>
           <button
             onClick={() => handleSwipe("super_like")}
             aria-label="Super like"
-            className="pop-pressable flex h-12 w-12 items-center justify-center rounded-full bg-[var(--bg-elevated)] text-xl text-amber-500"
+            className="surface-interactive flex h-12 w-12 items-center justify-center rounded-full bg-[var(--bg-elevated)] text-xl text-amber-500"
           >
             ★
           </button>
           <button
             onClick={() => handleSwipe("like")}
             aria-label="Like"
-            className="pop-pressable flex h-14 w-14 items-center justify-center rounded-full bg-accent-500 text-2xl text-[var(--on-accent)]"
+            className="surface-interactive flex h-14 w-14 items-center justify-center rounded-full bg-accent-500 text-2xl text-[var(--on-accent)]"
           >
             ♥
           </button>

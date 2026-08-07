@@ -77,20 +77,20 @@ export function QuizWizard({ title, subtitle, getNext, onComplete }: QuizWizardP
   return (
     <div className="mx-auto max-w-xl px-4 py-10">
       <div className="mb-6 text-center">
-        <p className="pop-badge inline-flex bg-accent-500 px-3 py-1 text-xs text-[var(--on-accent)]">{title}</p>
+        <p className="chip inline-flex bg-accent-500 px-3 py-1 text-xs text-[var(--on-accent)]">{title}</p>
         {subtitle && <p className="mt-2 text-sm font-medium text-[var(--text-muted)]">{subtitle}</p>}
-        <p className="mt-3 text-xs font-bold uppercase text-[var(--text-muted)]">Question {questionNumber + 1}</p>
+        <p className="mt-3 text-xs font-bold text-[var(--text-muted)]">Question {questionNumber + 1}</p>
       </div>
 
       {error && (
-        <div className="pop-panel mb-4 bg-red-100 px-4 py-3 text-sm font-bold text-red-700">
+        <div className="surface mb-4 bg-red-100 px-4 py-3 text-sm font-bold text-red-700">
           {error}
         </div>
       )}
 
       {question && (
-        <div key={question.id} className="quiz-question-enter pop-panel bg-[var(--bg-elevated)] p-6">
-          <h2 className="mb-5 text-2xl font-black uppercase leading-tight">{question.prompt}</h2>
+        <div key={question.id} className="quiz-question-enter surface bg-[var(--bg-elevated)] p-6">
+          <h2 className="mb-5 text-2xl font-semibold leading-tight">{question.prompt}</h2>
 
           {question.kind === "single" && (
             <div className="flex flex-col gap-2">
@@ -98,7 +98,7 @@ export function QuizWizard({ title, subtitle, getNext, onComplete }: QuizWizardP
                 <button
                   key={o.value}
                   onClick={() => submitAnswer(o.value)}
-                  className="pop-pressable bg-[var(--bg-elevated)] px-4 py-3 text-left text-sm font-bold hover:bg-accent-500 hover:text-[var(--on-accent)]"
+                  className="surface-interactive bg-[var(--bg-elevated)] px-4 py-3 text-left text-sm font-bold hover:bg-accent-500 hover:text-[var(--on-accent)]"
                 >
                   {o.label}
                 </button>
@@ -119,7 +119,7 @@ export function QuizWizard({ title, subtitle, getNext, onComplete }: QuizWizardP
                           selected ? prev.filter((v) => v !== o.value) : [...prev, o.value],
                         )
                       }
-                      className={`pop-badge px-4 py-2 text-sm ${
+                      className={`chip px-4 py-2 text-sm ${
                         selected ? "bg-accent-500 text-[var(--on-accent)]" : "bg-[var(--bg-elevated)] text-[var(--text)]"
                       }`}
                     >
@@ -130,7 +130,7 @@ export function QuizWizard({ title, subtitle, getNext, onComplete }: QuizWizardP
               </div>
               <button
                 onClick={() => submitAnswer(draftMulti)}
-                className="pop-pressable mt-6 w-full bg-accent-500 px-4 py-3 font-black uppercase text-[var(--on-accent)]"
+                className="surface-interactive mt-6 w-full bg-accent-500 px-4 py-3 font-semibold text-[var(--on-accent)]"
               >
                 Continue
               </button>
@@ -155,7 +155,7 @@ export function QuizWizard({ title, subtitle, getNext, onComplete }: QuizWizardP
                       .filter(Boolean),
                   )
                 }
-                className="pop-pressable mt-4 w-full bg-accent-500 px-4 py-3 font-black uppercase text-[var(--on-accent)]"
+                className="surface-interactive mt-4 w-full bg-accent-500 px-4 py-3 font-semibold text-[var(--on-accent)]"
               >
                 Continue
               </button>
@@ -184,7 +184,7 @@ export function QuizWizard({ title, subtitle, getNext, onComplete }: QuizWizardP
               </div>
               <button
                 onClick={() => submitAnswer(draftText3.map((s) => s.trim()).filter(Boolean))}
-                className="pop-pressable mt-4 w-full bg-accent-500 px-4 py-3 font-black uppercase text-[var(--on-accent)]"
+                className="surface-interactive mt-4 w-full bg-accent-500 px-4 py-3 font-semibold text-[var(--on-accent)]"
               >
                 Continue
               </button>
@@ -202,7 +202,7 @@ export function QuizWizard({ title, subtitle, getNext, onComplete }: QuizWizardP
                         <button
                           key={o.value}
                           onClick={() => setDraftToggles((prev) => ({ ...prev, [t.key]: o.value }))}
-                          className={`pop-badge px-4 py-2 text-sm ${
+                          className={`chip px-4 py-2 text-sm ${
                             draftToggles[t.key] === o.value
                               ? "bg-accent-500 text-[var(--on-accent)]"
                               : "bg-[var(--bg-elevated)] text-[var(--text)]"
@@ -218,7 +218,7 @@ export function QuizWizard({ title, subtitle, getNext, onComplete }: QuizWizardP
               <button
                 disabled={!question.toggles?.every((t) => draftToggles[t.key])}
                 onClick={() => submitAnswer(draftToggles)}
-                className="pop-pressable mt-6 w-full bg-accent-500 px-4 py-3 font-black uppercase text-[var(--on-accent)] disabled:opacity-40"
+                className="surface-interactive mt-6 w-full bg-accent-500 px-4 py-3 font-semibold text-[var(--on-accent)] disabled:opacity-40"
               >
                 Continue
               </button>

@@ -113,7 +113,7 @@ export function SwipeCard({ title, stackIndex, onSwipe, onOpenDetail }: SwipeCar
       onPointerCancel={handlePointerUp}
       onClick={handleClick}
     >
-      <div className="pop-panel relative flex h-full w-full flex-col overflow-hidden bg-[var(--bg-elevated)]">
+      <div className="surface relative flex h-full w-full flex-col overflow-hidden bg-[var(--bg-elevated)]">
         <div className="relative flex-1 overflow-hidden">
           <PosterImage
             src={title.posterUrl}
@@ -138,19 +138,19 @@ export function SwipeCard({ title, stackIndex, onSwipe, onOpenDetail }: SwipeCar
               />
 
               <div
-                className="absolute left-6 top-8 -rotate-12 rounded-lg border-4 border-emerald-400 px-3 py-1 text-2xl font-black tracking-widest text-emerald-400"
+                className="absolute left-6 top-8 -rotate-12 rounded-lg border-4 border-emerald-400 px-3 py-1 text-2xl font-semibold tracking-widest text-emerald-400"
                 style={{ opacity: likeOpacity }}
               >
                 LIKED
               </div>
               <div
-                className="absolute right-6 top-8 rotate-12 rounded-lg border-4 border-rose-400 px-3 py-1 text-2xl font-black tracking-widest text-rose-400"
+                className="absolute right-6 top-8 rotate-12 rounded-lg border-4 border-rose-400 px-3 py-1 text-2xl font-semibold tracking-widest text-rose-400"
                 style={{ opacity: passOpacity }}
               >
                 PASS
               </div>
               <div
-                className="absolute left-1/2 top-8 -translate-x-1/2 rounded-lg border-4 border-amber-300 px-3 py-1 text-2xl font-black tracking-widest text-amber-300"
+                className="absolute left-1/2 top-8 -translate-x-1/2 rounded-lg border-4 border-amber-300 px-3 py-1 text-2xl font-semibold tracking-widest text-amber-300"
                 style={{ opacity: superOpacity }}
               >
                 ★ SUPER
@@ -159,13 +159,13 @@ export function SwipeCard({ title, stackIndex, onSwipe, onOpenDetail }: SwipeCar
           )}
 
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-4 pt-10">
-            <h3 className="text-xl font-black uppercase tracking-tight text-white">{title.name}</h3>
+            <h3 className="text-xl font-semibold tracking-tight text-white">{title.name}</h3>
             <p className="mt-1 line-clamp-2 text-sm font-medium text-white/85">{title.plotSummary}</p>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {title.tags.genre.slice(0, 3).map((g) => (
                 <span
                   key={g}
-                  className="pop-badge border-white/70 bg-accent-500 px-2 py-0.5 text-[10px] text-[var(--on-accent)]"
+                  className="chip border-white/70 bg-accent-500 px-2 py-0.5 text-[10px] text-[var(--on-accent)]"
                 >
                   {g}
                 </span>

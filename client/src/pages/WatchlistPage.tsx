@@ -44,13 +44,13 @@ export function WatchlistPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10">
-      <h1 className="mb-1 text-3xl font-black uppercase sm:text-4xl">Watchlist</h1>
+      <h1 className="mb-1 text-3xl font-semibold sm:text-4xl">Watchlist</h1>
       <p className="mb-8 text-sm font-bold text-[var(--text-muted)]">Everything you've liked or super-liked, super-likes first.</p>
 
       {items.length === 0 ? (
-        <div className="pop-panel p-10 text-center font-semibold text-[var(--text-muted)]">
+        <div className="surface p-10 text-center font-semibold text-[var(--text-muted)]">
           Nothing here yet.{" "}
-          <Link to="/swipe" className="font-black text-accent-600 hover:underline">
+          <Link to="/swipe" className="font-semibold text-[var(--text-accent)] hover:underline">
             Go swipe
           </Link>{" "}
           to add some.
@@ -58,26 +58,26 @@ export function WatchlistPage() {
       ) : (
         <div className="flex flex-col gap-4">
           {items.map((item) => (
-            <div key={item.id} className="pop-panel flex gap-4 bg-[var(--bg-elevated)] p-4">
+            <div key={item.id} className="surface flex gap-4 bg-[var(--bg-elevated)] p-4">
               <Link to={`/titles/${item.id}`} className="shrink-0">
                 <PosterImage src={item.posterUrl} alt={item.name} className="aspect-[2/3] w-24 rounded-lg border-2 border-[var(--ink)] object-cover" />
               </Link>
               <div className="flex-1">
                 <div className="flex items-start justify-between gap-2">
-                  <Link to={`/titles/${item.id}`} className="font-black uppercase hover:text-accent-600">
+                  <Link to={`/titles/${item.id}`} className="font-semibold hover:text-[var(--text-accent)]">
                     {item.name}
                   </Link>
-                  {item.superLiked && <span className="pop-badge bg-amber-400 px-2 py-0.5 text-[10px] text-[var(--ink)]">★ Super</span>}
+                  {item.superLiked && <span className="chip bg-amber-400 px-2 py-0.5 text-[10px] text-[var(--ink)]">★ Super</span>}
                 </div>
                 <p className="mt-1 line-clamp-2 text-sm text-[var(--text-muted)]">{item.plotSummary}</p>
-                <p className="mt-1 text-xs font-bold text-accent-600">
+                <p className="mt-1 text-xs font-bold text-[var(--text-accent)]">
                   {item.seasons ? `${item.seasons} seasons` : item.runtimeMinutes ? `${item.runtimeMinutes} min` : ""}
                   {" · "}
                   {item.platforms.join(", ")}
                 </p>
                 <button
                   onClick={() => markWatched(item.id)}
-                  className="pop-pressable mt-3 bg-accent-500 px-3 py-1.5 text-xs font-black uppercase text-[var(--on-accent)]"
+                  className="surface-interactive mt-3 bg-accent-500 px-3 py-1.5 text-xs font-semibold text-[var(--on-accent)]"
                 >
                   Mark as watched
                 </button>

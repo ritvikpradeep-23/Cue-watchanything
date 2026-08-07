@@ -13,17 +13,17 @@ interface AdminStats {
 
 function StatTile({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="pop-panel bg-[var(--bg-elevated)] p-4 text-center">
-      <p className="text-2xl font-black">{value}</p>
-      <p className="mt-1 text-xs font-bold uppercase tracking-wide text-[var(--text-muted)]">{label}</p>
+    <div className="surface bg-[var(--bg-elevated)] p-4 text-center">
+      <p className="text-2xl font-semibold">{value}</p>
+      <p className="mt-1 text-xs font-bold tracking-wide text-[var(--text-muted)]">{label}</p>
     </div>
   );
 }
 
 function RankedList({ title, items }: { title: string; items: { name: string; count: number }[] }) {
   return (
-    <div className="pop-panel bg-[var(--bg-elevated)] p-5">
-      <h3 className="mb-3 text-sm font-black uppercase tracking-wide">{title}</h3>
+    <div className="surface bg-[var(--bg-elevated)] p-5">
+      <h3 className="mb-3 text-sm font-semibold tracking-wide">{title}</h3>
       {items.length === 0 ? (
         <p className="text-sm text-[var(--text-muted)]">Not enough activity yet.</p>
       ) : (
@@ -33,7 +33,7 @@ function RankedList({ title, items }: { title: string; items: { name: string; co
               <span className="font-bold">
                 {i + 1}. {item.name}
               </span>
-              <span className="pop-badge bg-accent-500 px-2 py-0.5 text-[10px] text-[var(--on-accent)]">{item.count}</span>
+              <span className="chip bg-accent-500 px-2 py-0.5 text-[10px] text-[var(--on-accent)]">{item.count}</span>
             </li>
           ))}
         </ol>
@@ -55,7 +55,7 @@ export function AdminDashboardPage() {
   if (error) {
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center">
-        <p className="pop-panel p-6 font-bold text-red-600">{error}</p>
+        <p className="surface p-6 font-bold text-red-600">{error}</p>
       </div>
     );
   }
@@ -73,7 +73,7 @@ export function AdminDashboardPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10">
-      <h1 className="mb-1 text-3xl font-black uppercase sm:text-4xl">Admin dashboard</h1>
+      <h1 className="mb-1 text-3xl font-semibold sm:text-4xl">Admin dashboard</h1>
       <p className="mb-8 text-sm font-bold text-[var(--text-muted)]">Internal-only — not visible to regular users.</p>
 
       <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -90,8 +90,8 @@ export function AdminDashboardPage() {
         />
       </div>
 
-      <div className="pop-panel mb-8 bg-[var(--bg-elevated)] p-5">
-        <h3 className="mb-3 text-sm font-black uppercase tracking-wide">Signups (last 14 days with activity)</h3>
+      <div className="surface mb-8 bg-[var(--bg-elevated)] p-5">
+        <h3 className="mb-3 text-sm font-semibold tracking-wide">Signups (last 14 days with activity)</h3>
         {recentSignups.length === 0 ? (
           <p className="text-sm text-[var(--text-muted)]">No signups recorded yet.</p>
         ) : (

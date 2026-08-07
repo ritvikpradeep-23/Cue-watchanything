@@ -38,6 +38,11 @@
    * reads at ~2:1 contrast in light mode, which is the real reason accent buttons were
    * illegible; light text reads correctly against the accent in both themes. */
   --on-accent: #fef7f8;
+  /* accent used as inline TEXT (links, ratings, status messages) rather than a button
+   * background — accent-600 reads fine on the light cream bg, but the same fixed shade is a
+   * dark red on near-black in dark mode (~2.6:1, fails WCAG). This flips per theme instead of
+   * being a hardcoded Tailwind class, unlike --on-accent which is intentionally fixed. */
+  --text-accent: var(--color-accent-600);
 
   /* ---------- spacing scale — 4/8/12/16/24/32/48px steps, single source of truth for any
    * custom CSS (Tailwind utilities already follow this scale natively: p-1..p-12 etc.) ---------- */
@@ -62,29 +67,17 @@
   --ink: #f3ede6;
   --ring: var(--color-accent-400);
   color-scheme: dark;
+  --text-accent: var(--color-accent-400);
 }
 
 * {
   border-color: var(--border);
 }
 
-/* Atmospheric depth for dark mode — subtle radial glows in the accent's hues, fixed to the
- * viewport so they don't repeat/tile awkwardly as the page scrolls. A flat single-tone dark
- * background was the actual reason the crimson accent read as flat/muddy: nothing behind it
- * gave the eye a sense of depth for the accent to pop against. Kept low-opacity and far apart
- * so it stays moody rather than becoming its own competing pattern. Light mode intentionally
- * gets no equivalent — it should read as a bright, plain daylight surface, not a tinted one. */
-:root[data-theme="dark"]::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    radial-gradient(1100px 750px at 10% -12%, color-mix(in srgb, var(--color-accent-700) 32%, transparent), transparent 62%),
-    radial-gradient(950px 800px at 108% 8%, color-mix(in srgb, var(--color-accent-900) 55%, transparent), transparent 65%),
-    radial-gradient(1300px 950px at 50% 118%, color-mix(in srgb, #2a0812 65%, transparent), transparent 70%);
-}
+/* Real streaming platforms run genuinely flat near-black in dark mode — no tinted glow behind
+ * the content, chrome kept to a minimum. (An earlier pass added a decorative accent-colored
+ * atmospheric glow here; removed now that the direction is an authentic platform look rather
+ * than a stylized one, and the accent is meant to stay functional/sparing, not decorative.) */
 
 body {
   margin: 0;
@@ -95,20 +88,19 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ---------- type scale — the fixed set of size/weight combos every page should reach for.
- * Expressed as Tailwind class conventions (not CSS, since components are utility-first) —
- * documented here as the single source of truth to audit against:
- *   hero / landing headline   text-5xl sm:text-7xl font-black uppercase leading-[0.95] tracking-tight
- *   page title (h1)           text-3xl sm:text-4xl font-black uppercase
- *   section header (h2)       text-xl sm:text-2xl font-black uppercase tracking-tight
- *   card title (h3)           text-sm font-black uppercase
- *   body text                 text-sm font-medium (font-semibold for emphasis)
- *   caption / meta            text-xs font-bold uppercase (tracking-wide for labels)
+/* ---------- type scale — restrained, content-forward sizing (no poster-style display type,
+ * no forced uppercase) — documented here as the single source of truth to audit against:
+ *   hero / landing headline   text-4xl sm:text-6xl font-semibold tracking-tight
+ *   page title (h1)           text-3xl sm:text-4xl font-semibold
+ *   section header (h2)       text-xl sm:text-2xl font-semibold tracking-tight
+ *   card title (h3)           text-sm font-medium
+ *   body text                 text-sm font-normal (font-medium for emphasis)
+ *   caption / meta            text-xs text-[var(--text-muted)]
  * ---------------------------------------------------------------------------------------- */
 h1, h2, h3 {
   font-family: var(--font-display);
-  font-weight: 900;
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 ::selection {
@@ -156,77 +148,65 @@ select:focus-visible {
   animation: quiz-question-in 0.18s ease-out;
 }
 
-/* ---------- retro / pop design system ---------- */
+/* ---------- design system ----------
+ * In @layer components: `@import "tailwindcss"` puts Tailwind's own utilities in a later,
+ * higher-priority layer than any @layer you declare, so a plain (unlayered) CSS class here
+ * would silently beat utilities like bg-accent-500 wherever the two are combined, regardless
+ * of source order — exactly what made the navbar's accent-colored logo badge invisible (its
+ * bg-accent-500 was losing to the card's own background). Layering these classes restores the
+ * expected "utility wins" cascade. */
+@layer components {
 
-/* thick-border, hard-offset-shadow card — the core visual motif everywhere */
-.pop-panel {
-  border: 3px solid var(--ink);
-  border-radius: 14px;
-  box-shadow: var(--shadow-offset) var(--shadow-offset) 0 0 var(--ink);
+/* flat card, minimal chrome — the base surface for panels/rows throughout the app */
+.surface {
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--border) 12%, transparent);
   background: var(--bg-elevated);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24);
 }
 
-/* interactive version: presses "into" the shadow on hover/active, like a tactile button */
-.pop-pressable {
-  border: 3px solid var(--ink);
-  border-radius: 14px;
-  box-shadow: var(--shadow-offset) var(--shadow-offset) 0 0 var(--ink);
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+/* interactive version — subtle lift + shadow on hover/focus instead of a hard offset shadow */
+.surface-interactive {
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--border) 12%, transparent);
+  background: var(--bg-elevated);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-.pop-pressable:hover {
-  transform: translate(2px, 2px);
-  box-shadow: 3px 3px 0 0 var(--ink);
+.surface-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.32);
+  border-color: color-mix(in srgb, var(--border) 24%, transparent);
 }
 
-.pop-pressable:active {
-  transform: translate(5px, 5px);
-  box-shadow: 0 0 0 0 var(--ink);
+.surface-interactive:active {
+  transform: translateY(0);
 }
 
-.pop-pressable:focus-visible {
-  outline: 3px solid var(--color-accent-500);
+.surface-interactive:focus-visible {
+  outline: 2px solid var(--color-accent-500);
   outline-offset: 2px;
 }
 
-/* bold rotated "stamp" badge for tags/labels — also used as an interactive multi-select
- * chip (quiz options, industry filter), so it needs its own focus-visible treatment too. */
-.pop-badge {
+/* small flat tag/chip — genre labels, platform badges, multi-select quiz options */
+.chip {
   display: inline-flex;
   align-items: center;
-  border: 2px solid var(--ink);
-  border-radius: 999px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  transition: transform 0.12s ease;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--border) 8%, transparent);
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-button.pop-badge:hover {
-  transform: translateY(-1px);
+button.chip:hover {
+  background: color-mix(in srgb, var(--border) 16%, transparent);
 }
 
-button.pop-badge:focus-visible {
-  outline: 3px solid var(--color-accent-500);
+button.chip:focus-visible {
+  outline: 2px solid var(--color-accent-500);
   outline-offset: 2px;
-}
-
-/* subtle halftone dot texture for decorative panels/heroes */
-.halftone-bg {
-  background-image: radial-gradient(var(--ink) 1.4px, transparent 1.4px);
-  background-size: 14px 14px;
-  opacity: 0.08;
-}
-
-/* diagonal stripe accent strip */
-.stripe-bg {
-  background-image: repeating-linear-gradient(
-    45deg,
-    var(--color-accent-500),
-    var(--color-accent-500) 10px,
-    var(--color-accent-600) 10px,
-    var(--color-accent-600) 20px
-  );
 }
 
 /* floating action button — a consistent offset from the viewport edge on narrow/medium
@@ -281,3 +261,17 @@ button.pop-badge:focus-visible {
   scroll-snap-align: start;
   flex-shrink: 0;
 }
+
+/* Netflix/Disney+-style hero backdrop — a large image with a bottom-to-top fade into the page
+ * background so content (title/description/CTA) sitting on it stays readable regardless of
+ * what's in the image, plus a side fade for the same reason on wide screens. */
+.hero-backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top, var(--bg) 2%, transparent 55%),
+    linear-gradient(to right, var(--bg) 0%, transparent 40%);
+}
+
+} /* @layer components */

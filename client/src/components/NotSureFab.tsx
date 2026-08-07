@@ -100,7 +100,7 @@ export function NotSureFab() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="fab pop-pressable flex items-center gap-2 bg-accent-500 px-5 py-3 font-black uppercase text-[var(--on-accent)]"
+        className="fab surface-interactive flex items-center gap-2 bg-accent-500 px-5 py-3 font-semibold text-[var(--on-accent)]"
       >
         <span className="text-xl">🤔</span>
         <span className="hidden sm:inline">Not sure what to watch?</span>
@@ -108,11 +108,11 @@ export function NotSureFab() {
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-[var(--ink)]/60 p-0 sm:items-center sm:p-4">
-          <div className="pop-panel relative max-h-[90vh] w-full max-w-xl overflow-y-auto bg-[var(--bg-elevated)] sm:max-h-[85vh]">
+          <div className="surface relative max-h-[90vh] w-full max-w-xl overflow-y-auto bg-[var(--bg-elevated)] sm:max-h-[85vh]">
             <button
               onClick={() => setOpen(false)}
               aria-label="Close"
-              className="pop-pressable absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center bg-[var(--bg-elevated)] font-black"
+              className="surface-interactive absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center bg-[var(--bg-elevated)] font-semibold"
             >
               ✕
             </button>
@@ -140,11 +140,11 @@ export function NotSureFab() {
 
             {mode === "onboarding-done" && (
               <div className="flex flex-col items-center gap-4 p-10 text-center">
-                <p className="text-2xl font-black uppercase">Profile built!</p>
+                <p className="text-2xl font-semibold">Profile built!</p>
                 <Link
                   to="/swipe"
                   onClick={() => setOpen(false)}
-                  className="pop-pressable bg-accent-500 px-5 py-2.5 font-black uppercase text-[var(--on-accent)]"
+                  className="surface-interactive bg-accent-500 px-5 py-2.5 font-semibold text-[var(--on-accent)]"
                 >
                   Go swipe
                 </Link>
@@ -162,13 +162,13 @@ export function NotSureFab() {
 
             {mode === "results" && result && (
               <div className="p-6">
-                <h2 className="mb-1 text-2xl font-black uppercase">Your next 3</h2>
+                <h2 className="mb-1 text-2xl font-semibold">Your next 3</h2>
                 <p className="mb-6 text-sm text-[var(--text-muted)]">
                   {result.swappable ? "Not feeling one? Swap it out." : "Locked in — no swapping this round."}
                 </p>
                 <div className="grid grid-cols-3 gap-3">
                   {result.titles.map((t) => (
-                    <div key={t.id} className="pop-panel overflow-hidden">
+                    <div key={t.id} className="surface overflow-hidden">
                       <Link to={`/titles/${t.id}`} onClick={() => setOpen(false)}>
                         <PosterImage src={t.posterUrl} alt={t.name} active className="aspect-[2/3] w-full" />
                       </Link>
@@ -176,14 +176,14 @@ export function NotSureFab() {
                         <Link
                           to={`/titles/${t.id}`}
                           onClick={() => setOpen(false)}
-                          className="line-clamp-2 text-xs font-black uppercase hover:text-accent-600"
+                          className="line-clamp-2 text-xs font-semibold hover:text-[var(--text-accent)]"
                         >
                           {t.name}
                         </Link>
                         {result.swappable && (
                           <button
                             onClick={() => handleSwap(t.id)}
-                            className="pop-pressable mt-2 w-full bg-[var(--bg-elevated)] px-2 py-1 text-[10px] font-bold uppercase"
+                            className="surface-interactive mt-2 w-full bg-[var(--bg-elevated)] px-2 py-1 text-[10px] font-bold"
                           >
                             Swap
                           </button>

@@ -1,20 +1,38 @@
-import { useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../lib/auth-context";
 import { useTheme } from "../lib/theme-context";
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  `px-3 py-1.5 rounded-full text-sm font-bold uppercase tracking-wide transition-colors border-2 ${
+  `px-3 py-1.5 rounded-full text-sm font-bold tracking-wide transition-colors border-2 ${
     isActive
       ? "text-[var(--bg-elevated)] bg-[var(--ink)] border-[var(--ink)]"
-      : "text-[var(--text)] border-transparent hover:border-[var(--ink)]"
+      : "border-transparent hover:border-current"
   }`;
 
 export function Navbar() {
   const { isAuthenticated, user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  // The dashboard/landing home page renders a full-bleed hero right under the navbar — let the
+  // navbar sit transparent over it (Netflix/Disney+ Hotstar pattern) until the user scrolls
+  // past it, then solidify. Every other route just gets the normal solid navbar.
+  const isHome = location.pathname === "/";
+  const transparent = isHome && !scrolled;
+
+  useEffect(() => {
+    if (!isHome) return;
+    function onScroll() {
+      setScrolled(window.scrollY > 48);
+    }
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [isHome]);
 
   const links = isAuthenticated
     ? [
@@ -37,10 +55,16 @@ export function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b-[3px] border-[var(--ink)] bg-[var(--bg-elevated)]">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        <Link to="/" className="flex items-center gap-2.5 text-lg font-black uppercase tracking-tight">
-          <span className="pop-panel flex h-8 w-8 items-center justify-center bg-accent-500 text-sm font-black text-[var(--on-accent)]">
+    <header
+      className={`sticky top-0 z-40 h-16 transition-colors duration-300 ${
+        transparent
+          ? "border-b border-transparent bg-transparent text-white [text-shadow:0_1px_4px_rgba(0,0,0,0.6)]"
+          : "border-b border-[var(--border)]/10 bg-[var(--bg-elevated)] text-[var(--text)]"
+      }`}
+    >
+      <div className="mx-auto flex h-full max-w-6xl items-center justify-between px-4">
+        <Link to="/" className="flex items-center gap-2.5 text-lg font-semibold tracking-tight">
+          <span className="surface flex h-8 w-8 items-center justify-center bg-accent-500 text-sm font-semibold text-[var(--on-accent)]">
             ?
           </span>
           <span className="hidden sm:inline">What Should I Watch</span>
@@ -56,14 +80,14 @@ export function Navbar() {
           <button
             onClick={toggleTheme}
             aria-label="Toggle theme"
-            className="pop-pressable ml-2 bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-bold uppercase text-[var(--text)]"
+            className="surface-interactive ml-2 bg-[var(--bg-elevated)]/80 px-3 py-1.5 text-xs font-bold text-[var(--text)] backdrop-blur-sm"
           >
             {theme === "dark" ? "Light" : "Dark"}
           </button>
           {isAuthenticated ? (
             <button
               onClick={handleLogout}
-              className="pop-pressable ml-1 bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-bold uppercase text-[var(--text)]"
+              className="surface-interactive ml-1 bg-[var(--bg-elevated)]/80 px-3 py-1.5 text-xs font-bold backdrop-blur-sm"
             >
               Log out
             </button>
@@ -74,7 +98,7 @@ export function Navbar() {
               </NavLink>
               <Link
                 to="/signup"
-                className="pop-pressable ml-1 bg-accent-500 px-4 py-1.5 text-xs font-black uppercase text-[var(--on-accent)]"
+                className="surface-interactive ml-1 bg-accent-500 px-4 py-1.5 text-xs font-semibold text-[var(--on-accent)]"
               >
                 Get started
               </Link>
@@ -83,18 +107,18 @@ export function Navbar() {
         </nav>
 
         <button
-          className="pop-pressable p-2 md:hidden"
+          className="surface-interactive p-2 md:hidden"
           aria-label="Toggle menu"
           onClick={() => setOpen((o) => !o)}
         >
-          <span className="block h-0.5 w-5 bg-[var(--text)]" />
-          <span className="mt-1 block h-0.5 w-5 bg-[var(--text)]" />
-          <span className="mt-1 block h-0.5 w-5 bg-[var(--text)]" />
+          <span className="block h-0.5 w-5 bg-current" />
+          <span className="mt-1 block h-0.5 w-5 bg-current" />
+          <span className="mt-1 block h-0.5 w-5 bg-current" />
         </button>
       </div>
 
       {open && (
-        <nav className="flex flex-col gap-2 border-t-[3px] border-[var(--ink)] px-4 py-3 md:hidden">
+        <nav className="flex flex-col gap-2 border-t border-[var(--border)]/10 bg-[var(--bg-elevated)] px-4 py-3 text-[var(--text)] md:hidden">
           {links.map((l) => (
             <NavLink key={l.to} to={l.to} className={navLinkClass} onClick={() => setOpen(false)}>
               {l.label}
@@ -105,7 +129,7 @@ export function Navbar() {
               toggleTheme();
               setOpen(false);
             }}
-            className="pop-pressable bg-[var(--bg-elevated)] px-3 py-2 text-left text-sm font-bold uppercase"
+            className="surface-interactive bg-[var(--bg-elevated)] px-3 py-2 text-left text-sm font-bold"
           >
             {theme === "dark" ? "Switch to light" : "Switch to dark"}
           </button>
@@ -115,7 +139,7 @@ export function Navbar() {
                 handleLogout();
                 setOpen(false);
               }}
-              className="pop-pressable bg-[var(--bg-elevated)] px-3 py-2 text-left text-sm font-bold uppercase"
+              className="surface-interactive bg-[var(--bg-elevated)] px-3 py-2 text-left text-sm font-bold"
             >
               Log out
             </button>
@@ -127,7 +151,7 @@ export function Navbar() {
               <Link
                 to="/signup"
                 onClick={() => setOpen(false)}
-                className="pop-pressable bg-accent-500 px-3 py-2 text-center text-sm font-black uppercase text-[var(--on-accent)]"
+                className="surface-interactive bg-accent-500 px-3 py-2 text-center text-sm font-semibold text-[var(--on-accent)]"
               >
                 Get started
               </Link>

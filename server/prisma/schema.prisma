@@ -4,8 +4,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
 enum Role {
@@ -26,52 +27,157 @@ enum ActionType {
   watched
 }
 
-model User {
-  id            String   @id @default(uuid())
-  email         String   @unique
-  passwordHash  String
-  createdAt     DateTime @default(now())
-  role          Role     @default(USER)
-
-  actions       UserTitleAction[]
-  ratings       Rating[]
-  quizResponses QuizResponse[]
+enum ReportStatus {
+  PENDING
+  REVIEWED
 }
 
-model Title {
-  id              String   @id @default(uuid())
-  name            String
-  type            TitleType
-  plotSummary     String
-  cast            String   // JSON-encoded string[] (SQLite has no native array type)
-  seasons         Int?
-  episodes        Int?
-  runtimeMinutes  Int?
-  releaseYear     Int
-  platforms       String   // JSON-encoded string[]
-  languages       String   @default("[\"English\"]") // JSON-encoded string[] — hard filter, see buildDeck
-  posterUrl       String
-  tags            String   // JSON-encoded TitleTags object (includes industry)
-  dateAdded       DateTime @default(now())
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+}
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String
+  createdAt    DateTime  @default(now())
+  role         Role      @default(USER)
+  bannedAt     DateTime?
+
+  // Social & Taste Twins — nullable: existing accounts have no username until they set one,
+  // and social features (search, twins, chat, friends) require it first. No fabricated default.
+  username     String? @unique
+  avatarUrl    String?
+  discoverable Boolean @default(true)
 
   actions         UserTitleAction[]
   ratings         Rating[]
+  quizResponses   QuizResponse[]
+  reportsFiled    Report[]          @relation("ReporterRel")
+  reportsReceived Report[]          @relation("ReportedRel")
+  blocksMade      Block[]           @relation("BlockerRel")
+  blocksReceived  Block[]           @relation("BlockedRel")
+
+  friendRequestsSent     Friendship[]           @relation("FriendRequester")
+  friendRequestsReceived Friendship[]           @relation("FriendAddressee")
+  messagesSent           Message[]              @relation("MessageSender")
+  messagesReceived       Message[]              @relation("MessageRecipient")
+  watchTogetherInitiated WatchTogetherSession[] @relation("WTInitiator")
+  watchTogetherJoined    WatchTogetherSession[] @relation("WTPartner")
+}
+
+model Friendship {
+  id          String           @id @default(uuid())
+  requesterId String
+  addresseeId String
+  status      FriendshipStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+  respondedAt DateTime?
+
+  requester User @relation("FriendRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  addressee User @relation("FriendAddressee", fields: [addresseeId], references: [id], onDelete: Cascade)
+
+  @@unique([requesterId, addresseeId])
+}
+
+model Message {
+  id            String    @id @default(uuid())
+  senderId      String
+  recipientId   String
+  content       String
+  sharedTitleId String?
+  createdAt     DateTime  @default(now())
+  readAt        DateTime?
+
+  sender      User   @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  recipient   User   @relation("MessageRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  sharedTitle Title? @relation(fields: [sharedTitleId], references: [id], onDelete: SetNull)
+
+  @@index([senderId, recipientId, createdAt])
+  @@index([recipientId, readAt])
+}
+
+model WatchTogetherSession {
+  id            String   @id @default(uuid())
+  initiatorId   String
+  partnerId     String
+  mergedProfile String // JSON-encoded TagProfile, same encoding convention as QuizResponse
+  createdAt     DateTime @default(now())
+
+  initiator User              @relation("WTInitiator", fields: [initiatorId], references: [id], onDelete: Cascade)
+  partner   User              @relation("WTPartner", fields: [partnerId], references: [id], onDelete: Cascade)
+  actions   UserTitleAction[]
+}
+
+model Report {
+  id             String       @id @default(uuid())
+  reporterId     String
+  reportedUserId String
+  reason         String
+  status         ReportStatus @default(PENDING)
+  createdAt      DateTime     @default(now())
+  reviewedAt     DateTime?
+
+  reporter     User @relation("ReporterRel", fields: [reporterId], references: [id], onDelete: Cascade)
+  reportedUser User @relation("ReportedRel", fields: [reportedUserId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+}
+
+model Block {
+  id        String   @id @default(uuid())
+  blockerId String
+  blockedId String
+  createdAt DateTime @default(now())
+
+  blocker User @relation("BlockerRel", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked User @relation("BlockedRel", fields: [blockedId], references: [id], onDelete: Cascade)
+
+  @@unique([blockerId, blockedId])
+}
+
+model Title {
+  id             String    @id @default(uuid())
+  name           String
+  type           TitleType
+  plotSummary    String
+  cast           String // JSON-encoded string[] (SQLite has no native array type)
+  seasons        Int?
+  episodes       Int?
+  runtimeMinutes Int?
+  releaseYear    Int
+  platforms      String // JSON-encoded string[]
+  languages      String    @default("[\"English\"]") // JSON-encoded string[] — hard filter, see buildDeck
+  posterUrl      String
+  tags           String // JSON-encoded TitleTags object (includes industry)
+  dateAdded      DateTime  @default(now())
+
+  actions          UserTitleAction[]
+  ratings          Rating[]
+  sharedInMessages Message[]
 
   @@index([type])
 }
 
 model UserTitleAction {
-  id        String     @id @default(uuid())
-  userId    String
-  titleId   String
-  action    ActionType
-  createdAt DateTime   @default(now())
+  id                     String     @id @default(uuid())
+  userId                 String
+  titleId                String
+  action                 ActionType
+  createdAt              DateTime   @default(now())
+  // set when this swipe happened inside a Watch Together session — the joint watchlist is
+  // just actions filtered by this id, reusing the existing action-recording pipeline instead
+  // of a parallel table.
+  watchTogetherSessionId String?
 
-  user      User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title     Title @relation(fields: [titleId], references: [id], onDelete: Cascade)
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title                Title                 @relation(fields: [titleId], references: [id], onDelete: Cascade)
+  watchTogetherSession WatchTogetherSession? @relation(fields: [watchTogetherSessionId], references: [id], onDelete: Cascade)
 
   @@index([userId, action])
   @@index([titleId])
+  @@index([watchTogetherSessionId])
 }
 
 model Rating {
@@ -82,8 +188,8 @@ model Rating {
   comment   String?
   createdAt DateTime @default(now())
 
-  user      User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title     Title @relation(fields: [titleId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title Title @relation(fields: [titleId], references: [id], onDelete: Cascade)
 
   @@unique([userId, titleId])
   @@index([titleId])
@@ -92,13 +198,13 @@ model Rating {
 model QuizResponse {
   id                  String   @id @default(uuid())
   userId              String
-  kind                String   // "onboarding" | "next_show"
-  answers             String   // JSON-encoded question_id -> answer
-  resultingTagProfile String   // JSON-encoded tag -> weight
-  watchedTitleId      String?  // set for next_show responses
+  kind                String // "onboarding" | "next_show"
+  answers             String // JSON-encoded question_id -> answer
+  resultingTagProfile String // JSON-encoded tag -> weight
+  watchedTitleId      String? // set for next_show responses
   createdAt           DateTime @default(now())
 
-  user                User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, kind, createdAt])
 }

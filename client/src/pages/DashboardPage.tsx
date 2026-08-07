@@ -15,6 +15,7 @@ export function DashboardPage() {
   const [recommended, setRecommended] = useState<DeckTitle[] | null>(null);
   const [actorQuery, setActorQuery] = useState("");
   const [industryFilter, setIndustryFilter] = useState<string | null>(null);
+  const [becauseYouLoved, setBecauseYouLoved] = useState<{ name: string; titles: DeckTitle[] } | null>(null);
   const watchlistDrag = useDragScroll<HTMLDivElement>();
 
   useEffect(() => {
@@ -25,6 +26,16 @@ export function DashboardPage() {
       .catch((e) => {
         if (e instanceof ApiError && e.status === 409) setRecommended([]);
       });
+    apiGet<{ topRatedTitleId: string | null }>("/profile").then((res) => {
+      if (!res.topRatedTitleId) return;
+      apiGet<{ title: DeckTitle }>(`/titles/${res.topRatedTitleId}`).then((titleRes) => {
+        apiGet<{ titles: DeckTitle[] }>(`/titles/${res.topRatedTitleId}/similar`).then((similarRes) => {
+          if (similarRes.titles.length > 0) {
+            setBecauseYouLoved({ name: titleRes.title.name, titles: similarRes.titles });
+          }
+        });
+      });
+    });
   }, []);
 
   const anime = catalog?.filter((t) => t.type === "anime").slice(0, 14) ?? [];
@@ -63,7 +74,7 @@ export function DashboardPage() {
             ))}
           </div>
         )}
-        <div className="relative mx-auto flex h-full max-w-6xl flex-col justify-end px-4 pb-12">
+        <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col justify-end px-4 pb-12">
           <h1 className="max-w-lg text-3xl font-semibold sm:text-5xl">Welcome back</h1>
           <p className="mt-3 max-w-md text-sm text-[var(--text-muted)] sm:text-base">
             Pick up where you left off, or let us find something new — your taste profile keeps
@@ -192,6 +203,10 @@ export function DashboardPage() {
 
       {recommended && recommended.length > 0 && (
         <TitleCarousel heading="Recommended for you" titles={recommended.slice(0, 14)} />
+      )}
+
+      {becauseYouLoved && (
+        <TitleCarousel heading={`Because you loved ${becauseYouLoved.name}`} titles={becauseYouLoved.titles} />
       )}
 
       {newArrivals.length > 0 && <TitleCarousel heading="New arrivals" subheading="Most recently added to the catalog" titles={newArrivals} />}

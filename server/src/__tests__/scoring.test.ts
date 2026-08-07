@@ -2,11 +2,15 @@ import { describe, expect, it } from "vitest";
 import type { TitleSeed } from "@watch-recommender/shared";
 import {
   scoreTitle,
+  scoreTitleBreakdown,
   buildDeck,
   buildTop3,
   applyDelta,
   mergeDeltas,
   generateTagCheckQuestions,
+  findSimilarTitles,
+  compareProfiles,
+  mergeProfiles,
 } from "@watch-recommender/shared";
 
 function makeTitle(overrides: Partial<TitleSeed> & { id: string }): TitleSeed {
@@ -60,6 +64,89 @@ describe("scoreTitle", () => {
   it("defaults absent tags to 0 weight", () => {
     const title = makeTitle({ id: "t1", tags: { ...makeTitle({ id: "t1" }).tags, genre: ["horror"] } });
     expect(scoreTitle({}, title)).toBe(0);
+  });
+});
+
+describe("scoreTitleBreakdown", () => {
+  it("groups the same total scoreTitle produces by tag category", () => {
+    const title = makeTitle({
+      id: "t1",
+      tags: { ...makeTitle({ id: "t1" }).tags, genre: ["comedy", "drama"], mood: ["funny-witty"] },
+    });
+    const profile = { comedy: 3, drama: 1, "funny-witty": 2, horror: -5 };
+    const breakdown = scoreTitleBreakdown(profile, title);
+    expect(breakdown.total).toBe(scoreTitle(profile, title));
+    expect(breakdown.byCategory.genre).toBe(4);
+    expect(breakdown.byCategory.mood).toBe(2);
+  });
+
+  it("omits categories the title has no tags in from the breakdown", () => {
+    const title = makeTitle({ id: "t1", tags: { ...makeTitle({ id: "t1" }).tags, genre: ["horror"] } });
+    const breakdown = scoreTitleBreakdown({ horror: 2 }, title);
+    expect(breakdown.byCategory.mood).toBeUndefined();
+  });
+});
+
+describe("findSimilarTitles", () => {
+  function tagged(id: string, extra: Partial<TitleSeed["tags"]>): TitleSeed {
+    const base = makeTitle({ id });
+    return makeTitle({ id, tags: { ...base.tags, ...extra } });
+  }
+
+  const anchor = tagged("anchor", { genre: ["comedy"], mood: ["funny-witty"], love_factor: ["humor"] });
+  const closeMatch = tagged("close", { genre: ["comedy"], mood: ["funny-witty"] });
+  const partialMatch = tagged("partial", { genre: ["comedy"] });
+  const noMatch = tagged("none", { genre: ["horror"], mood: ["dark"] });
+
+  it("ranks titles by shared flavor tags, closest first, excluding the target itself", () => {
+    const results = findSimilarTitles(anchor, [anchor, closeMatch, partialMatch, noMatch]);
+    expect(results.map((t) => t.id)).toEqual(["close", "partial"]);
+  });
+
+  it("excludes titles with zero shared flavor tags", () => {
+    const results = findSimilarTitles(anchor, [anchor, noMatch]);
+    expect(results).toHaveLength(0);
+  });
+
+  it("respects the limit", () => {
+    const results = findSimilarTitles(anchor, [anchor, closeMatch, partialMatch], 1);
+    expect(results).toHaveLength(1);
+    expect(results[0].id).toBe("close");
+  });
+});
+
+describe("compareProfiles", () => {
+  it("returns 1 for identical profiles", () => {
+    expect(compareProfiles({ comedy: 3, drama: 1 }, { comedy: 3, drama: 1 })).toBeCloseTo(1);
+  });
+
+  it("returns 0 for profiles with no tag overlap", () => {
+    expect(compareProfiles({ comedy: 5 }, { horror: 5 })).toBe(0);
+  });
+
+  it("scores partial overlap between 0 and 1", () => {
+    const s = compareProfiles({ comedy: 5, drama: 5 }, { comedy: 5, horror: 5 });
+    expect(s).toBeGreaterThan(0);
+    expect(s).toBeLessThan(1);
+  });
+
+  it("returns 0 when either profile is empty", () => {
+    expect(compareProfiles({}, { comedy: 5 })).toBe(0);
+  });
+
+  it("never returns a negative score for opposed tastes", () => {
+    const s = compareProfiles({ comedy: 5 }, { comedy: -5 });
+    expect(s).toBe(0);
+  });
+});
+
+describe("mergeProfiles", () => {
+  it("averages weights for tags both profiles share", () => {
+    expect(mergeProfiles({ comedy: 4 }, { comedy: 2 })).toEqual({ comedy: 3 });
+  });
+
+  it("halves a tag only one profile has (missing side defaults to 0)", () => {
+    expect(mergeProfiles({ comedy: 4 }, { drama: 2 })).toEqual({ comedy: 2, drama: 1 });
   });
 });
 

@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import type { TagProfile } from "@watch-recommender/shared";
 import { PosterImage } from "../components/ui/PosterImage";
+import { TasteRadarChart } from "../components/ui/TasteRadarChart";
+import { TitleCarousel } from "../components/TitleCarousel";
 import { apiGet, apiPost } from "../lib/api";
 import { useAuth } from "../lib/auth-context";
+import type { DeckTitle } from "../components/SwipeCard";
 
 interface ApiTitle {
   id: string;
@@ -36,6 +40,10 @@ export function TitleDetailPage() {
   const [myRating, setMyRating] = useState(0);
   const [myComment, setMyComment] = useState("");
   const [status, setStatus] = useState<string | null>(null);
+  const [tagProfile, setTagProfile] = useState<TagProfile | null>(null);
+  const [similar, setSimilar] = useState<DeckTitle[]>([]);
+  const [avoidGenres, setAvoidGenres] = useState<string[]>([]);
+  const [confirmingRegret, setConfirmingRegret] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -44,10 +52,28 @@ export function TitleDetailPage() {
       setRatingSummary(res.rating);
     });
     apiGet<{ ratings: Review[] }>(`/titles/${id}/ratings`).then((res) => setReviews(res.ratings));
+    apiGet<{ titles: DeckTitle[] }>(`/titles/${id}/similar`).then((res) => setSimilar(res.titles));
   }, [id]);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    apiGet<{ tagProfile: TagProfile; avoidGenres: string[] }>("/profile").then((res) => {
+      setTagProfile(res.tagProfile);
+      setAvoidGenres(res.avoidGenres ?? []);
+    });
+  }, [isAuthenticated]);
+
+  const conflictingGenres = title ? (title.tags.genre ?? []).filter((g) => avoidGenres.includes(g)) : [];
 
   async function handleAction(action: "like" | "super_like" | "pass") {
     if (!id) return;
+    // Regret-proofing: super-like is a strong signal, so double-check before committing if the
+    // title conflicts with a genre the user said they'd rather avoid.
+    if (action === "super_like" && conflictingGenres.length > 0 && !confirmingRegret) {
+      setConfirmingRegret(true);
+      return;
+    }
+    setConfirmingRegret(false);
     await apiPost("/actions", { titleId: id, action });
     setStatus(action === "like" ? "Added to watchlist" : action === "super_like" ? "Super-liked" : "Passed");
   }
@@ -89,6 +115,13 @@ export function TitleDetailPage() {
               </span>
             ))}
           </div>
+
+          {tagProfile && Object.keys(tagProfile).length > 0 && (
+            <div className="surface mt-4 flex flex-col items-center gap-1 bg-[var(--bg-elevated)] p-4 sm:w-fit">
+              <p className="text-xs font-bold tracking-wide text-[var(--text-muted)]">Why this matches you</p>
+              <TasteRadarChart userProfile={tagProfile} tags={title.tags as any} size={200} />
+            </div>
+          )}
 
           <p className="mt-4 leading-relaxed text-[var(--text)]">{title.plotSummary}</p>
 
@@ -138,6 +171,26 @@ export function TitleDetailPage() {
                 className="surface-interactive bg-[var(--bg-elevated)] px-4 py-2.5 text-sm font-semibold"
               >
                 Not interested
+              </button>
+            </div>
+          )}
+          {confirmingRegret && (
+            <div className="surface mt-3 flex flex-wrap items-center gap-3 bg-[var(--bg-elevated)] p-3">
+              <p className="text-sm font-semibold">
+                Heads up — this is tagged {conflictingGenres.join(", ")}, which you said you'd rather
+                avoid. Still want to super-like it?
+              </p>
+              <button
+                onClick={() => handleAction("super_like")}
+                className="surface-interactive bg-accent-500 px-3 py-1.5 text-xs font-semibold text-[var(--on-accent)]"
+              >
+                Yes, super-like it
+              </button>
+              <button
+                onClick={() => setConfirmingRegret(false)}
+                className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-semibold"
+              >
+                Cancel
               </button>
             </div>
           )}
@@ -195,6 +248,8 @@ export function TitleDetailPage() {
           </div>
         )}
       </div>
+
+      {similar.length > 0 && <TitleCarousel heading="More like this" titles={similar} />}
 
       <Link to="/swipe" className="mt-10 inline-block text-sm font-bold text-[var(--text-accent)] hover:underline">
         ← Back to swipe deck

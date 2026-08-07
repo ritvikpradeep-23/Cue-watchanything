@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { getNextNextShowQuestion, type NextShowContext, type HardFilters, type TagProfile, type TitleSeed } from "@watch-recommender/shared";
 import { QuizWizard } from "../components/QuizWizard";
 import { PosterImage } from "../components/ui/PosterImage";
+import { TasteRadarChart } from "../components/ui/TasteRadarChart";
 import { apiGet, apiPost, ApiError } from "../lib/api";
 import type { DeckTitle } from "../components/SwipeCard";
 
@@ -81,7 +82,13 @@ export function NextShowPage() {
                 <Link to={`/titles/${t.id}`} className="font-semibold hover:text-[var(--text-accent)]">
                   {t.name}
                 </Link>
-                <p className="mt-1 line-clamp-3 flex-1 text-sm text-[var(--text-muted)]">{t.plotSummary}</p>
+                <p className="mt-1 line-clamp-3 text-sm text-[var(--text-muted)]">{t.plotSummary}</p>
+                {ctx?.baseProfile && (
+                  <div className="mt-2 flex justify-center">
+                    <TasteRadarChart userProfile={ctx.baseProfile} tags={t.tags as any} size={160} />
+                  </div>
+                )}
+                <div className="flex-1" />
                 {result.swappable && (
                   <button
                     onClick={() => handleSwap(t.id)}

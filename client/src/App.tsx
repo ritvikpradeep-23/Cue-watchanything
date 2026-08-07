@@ -12,8 +12,16 @@ import { WatchlistPage } from "./pages/WatchlistPage";
 import { HistoryPage } from "./pages/HistoryPage";
 import { NextShowPage } from "./pages/NextShowPage";
 import { ProfilePage } from "./pages/ProfilePage";
+import { TasteTimelinePage } from "./pages/TasteTimelinePage";
 import { AdminAddTitlePage } from "./pages/AdminAddTitlePage";
 import { AdminDashboardPage } from "./pages/AdminDashboardPage";
+import { AdminUsersPage } from "./pages/AdminUsersPage";
+import { AdminReportsPage } from "./pages/AdminReportsPage";
+import { TwinsPage } from "./pages/TwinsPage";
+import { TwinProfilePage } from "./pages/TwinProfilePage";
+import { ChatPage } from "./pages/ChatPage";
+import { FriendsPage } from "./pages/FriendsPage";
+import { WatchTogetherPage } from "./pages/WatchTogetherPage";
 
 function App() {
   return (
@@ -74,6 +82,62 @@ function App() {
             }
           />
           <Route
+            path="/profile/timeline"
+            element={
+              <ProtectedRoute>
+                <TasteTimelinePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/twins"
+            element={
+              <ProtectedRoute>
+                <TwinsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/twins/:username"
+            element={
+              <ProtectedRoute>
+                <TwinProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/chat"
+            element={
+              <ProtectedRoute>
+                <ChatPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/chat/:userId"
+            element={
+              <ProtectedRoute>
+                <ChatPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/friends"
+            element={
+              <ProtectedRoute>
+                <FriendsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/watch-together/:sessionId"
+            element={
+              <ProtectedRoute>
+                <WatchTogetherPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/admin/add-title"
             element={
               <ProtectedRoute adminOnly>
@@ -86,6 +150,22 @@ function App() {
             element={
               <ProtectedRoute adminOnly>
                 <AdminDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminUsersPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/reports"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminReportsPage />
               </ProtectedRoute>
             }
           />

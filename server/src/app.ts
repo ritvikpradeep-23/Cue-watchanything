@@ -11,6 +11,7 @@ import { historyRouter } from "./routes/history";
 import { profileRouter } from "./routes/profile";
 import { nextShowRouter } from "./routes/nextShow";
 import { adminRouter } from "./routes/admin";
+import { socialRouter } from "./routes/social";
 
 export const app = express();
 
@@ -29,6 +30,7 @@ app.use("/api/history", historyRouter);
 app.use("/api/profile", profileRouter);
 app.use("/api/next-show", nextShowRouter);
 app.use("/api/admin", adminRouter);
+app.use("/api/social", socialRouter);
 
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error(err);

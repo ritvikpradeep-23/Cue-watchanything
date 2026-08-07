@@ -1,8 +1,9 @@
 import { Router } from "express";
 import { requireAuth, AuthedRequest } from "../lib/auth";
 import { prisma } from "../lib/prisma";
-import { toApiTitle } from "../lib/titles";
+import { toApiTitle, toApiTitleFromSeed, getAllTitleSeeds, getTitleSeedById } from "../lib/titles";
 import { getTrendingStats } from "../lib/trending";
+import { findSimilarTitles } from "@watch-recommender/shared";
 
 export const titlesRouter = Router();
 
@@ -34,6 +35,18 @@ titlesRouter.get("/:id", async (req, res) => {
   if (!title) return res.status(404).json({ error: "Title not found" });
   const summary = await ratingSummary(title.id);
   res.json({ title: toApiTitle(title), rating: summary });
+});
+
+/** "More like this" / "Because you loved X" — reuses findSimilarTitles against the same
+ * TitleSeed dataset the scoring engine already works from. */
+titlesRouter.get("/:id/similar", async (req, res) => {
+  const id = String(req.params.id);
+  const target = await getTitleSeedById(id);
+  if (!target) return res.status(404).json({ error: "Title not found" });
+
+  const limit = Math.min(20, Number(req.query.limit) || 10);
+  const similar = findSimilarTitles(target, await getAllTitleSeeds(), limit);
+  res.json({ titles: similar.map(toApiTitleFromSeed) });
 });
 
 titlesRouter.get("/:id/ratings", async (req, res) => {

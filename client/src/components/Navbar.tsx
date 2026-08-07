@@ -39,10 +39,15 @@ export function Navbar() {
         { to: "/swipe", label: "Swipe" },
         { to: "/watchlist", label: "Watchlist" },
         { to: "/history", label: "History" },
+        { to: "/twins", label: "Twins" },
+        { to: "/chat", label: "Chat" },
+        { to: "/friends", label: "Friends" },
         { to: "/profile", label: "Profile" },
         ...(user?.role === "ADMIN"
           ? [
               { to: "/admin/dashboard", label: "Admin" },
+              { to: "/admin/users", label: "Users" },
+              { to: "/admin/reports", label: "Reports" },
               { to: "/admin/add-title", label: "Add title" },
             ]
           : []),

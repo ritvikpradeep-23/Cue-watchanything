@@ -32,11 +32,14 @@ const PREFERRED_TIE_CATEGORIES = ["mood", "love_factor", "genre", "tone", "pace"
  * coincidence rather than taste and would otherwise swamp the comparison. */
 const FLAVOR_CATEGORIES = new Set(["genre", "mood", "pace", "tone", "cast_style", "love_factor"]);
 
-function flavorTags(title: TitleSeed): string[] {
+export function flavorTags(title: { tags: TitleSeed["tags"] }): string[] {
   return flattenTags(title.tags).filter((t) => FLAVOR_CATEGORIES.has(TAG_CATEGORY[t] ?? ""));
 }
 
-function sharedTagCount(a: TitleSeed, b: TitleSeed): number {
+/** Count of "taste flavor" tags b shares with a — used both for buildTop3's diversity swap
+ * and for findSimilarTitles's "more like this" ranking. Only reads `.tags`, so it works with
+ * both a server-side TitleSeed (snake_case fields) and a client-side ApiTitle (camelCase). */
+export function sharedTagCount(a: { tags: TitleSeed["tags"] }, b: { tags: TitleSeed["tags"] }): number {
   const tagsA = new Set(flavorTags(a));
   const tagsB = flavorTags(b);
   return tagsB.filter((t) => tagsA.has(t)).length;

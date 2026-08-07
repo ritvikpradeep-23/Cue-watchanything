@@ -1,4 +1,5 @@
 import type { TagProfile, TitleSeed, TitleTags } from "../types";
+import { TAG_CATEGORY } from "../taxonomy";
 
 /** Flattens every tag category on a title into one list of tag strings. */
 export function flattenTags(tags: TitleTags): string[] {
@@ -28,4 +29,26 @@ export function scoreTitle(userProfile: TagProfile, title: TitleSeed): number {
     score += userProfile[tag] ?? 0;
   }
   return score;
+}
+
+export interface ScoreBreakdown {
+  total: number;
+  /** same total as scoreTitle, grouped by taxonomy category (genre, mood, pace, ...) — the
+   * axes for a "why this matches you" radar chart. */
+  byCategory: Record<string, number>;
+}
+
+/** Same score as scoreTitle, but grouped by tag category instead of summed into one number.
+ * Only reads `.tags` — accepts anything tag-shaped (an ApiTitle from the client, a TitleSeed
+ * fixture, etc.), not the full TitleSeed. */
+export function scoreTitleBreakdown(userProfile: TagProfile, title: { tags: TitleTags }): ScoreBreakdown {
+  const byCategory: Record<string, number> = {};
+  let total = 0;
+  for (const tag of flattenTags(title.tags)) {
+    const weight = userProfile[tag] ?? 0;
+    total += weight;
+    const category = TAG_CATEGORY[tag] ?? "other";
+    byCategory[category] = (byCategory[category] ?? 0) + weight;
+  }
+  return { total, byCategory };
 }

@@ -1,16 +1,31 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SwipeCard, type DeckTitle } from "../components/SwipeCard";
 import { apiGet, apiPost, ApiError } from "../lib/api";
+
+interface RegretWarning {
+  titleId: string;
+  titleName: string;
+  conflictingGenres: string[];
+}
 
 export function SwipePage() {
   const navigate = useNavigate();
   const [deck, setDeck] = useState<DeckTitle[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [regretWarning, setRegretWarning] = useState<RegretWarning | null>(null);
+  const [comfortZone, setComfortZone] = useState(() => localStorage.getItem("watchrec_comfort_zone") === "true");
+  const avoidGenres = useRef<string[]>([]);
+  const dismissTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    apiGet<{ deck: DeckTitle[] }>("/deck")
-      .then((res) => setDeck(res.deck))
+    localStorage.setItem("watchrec_comfort_zone", String(comfortZone));
+    setDeck(null);
+    apiGet<{ deck: DeckTitle[]; avoidGenres: string[] }>(`/deck${comfortZone ? "?comfortZone=true" : ""}`)
+      .then((res) => {
+        setDeck(res.deck);
+        avoidGenres.current = res.avoidGenres ?? [];
+      })
       .catch((e) => {
         if (e instanceof ApiError && e.status === 409) {
           navigate("/quiz");
@@ -18,15 +33,39 @@ export function SwipePage() {
           setError(e.message ?? "Failed to load your deck");
         }
       });
-  }, [navigate]);
+    return () => {
+      if (dismissTimer.current) clearTimeout(dismissTimer.current);
+    };
+  }, [navigate, comfortZone]);
 
-  const handleSwipe = useCallback(async (direction: "pass" | "like" | "super_like") => {
+  function showRegretWarning(title: DeckTitle, conflictingGenres: string[]) {
+    if (dismissTimer.current) clearTimeout(dismissTimer.current);
+    setRegretWarning({ titleId: title.id, titleName: title.name, conflictingGenres });
+    dismissTimer.current = setTimeout(() => setRegretWarning(null), 8000);
+  }
+
+  function undoRegretSuperLike() {
+    if (!regretWarning) return;
+    apiPost("/actions", { titleId: regretWarning.titleId, action: "pass" }).catch(() => {});
+    setRegretWarning(null);
+    if (dismissTimer.current) clearTimeout(dismissTimer.current);
+  }
+
+  const handleSwipe = useCallback((direction: "pass" | "like" | "super_like") => {
     setDeck((prev) => {
       if (!prev || prev.length === 0) return prev;
       const [current, ...rest] = prev;
       apiPost("/actions", { titleId: current.id, action: direction }).catch(() => {
         // best-effort — the swipe already committed visually; a failed log shouldn't block the session
       });
+
+      // Regret-proofing: super-like is a strong signal, so flag it (non-blocking — the like
+      // already went through) if it conflicts with a genre the user said they'd rather avoid.
+      if (direction === "super_like" && avoidGenres.current.length > 0) {
+        const conflicting = current.tags.genre.filter((g) => avoidGenres.current.includes(g));
+        if (conflicting.length > 0) showRegretWarning(current, conflicting);
+      }
+
       return rest;
     });
   }, []);
@@ -65,9 +104,19 @@ export function SwipePage() {
       <p className="mb-1 text-sm font-bold text-[var(--text-muted)]">
         {deck.length > 0 ? `${deck.length} left in this batch` : "You've been through the whole batch"}
       </p>
-      <p className="mb-8 text-xs font-semibold text-[var(--text-muted)]">
+      <p className="mb-4 text-xs font-semibold text-[var(--text-muted)]">
         Drag the card, use the buttons below, or the arrow keys.
       </p>
+
+      <button
+        onClick={() => setComfortZone((c) => !c)}
+        className={`chip mb-8 px-3 py-1.5 text-xs ${
+          comfortZone ? "bg-accent-500 text-[var(--on-accent)]" : "bg-[var(--bg-elevated)] text-[var(--text)]"
+        }`}
+        title="Try something outside your usual picks"
+      >
+        {comfortZone ? "✓ " : ""}Try something new
+      </button>
 
       <div className="relative h-[520px] w-full">
         {deck.length === 0 ? (
@@ -121,6 +170,30 @@ export function SwipePage() {
           >
             ♥
           </button>
+        </div>
+      )}
+
+      {regretWarning && (
+        <div className="surface fixed inset-x-4 bottom-6 z-50 mx-auto flex max-w-md flex-col gap-2 bg-[var(--bg-elevated)] p-4 sm:inset-x-auto">
+          <p className="text-sm font-semibold">
+            Heads up — <span className="font-bold">{regretWarning.titleName}</span> is tagged{" "}
+            {regretWarning.conflictingGenres.map((g) => g.replace(/-/g, " ")).join(", ")}, which you
+            said you'd rather avoid. Still want to super-like it?
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={undoRegretSuperLike}
+              className="surface-interactive bg-accent-500 px-3 py-1.5 text-xs font-semibold text-[var(--on-accent)]"
+            >
+              Undo super-like
+            </button>
+            <button
+              onClick={() => setRegretWarning(null)}
+              className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-semibold"
+            >
+              Keep it
+            </button>
+          </div>
         </div>
       )}
     </div>

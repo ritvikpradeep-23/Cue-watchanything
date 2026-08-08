@@ -28,7 +28,7 @@ function answerFull(ctx: NextShowContext, overrides: Answers = {}) {
     }
     if (q.kind === "single") answers[q.id] = q.options![0].value;
     else if (q.kind === "multi") answers[q.id] = [];
-    else if (q.kind === "text") answers[q.id] = [];
+    else if (q.kind === "text" || q.kind === "text3") answers[q.id] = [];
   }
   return answers;
 }

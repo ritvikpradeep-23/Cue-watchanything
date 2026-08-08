@@ -124,8 +124,8 @@ function staticQuestions(watchedTitle: TitleSeed): QuizQuestion[] {
     },
     {
       id: "new_favorite",
-      prompt: "Any new favorite to add? (optional)",
-      kind: "text",
+      prompt: "Any new favorites to add? (up to 3, optional)",
+      kind: "text3",
     },
     {
       id: "explore_exploit_dial",

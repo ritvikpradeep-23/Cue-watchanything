@@ -1,0 +1,122 @@
+import type { RawTitle } from "../shape";
+
+/** Batch 039 — actor-filmography-driven expansion: for actors clearly underrepresented relative
+ * to their real career (showing 2-3 dataset titles against a much deeper actual filmography —
+ * Mohanlal, Amitabh Bachchan, Denzel Washington, Song Kang-ho, Suriya), cross-referenced each
+ * against their real Wikipedia filmography for 1990+ releases not already in the dataset. This
+ * is a curated significant subset per actor, not an exhaustive dump — most of these actors have
+ * 100-300+ real film credits, many obscure/regional with no verifiable OTT presence on our
+ * platform list, so only titles with an actual confirmed streaming platform (checked per-title
+ * via Wikipedia, not guessed) were added. Plot summaries paraphrased in-house, not copied. */
+export const RAW: RawTitle[] = [
+  {
+    id: "drishyam-2-2021", name: "Drishyam 2", type: "movie",
+    plot: "Years after covering up his family's darkest secret, Georgekutty is living a quiet, settled life — until the case is reopened and investigators start pulling at threads he thought were long buried. He has to out-plan the police all over again, this time with far less room for error.",
+    cast: ["Mohanlal", "Meena", "Ansiba Hassan", "Esther Anil", "Asha Sarath"], runtime: 153, year: 2021,
+    platforms: ["Prime Video"], language: ["Malayalam"], industry: ["Mollywood"],
+    genre: ["thriller", "drama", "mystery"], mood: ["dark", "cerebral-mystery"], pace: ["slow-burn"],
+    tone: ["gritty"], cast_style: ["ensemble"], content_rating: ["mature"], intensity: ["heavy-themes"],
+    era: ["modern"], structure: ["franchise"], recency: ["hidden-gem"],
+    length: ["single-sitting"], love: ["plot-twists", "world-building"],
+  },
+  {
+    id: "neru-2023", name: "Neru", type: "movie",
+    plot: "A blind sculptor accuses a powerful businessman's son of assault, and when the case stalls, a disbarred lawyer steps in as special prosecutor against a formidable defense attorney. Her own ability to sculpt her attacker's face from memory becomes the case's most unexpected piece of evidence.",
+    cast: ["Mohanlal", "Anaswara Rajan", "Priyamani", "Siddique"], runtime: 145, year: 2023,
+    platforms: ["Disney+ Hotstar"], language: ["Malayalam"], industry: ["Mollywood"],
+    genre: ["drama", "thriller"], mood: ["dark", "cerebral-mystery"], pace: ["slow-burn"],
+    tone: ["mixed"], cast_style: ["ensemble"], content_rating: ["mature"], intensity: ["heavy-themes"],
+    era: ["modern"], structure: ["standalone"], recency: ["new-buzzy"],
+    length: ["single-sitting"], love: ["plot-twists", "emotional-weight"],
+  },
+  {
+    id: "barroz-2024", name: "Barroz", type: "movie",
+    plot: "A centuries-old guardian spirit is bound by an ancient spell to protect a hidden treasure — until a young girl arrives with her father, who plans to demolish the palace Barroz haunts. What starts as a standoff turns into an unlikely bond, as Barroz has to decide how far he'll go to earn her trust.",
+    cast: ["Mohanlal", "Maya Rao West", "Ignacio Mateos", "Guru Somasundaram"], runtime: 139, year: 2024,
+    platforms: ["Disney+ Hotstar"], language: ["Malayalam"], industry: ["Mollywood"],
+    genre: ["fantasy", "action"], mood: ["comfort-escapist", "feel-good"], pace: ["fast-paced"],
+    tone: ["hopeful"], cast_style: ["ensemble"], content_rating: ["family"],
+    era: ["fantasy-world"], structure: ["standalone"], recency: ["new-buzzy"],
+    length: ["single-sitting"], love: ["world-building", "emotional-weight"],
+  },
+  {
+    id: "marakkar-2021", name: "Marakkar: Lion of the Arabian Sea", type: "movie",
+    plot: "In the late 1500s, a naval commander leads guerrilla resistance against Portuguese colonizers threatening the kingdom of Kozhikode. After personal tragedy at the colonizers' hands, he wages an increasingly desperate campaign against European ships and the internal political betrayal working against him.",
+    cast: ["Mohanlal", "Arjun Sarja", "Suniel Shetty", "Keerthy Suresh", "Manju Warrier"], runtime: 175, year: 2021,
+    platforms: ["Prime Video"], language: ["Malayalam"], industry: ["Mollywood"],
+    genre: ["action", "drama"], mood: ["intense", "dark"], pace: ["fast-paced"],
+    tone: ["gritty"], cast_style: ["ensemble"], content_rating: ["mature"], intensity: ["graphic-violence"],
+    era: ["historical"], structure: ["standalone"], recency: ["hidden-gem"],
+    length: ["single-sitting"], love: ["world-building", "characters"],
+  },
+  {
+    id: "gulabo-sitabo", name: "Gulabo Sitabo", type: "movie",
+    plot: "A stingy old landlord schemes to force out the sole tenant of his crumbling Lucknow mansion, while the tenant plots right back. When a government archaeologist tries to seize the building as a heritage site, the two lifelong antagonists end up on the same side of a fight neither of them saw coming.",
+    cast: ["Amitabh Bachchan", "Ayushmann Khurrana", "Farrukh Jaffar"], runtime: 124, year: 2020,
+    platforms: ["Prime Video"], language: ["Hindi"], industry: ["Bollywood"],
+    genre: ["comedy", "drama"], mood: ["funny-witty", "comfort-background"], pace: ["slow-burn"],
+    tone: ["mixed"], cast_style: ["ensemble"], content_rating: ["teen"],
+    era: ["modern"], structure: ["standalone"], recency: ["hidden-gem"],
+    length: ["single-sitting"], love: ["characters", "humor"],
+  },
+  {
+    id: "kalki-2898-ad", name: "Kalki 2898 AD", type: "movie",
+    plot: "In a scorched, dystopian 2898, rebels shield a pregnant woman believed to carry the final incarnation of a prophesied hero from a totalitarian ruler. Their fight for her survival keeps colliding with an immortal warrior cursed six millennia ago, whose own path to redemption runs straight through hers.",
+    cast: ["Prabhas", "Amitabh Bachchan", "Kamal Haasan", "Deepika Padukone", "Disha Patani"], runtime: 181, year: 2024,
+    platforms: ["Netflix", "Prime Video"], language: ["Telugu", "Hindi"], industry: ["Tollywood"],
+    genre: ["sci-fi", "action", "fantasy"], mood: ["dark", "cerebral-ideas"], pace: ["fast-paced"],
+    tone: ["mixed"], cast_style: ["ensemble"], content_rating: ["mature"], intensity: ["graphic-violence"],
+    era: ["sci-fi-future"], structure: ["franchise"], recency: ["new-buzzy"],
+    length: ["single-sitting"], love: ["world-building", "plot-twists"],
+  },
+  {
+    id: "brahmastra-part-one", name: "Brahmastra: Part One - Shiva", type: "movie",
+    plot: "An orphaned musician discovers he can summon fire, and that the gift ties him to an ancient celestial weapon powerful enough to remake the world in the wrong hands. He's pulled into a secret order sworn to protect it, right as the forces hunting it start closing in.",
+    cast: ["Ranbir Kapoor", "Alia Bhatt", "Amitabh Bachchan", "Mouni Roy", "Nagarjuna"], runtime: 168, year: 2022,
+    platforms: ["Disney+ Hotstar", "Hulu"], language: ["Hindi"], industry: ["Bollywood"],
+    genre: ["fantasy", "action", "romance"], mood: ["cerebral-ideas", "light"], pace: ["fast-paced"],
+    tone: ["hopeful"], cast_style: ["ensemble"], content_rating: ["teen"],
+    era: ["fantasy-world"], structure: ["franchise"], recency: ["hidden-gem"],
+    length: ["single-sitting"], love: ["world-building", "characters"],
+  },
+  {
+    id: "the-little-things-2021", name: "The Little Things", type: "movie",
+    plot: "A small-town deputy is pulled back to Los Angeles by a serial-murder case that mirrors the one that ended his career there years earlier. Working alongside the sharp young detective who now has his old job, he closes in on a suspect whose guilt is never quite as certain as it should be.",
+    cast: ["Denzel Washington", "Rami Malek", "Jared Leto"], runtime: 127, year: 2021,
+    platforms: ["HBO Max"], language: ["English"], industry: ["Hollywood"],
+    genre: ["thriller", "mystery", "drama"], mood: ["dark", "cerebral-mystery"], pace: ["slow-burn"],
+    tone: ["gritty"], cast_style: ["ensemble"], content_rating: ["mature"], intensity: ["heavy-themes", "graphic-violence"],
+    era: ["modern"], structure: ["standalone"], recency: ["hidden-gem"],
+    length: ["single-sitting"], love: ["plot-twists", "characters"],
+  },
+  {
+    id: "uncle-samsik", name: "Uncle Samsik", type: "show",
+    plot: "In the chaos of 1960s South Korea, a man committed to nothing more than three square meals a day gets pulled into the orbit of an elite military academy graduate. Their tangled alliance plays out against real election fraud and the revolution that followed, as both men get in far deeper than either intended.",
+    cast: ["Song Kang-ho", "Byun Yo-han", "Lee Kyu-hyung", "Jin Ki-joo", "Seo Hyun-woo"], seasons: 1, episodes: 16, year: 2024,
+    platforms: ["Hulu"], language: ["Korean"], industry: ["Korean Cinema"],
+    genre: ["drama", "thriller"], mood: ["dark", "cerebral-ideas"], pace: ["slow-burn"],
+    tone: ["gritty"], cast_style: ["ensemble"], content_rating: ["mature"], intensity: ["heavy-themes"],
+    era: ["historical"], structure: ["serialized"], completion: ["completed"], recency: ["new-buzzy"],
+    length: ["multi-season"], love: ["characters", "world-building"],
+  },
+  {
+    id: "etharkkum-thunindhavan", name: "Etharkkum Thunindhavan", type: "movie",
+    plot: "A mild-mannered lawyer turns vigilante after the justice system fails to stop a minister's son running a pornography racket that's been preying on women in his town. What starts as one case becomes a one-man campaign to tear the whole operation down.",
+    cast: ["Suriya", "Vinay Rai", "Priyanka Mohan"], runtime: 146, year: 2022,
+    platforms: ["Netflix"], language: ["Tamil"], industry: ["Kollywood"],
+    genre: ["action", "drama", "thriller"], mood: ["intense", "dark"], pace: ["fast-paced"],
+    tone: ["gritty"], cast_style: ["single-protagonist"], content_rating: ["mature"], intensity: ["graphic-violence", "heavy-themes"],
+    era: ["modern"], structure: ["standalone"], recency: ["hidden-gem"],
+    length: ["single-sitting"], love: ["characters", "plot-twists"],
+  },
+  {
+    id: "kanguva-2024", name: "Kanguva", type: "movie",
+    plot: "A present-day bounty hunter's fate keeps crossing paths with a fierce tribal warrior from a thousand years earlier, and the connection is closer than either timeline lets on. As pieces of his past life surface, centuries-old battles for revenge and redemption start bleeding into the present.",
+    cast: ["Suriya", "Bobby Deol", "Disha Patani"], runtime: 159, year: 2024,
+    platforms: ["Prime Video"], language: ["Tamil"], industry: ["Kollywood"],
+    genre: ["action", "fantasy"], mood: ["intense", "dark"], pace: ["fast-paced"],
+    tone: ["gritty"], cast_style: ["single-protagonist"], content_rating: ["mature"], intensity: ["graphic-violence"],
+    era: ["historical", "modern"], structure: ["standalone"], recency: ["new-buzzy"],
+    length: ["single-sitting"], love: ["world-building", "plot-twists"],
+  },
+];

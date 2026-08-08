@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import compression from "compression";
 import { authRouter } from "./routes/auth";
 import { quizRouter } from "./routes/quiz";
 import { deckRouter } from "./routes/deck";
@@ -15,6 +16,7 @@ import { socialRouter } from "./routes/social";
 
 export const app = express();
 
+app.use(compression());
 app.use(cors({ origin: process.env.CLIENT_ORIGIN ?? "http://localhost:5173" }));
 app.use(express.json());
 

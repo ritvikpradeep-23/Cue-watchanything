@@ -10,7 +10,7 @@ export async function sendNotificationEmail(to: string, subject: string, text: s
   if (!resend) return;
   try {
     await resend.emails.send({
-      from: "What Should I Watch <notifications@resend.dev>",
+      from: "Cue <notifications@resend.dev>",
       to,
       subject,
       text,

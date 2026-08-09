@@ -72,7 +72,7 @@ export function AdminDashboardPage() {
   const maxSignups = Math.max(1, ...recentSignups.map((d) => d.count));
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10">
+    <div>
       <h1 className="mb-1 text-3xl font-semibold sm:text-4xl">Admin dashboard</h1>
       <p className="mb-8 text-sm font-bold text-[var(--text-muted)]">Internal-only — not visible to regular users.</p>
 

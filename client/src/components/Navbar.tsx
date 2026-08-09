@@ -4,11 +4,49 @@ import { useAuth } from "../lib/auth-context";
 import { useTheme } from "../lib/theme-context";
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  `px-3 py-1.5 rounded-full text-sm font-bold tracking-wide transition-colors border-2 ${
-    isActive
-      ? "text-[var(--bg-elevated)] bg-[var(--ink)] border-[var(--ink)]"
-      : "border-transparent hover:border-current"
+  `text-sm font-medium tracking-wide transition-opacity ${
+    isActive ? "opacity-100 underline underline-offset-4 decoration-2" : "opacity-70 hover:opacity-100"
   }`;
+
+const mobileNavLinkClass = ({ isActive }: { isActive: boolean }) =>
+  `text-sm font-medium transition-opacity ${
+    isActive ? "opacity-100 underline underline-offset-4 decoration-2" : "opacity-70 hover:opacity-100"
+  }`;
+
+function SunIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+    </svg>
+  );
+}
+
+function MoonIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z" />
+    </svg>
+  );
+}
+
+function PlusIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  );
+}
+
+function LogoutIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <path d="M16 17l5-5-5-5" />
+      <path d="M21 12H9" />
+    </svg>
+  );
+}
 
 export function Navbar() {
   const { isAuthenticated, user, logout } = useAuth();
@@ -34,6 +72,8 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, [isHome]);
 
+  const isAdmin = user?.role === "ADMIN";
+
   const links = isAuthenticated
     ? [
         { to: "/swipe", label: "Swipe" },
@@ -43,14 +83,6 @@ export function Navbar() {
         { to: "/chat", label: "Chat" },
         { to: "/friends", label: "Friends" },
         { to: "/profile", label: "Profile" },
-        ...(user?.role === "ADMIN"
-          ? [
-              { to: "/admin/dashboard", label: "Admin" },
-              { to: "/admin/users", label: "Users" },
-              { to: "/admin/reports", label: "Reports" },
-              { to: "/admin/add-title", label: "Add title" },
-            ]
-          : []),
       ]
     : [];
 
@@ -72,43 +104,58 @@ export function Navbar() {
           <span className="surface flex h-8 w-8 items-center justify-center bg-accent-500 text-sm font-semibold text-[var(--on-accent)]">
             ?
           </span>
-          <span className="hidden sm:inline">What Should I Watch</span>
-          <span className="sm:hidden">WSIW</span>
+          <span>Cue</span>
         </Link>
 
-        <nav className="hidden items-center gap-1 md:flex">
+        <nav className="hidden items-center gap-5 md:flex">
           {links.map((l) => (
             <NavLink key={l.to} to={l.to} className={navLinkClass}>
               {l.label}
             </NavLink>
           ))}
-          <button
-            onClick={toggleTheme}
-            aria-label="Toggle theme"
-            className="surface-interactive ml-2 bg-[var(--bg-elevated)]/80 px-3 py-1.5 text-xs font-bold text-[var(--text)] backdrop-blur-sm"
-          >
-            {theme === "dark" ? "Light" : "Dark"}
-          </button>
-          {isAuthenticated ? (
-            <button
-              onClick={handleLogout}
-              className="surface-interactive ml-1 bg-[var(--bg-elevated)]/80 px-3 py-1.5 text-xs font-bold backdrop-blur-sm"
-            >
-              Log out
-            </button>
-          ) : (
-            <>
-              <NavLink to="/login" className={navLinkClass}>
-                Log in
-              </NavLink>
+
+          <div className="ml-3 flex items-center gap-3 border-l border-current/15 pl-3">
+            {isAdmin && (
               <Link
-                to="/signup"
-                className="surface-interactive ml-1 bg-accent-500 px-4 py-1.5 text-xs font-semibold text-[var(--on-accent)]"
+                to="/admin/add-title"
+                aria-label="Add title"
+                title="Add title"
+                className="opacity-70 transition-opacity hover:opacity-100"
               >
-                Get started
+                <PlusIcon />
               </Link>
-            </>
-          )}
+            )}
+            <button
+              onClick={toggleTheme}
+              aria-label="Toggle theme"
+              title="Toggle theme"
+              className="opacity-70 transition-opacity hover:opacity-100"
+            >
+              {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+            </button>
+            {isAuthenticated ? (
+              <button
+                onClick={handleLogout}
+                aria-label="Log out"
+                title="Log out"
+                className="opacity-70 transition-opacity hover:opacity-100"
+              >
+                <LogoutIcon />
+              </button>
+            ) : (
+              <>
+                <NavLink to="/login" className={navLinkClass}>
+                  Log in
+                </NavLink>
+                <Link
+                  to="/signup"
+                  className="surface-interactive bg-accent-500 px-4 py-1.5 text-xs font-semibold text-[var(--on-accent)]"
+                >
+                  Get started
+                </Link>
+              </>
+            )}
+          </div>
         </nav>
 
         <button
@@ -123,34 +170,49 @@ export function Navbar() {
       </div>
 
       {open && (
-        <nav className="flex flex-col gap-2 border-t border-[var(--border)]/10 bg-[var(--bg-elevated)] px-4 py-3 text-[var(--text)] md:hidden">
+        <nav className="flex flex-col gap-3 border-t border-[var(--border)]/10 bg-[var(--bg-elevated)] px-4 py-3 text-[var(--text)] md:hidden">
           {links.map((l) => (
-            <NavLink key={l.to} to={l.to} className={navLinkClass} onClick={() => setOpen(false)}>
+            <NavLink key={l.to} to={l.to} className={mobileNavLinkClass} onClick={() => setOpen(false)}>
               {l.label}
             </NavLink>
           ))}
+
+          {isAdmin && (
+            <Link
+              to="/admin/add-title"
+              className="flex items-center gap-2 text-sm font-medium opacity-70 hover:opacity-100"
+              onClick={() => setOpen(false)}
+            >
+              <PlusIcon />
+              Add title
+            </Link>
+          )}
+
           <button
             onClick={() => {
               toggleTheme();
               setOpen(false);
             }}
-            className="surface-interactive bg-[var(--bg-elevated)] px-3 py-2 text-left text-sm font-bold"
+            className="flex items-center gap-2 text-left text-sm font-medium opacity-70 hover:opacity-100"
           >
+            {theme === "dark" ? <SunIcon /> : <MoonIcon />}
             {theme === "dark" ? "Switch to light" : "Switch to dark"}
           </button>
+
           {isAuthenticated ? (
             <button
               onClick={() => {
                 handleLogout();
                 setOpen(false);
               }}
-              className="surface-interactive bg-[var(--bg-elevated)] px-3 py-2 text-left text-sm font-bold"
+              className="flex items-center gap-2 text-left text-sm font-medium opacity-70 hover:opacity-100"
             >
+              <LogoutIcon />
               Log out
             </button>
           ) : (
             <>
-              <NavLink to="/login" className={navLinkClass} onClick={() => setOpen(false)}>
+              <NavLink to="/login" className={mobileNavLinkClass} onClick={() => setOpen(false)}>
                 Log in
               </NavLink>
               <Link

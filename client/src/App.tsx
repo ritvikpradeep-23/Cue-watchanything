@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import { Navbar } from "./components/Navbar";
+import { AdminLayout } from "./components/AdminLayout";
 import { NotSureFab } from "./components/NotSureFab";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { HomeRoute } from "./pages/HomeRoute";
@@ -149,7 +150,9 @@ function App() {
             path="/admin/dashboard"
             element={
               <ProtectedRoute adminOnly>
-                <AdminDashboardPage />
+                <AdminLayout>
+                  <AdminDashboardPage />
+                </AdminLayout>
               </ProtectedRoute>
             }
           />
@@ -157,7 +160,9 @@ function App() {
             path="/admin/users"
             element={
               <ProtectedRoute adminOnly>
-                <AdminUsersPage />
+                <AdminLayout>
+                  <AdminUsersPage />
+                </AdminLayout>
               </ProtectedRoute>
             }
           />
@@ -165,7 +170,9 @@ function App() {
             path="/admin/reports"
             element={
               <ProtectedRoute adminOnly>
-                <AdminReportsPage />
+                <AdminLayout>
+                  <AdminReportsPage />
+                </AdminLayout>
               </ProtectedRoute>
             }
           />

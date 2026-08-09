@@ -57,7 +57,7 @@ export function AdminUsersPage() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10">
+    <div>
       <h1 className="mb-1 text-3xl font-semibold sm:text-4xl">Users</h1>
       <p className="mb-6 text-sm font-bold text-[var(--text-muted)]">{total} accounts</p>
 

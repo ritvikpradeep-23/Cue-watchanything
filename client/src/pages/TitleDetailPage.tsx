@@ -95,7 +95,8 @@ export function TitleDetailPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10">
+    <div className="mx-auto max-w-[1800px] px-4 py-10">
+      <div className="mx-auto max-w-4xl">
       <div className="grid gap-8 sm:grid-cols-[280px_1fr]">
         <PosterImage src={title.posterUrl} alt={title.name} active className="surface aspect-[2/3] w-full object-cover" />
 
@@ -249,11 +250,15 @@ export function TitleDetailPage() {
         )}
       </div>
 
+      </div>
+
       {similar.length > 0 && <TitleCarousel heading="More like this" titles={similar} />}
 
+      <div className="mx-auto max-w-4xl">
       <Link to="/swipe" className="mt-10 inline-block text-sm font-bold text-[var(--text-accent)] hover:underline">
         ← Back to swipe deck
       </Link>
+      </div>
     </div>
   );
 }

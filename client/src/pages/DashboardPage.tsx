@@ -86,7 +86,7 @@ export function DashboardPage() {
             ))}
           </div>
         )}
-        <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col justify-end px-4 pb-12">
+        <div className="relative z-10 mx-auto flex h-full max-w-[1800px] flex-col justify-end px-4 pb-12">
           <h1 className="max-w-lg text-3xl font-semibold sm:text-5xl">Welcome back</h1>
           <p className="mt-3 max-w-md text-sm text-[var(--text-muted)] sm:text-base">
             Pick up where you left off, or let us find something new — your taste profile keeps
@@ -106,7 +106,7 @@ export function DashboardPage() {
         </div>
       </section>
 
-      <div className="mx-auto max-w-6xl px-4 pb-8">
+      <div className="mx-auto max-w-[1800px] px-4 pb-8">
       <section className="mb-10 pt-8">
         <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Browse</h2>

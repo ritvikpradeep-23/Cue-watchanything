@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { INDUSTRIES } from "@watch-recommender/shared";
+import { GENRES, INDUSTRIES } from "@watch-recommender/shared";
 import { PosterImage } from "../components/ui/PosterImage";
 import { TitleCarousel } from "../components/TitleCarousel";
 import { apiGet, ApiError } from "../lib/api";
@@ -13,8 +13,11 @@ export function DashboardPage() {
   const [watchlist, setWatchlist] = useState<DeckTitle[] | null>(null);
   const [catalog, setCatalog] = useState<DeckTitle[] | null>(null);
   const [recommended, setRecommended] = useState<DeckTitle[] | null>(null);
-  const [actorQuery, setActorQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [industryFilter, setIndustryFilter] = useState<string | null>(null);
+  const [genreFilter, setGenreFilter] = useState<string | null>(null);
+  const [browseResults, setBrowseResults] = useState<DeckTitle[]>([]);
+  const [browseLoading, setBrowseLoading] = useState(false);
   const [becauseYouLoved, setBecauseYouLoved] = useState<{ name: string; titles: DeckTitle[] } | null>(null);
   const watchlistDrag = useDragScroll<HTMLDivElement>();
 
@@ -51,16 +54,25 @@ export function DashboardPage() {
     [catalog],
   );
 
-  const activeSearch = actorQuery.trim().length > 0 || industryFilter !== null;
-  const searchResults = useMemo(() => {
-    if (!catalog || !activeSearch) return [];
-    const q = actorQuery.trim().toLowerCase();
-    return catalog.filter((t) => {
-      const matchesActor = q === "" || (t.cast ?? []).some((c) => c.toLowerCase().includes(q));
-      const matchesIndustry = !industryFilter || (t.tags.industry ?? []).includes(industryFilter);
-      return matchesActor && matchesIndustry;
-    });
-  }, [catalog, actorQuery, industryFilter, activeSearch]);
+  const activeSearch = searchQuery.trim().length > 0 || industryFilter !== null || genreFilter !== null;
+
+  useEffect(() => {
+    if (!activeSearch) {
+      setBrowseResults([]);
+      return;
+    }
+    setBrowseLoading(true);
+    const handle = setTimeout(() => {
+      const params = new URLSearchParams();
+      if (searchQuery.trim()) params.set("query", searchQuery.trim());
+      if (industryFilter) params.set("industry", industryFilter);
+      if (genreFilter) params.set("genre", genreFilter);
+      apiGet<{ titles: DeckTitle[] }>(`/browse?${params.toString()}`)
+        .then((res) => setBrowseResults(res.titles))
+        .finally(() => setBrowseLoading(false));
+    }, 250);
+    return () => clearTimeout(handle);
+  }, [searchQuery, industryFilter, genreFilter, activeSearch]);
 
   const heroPosters = (recommended && recommended.length > 0 ? recommended : catalog)?.slice(0, 10) ?? [];
 
@@ -99,13 +111,13 @@ export function DashboardPage() {
         <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Browse</h2>
           <input
-            value={actorQuery}
-            onChange={(e) => setActorQuery(e.target.value)}
-            placeholder="Search by actor…"
-            className="w-full rounded-xl border-2 border-[var(--ink)] bg-transparent px-4 py-2 text-sm outline-none sm:w-64"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search titles, actors, or tags…"
+            className="w-full rounded-xl border-2 border-[var(--ink)] bg-transparent px-4 py-2 text-sm outline-none sm:w-72"
           />
         </div>
-        <div className="flex flex-wrap gap-1.5">
+        <div className="mb-1.5 flex flex-wrap gap-1.5">
           <button
             onClick={() => setIndustryFilter(null)}
             className={`chip px-3 py-1 text-[11px] ${
@@ -126,14 +138,39 @@ export function DashboardPage() {
             </button>
           ))}
         </div>
+        <div className="flex flex-wrap gap-1.5">
+          <button
+            onClick={() => setGenreFilter(null)}
+            className={`chip px-3 py-1 text-[11px] ${
+              genreFilter === null ? "bg-accent-500 text-[var(--on-accent)]" : "bg-[var(--bg-elevated)] text-[var(--text)]"
+            }`}
+          >
+            All genres
+          </button>
+          {GENRES.map((g) => (
+            <button
+              key={g}
+              onClick={() => setGenreFilter((prev) => (prev === g ? null : g))}
+              className={`chip px-3 py-1 text-[11px] ${
+                genreFilter === g ? "bg-accent-500 text-[var(--on-accent)]" : "bg-[var(--bg-elevated)] text-[var(--text)]"
+              }`}
+            >
+              {g.replace(/-/g, " ")}
+            </button>
+          ))}
+        </div>
 
         {activeSearch && (
           <div className="mt-4">
-            {searchResults.length === 0 ? (
+            {browseLoading && browseResults.length === 0 ? (
+              <div className="flex justify-center py-8">
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-accent-500 border-t-transparent" />
+              </div>
+            ) : browseResults.length === 0 ? (
               <p className="surface p-4 text-sm font-semibold text-[var(--text-muted)]">No titles match.</p>
             ) : (
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-6">
-                {searchResults.slice(0, 24).map((t) => (
+                {browseResults.map((t) => (
                   <Link
                     key={t.id}
                     to={`/titles/${t.id}`}

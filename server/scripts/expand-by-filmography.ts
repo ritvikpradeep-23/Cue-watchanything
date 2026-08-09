@@ -46,38 +46,71 @@ const REGIONS = {
 };
 
 const ACTORS: ActorSpec[] = [
-  // Already successfully processed in batch 040 (Chiranjeevi through Unni Mukundan) — trimmed
-  // from this run so a retry doesn't waste calls re-doing already-done actors.
-  // Mollywood
-  { name: "Asif Ali", industry: "Mollywood", regions: REGIONS.india },
-  { name: "Kunchacko Boban", industry: "Mollywood", regions: REGIONS.india },
+  // Phase 2 — next slice of the 100-600 actor range, six new actors per industry (none
+  // overlapping Phase 1's roster or the earlier hand-verified round's five actors).
+  // Tollywood
+  { name: "Jr NTR", industry: "Tollywood", regions: REGIONS.india },
+  { name: "Ram Charan", industry: "Tollywood", regions: REGIONS.india },
+  { name: "Nani", industry: "Tollywood", regions: REGIONS.india },
+  { name: "Vijay Deverakonda", industry: "Tollywood", regions: REGIONS.india },
+  { name: "Rana Daggubati", industry: "Tollywood", regions: REGIONS.india },
+  { name: "Sai Dharam Tej", industry: "Tollywood", regions: REGIONS.india },
   // Kollywood
-  { name: "Vijay", industry: "Kollywood", regions: REGIONS.india },
-  { name: "Ajith Kumar", industry: "Kollywood", regions: REGIONS.india },
-  { name: "Vikram", industry: "Kollywood", regions: REGIONS.india },
-  { name: "Sivakarthikeyan", industry: "Kollywood", regions: REGIONS.india },
-  { name: "Karthi", industry: "Kollywood", regions: REGIONS.india },
-  { name: "Silambarasan", industry: "Kollywood", regions: REGIONS.india },
+  { name: "Rajinikanth", industry: "Kollywood", regions: REGIONS.india },
+  { name: "Kamal Haasan", industry: "Kollywood", regions: REGIONS.india },
+  { name: "Sarath Kumar", industry: "Kollywood", regions: REGIONS.india },
+  { name: "Jayam Ravi", industry: "Kollywood", regions: REGIONS.india },
+  { name: "Arya", industry: "Kollywood", regions: REGIONS.india },
+  { name: "Vishal", industry: "Kollywood", regions: REGIONS.india },
+  // Mollywood
+  { name: "Fahadh Faasil", industry: "Mollywood", regions: REGIONS.india },
+  { name: "Dulquer Salmaan", industry: "Mollywood", regions: REGIONS.india },
+  { name: "Biju Menon", industry: "Mollywood", regions: REGIONS.india },
+  { name: "Suraj Venjaramoodu", industry: "Mollywood", regions: REGIONS.india },
+  { name: "Indrajith Sukumaran", industry: "Mollywood", regions: REGIONS.india },
+  { name: "Jayasurya", industry: "Mollywood", regions: REGIONS.india },
   // Bollywood
-  { name: "Shah Rukh Khan", industry: "Bollywood", regions: REGIONS.india },
-  { name: "Salman Khan", industry: "Bollywood", regions: REGIONS.india },
-  { name: "Akshay Kumar", industry: "Bollywood", regions: REGIONS.india },
-  { name: "Hrithik Roshan", industry: "Bollywood", regions: REGIONS.india },
-  { name: "Ranveer Singh", industry: "Bollywood", regions: REGIONS.india },
-  { name: "Kartik Aaryan", industry: "Bollywood", regions: REGIONS.india },
+  { name: "Aamir Khan", industry: "Bollywood", regions: REGIONS.india },
+  { name: "Ajay Devgn", industry: "Bollywood", regions: REGIONS.india },
+  { name: "Ranbir Kapoor", industry: "Bollywood", regions: REGIONS.india },
+  { name: "Varun Dhawan", industry: "Bollywood", regions: REGIONS.india },
+  { name: "Sidharth Malhotra", industry: "Bollywood", regions: REGIONS.india },
+  { name: "Vicky Kaushal", industry: "Bollywood", regions: REGIONS.india },
   // Korean Cinema
-  { name: "Lee Byung-hun", industry: "Korean Cinema", regions: REGIONS.korea },
-  { name: "Ma Dong-seok", industry: "Korean Cinema", regions: REGIONS.korea },
-  { name: "Song Joong-ki", industry: "Korean Cinema", regions: REGIONS.korea },
-  { name: "Park Seo-joon", industry: "Korean Cinema", regions: REGIONS.korea },
-  { name: "Jun Ji-hyun", industry: "Korean Cinema", regions: REGIONS.korea },
-  { name: "Kim Yoon-seok", industry: "Korean Cinema", regions: REGIONS.korea },
+  { name: "Choi Min-sik", industry: "Korean Cinema", regions: REGIONS.korea },
+  { name: "Hwang Jung-min", industry: "Korean Cinema", regions: REGIONS.korea },
+  { name: "Kim Hye-soo", industry: "Korean Cinema", regions: REGIONS.korea },
+  { name: "Jeon Do-yeon", industry: "Korean Cinema", regions: REGIONS.korea },
+  { name: "Yoo Ah-in", industry: "Korean Cinema", regions: REGIONS.korea },
+  { name: "Ryu Seung-ryong", industry: "Korean Cinema", regions: REGIONS.korea },
+  // Japanese Cinema
+  { name: "Ken Watanabe", industry: "Japanese Cinema", regions: REGIONS.japan },
+  { name: "Koji Yakusho", industry: "Japanese Cinema", regions: REGIONS.japan },
+  { name: "Masaharu Fukuyama", industry: "Japanese Cinema", regions: REGIONS.japan },
+  { name: "Takeshi Kitano", industry: "Japanese Cinema", regions: REGIONS.japan },
+  { name: "Yui Aragaki", industry: "Japanese Cinema", regions: REGIONS.japan },
+  { name: "Satomi Ishihara", industry: "Japanese Cinema", regions: REGIONS.japan },
+  // European Cinema
+  { name: "Marion Cotillard", industry: "European Cinema", regions: REGIONS.europe },
+  { name: "Vincent Cassel", industry: "European Cinema", regions: REGIONS.europe },
+  { name: "Daniel Bruhl", industry: "European Cinema", regions: REGIONS.europe },
+  { name: "Toni Servillo", industry: "European Cinema", regions: REGIONS.europe },
+  { name: "Isabelle Huppert", industry: "European Cinema", regions: REGIONS.europe },
+  { name: "Mads Mikkelsen", industry: "European Cinema", regions: REGIONS.europe },
+  // Latin American Cinema
+  { name: "Ana de la Reguera", industry: "Latin American Cinema", regions: REGIONS.latam },
+  { name: "Kate del Castillo", industry: "Latin American Cinema", regions: REGIONS.latam },
+  { name: "Eugenio Derbez", industry: "Latin American Cinema", regions: REGIONS.latam },
+  { name: "Sonia Braga", industry: "Latin American Cinema", regions: REGIONS.latam },
+  { name: "Wagner Moura", industry: "Latin American Cinema", regions: REGIONS.latam },
+  { name: "Karla Souza", industry: "Latin American Cinema", regions: REGIONS.latam },
   // Hollywood
-  { name: "Ryan Reynolds", industry: "Hollywood", regions: REGIONS.hollywood },
-  { name: "Hugh Jackman", industry: "Hollywood", regions: REGIONS.hollywood },
-  { name: "Robert Downey Jr.", industry: "Hollywood", regions: REGIONS.hollywood },
-  { name: "Chris Hemsworth", industry: "Hollywood", regions: REGIONS.hollywood },
-  { name: "Emily Blunt", industry: "Hollywood", regions: REGIONS.hollywood },
+  { name: "Scarlett Johansson", industry: "Hollywood", regions: REGIONS.hollywood },
+  { name: "Tom Hanks", industry: "Hollywood", regions: REGIONS.hollywood },
+  { name: "Leonardo DiCaprio", industry: "Hollywood", regions: REGIONS.hollywood },
+  { name: "Zendaya", industry: "Hollywood", regions: REGIONS.hollywood },
+  { name: "Florence Pugh", industry: "Hollywood", regions: REGIONS.hollywood },
+  { name: "Margot Robbie", industry: "Hollywood", regions: REGIONS.hollywood },
 ];
 
 // ---------------------------------------------------------------------------
@@ -310,7 +343,11 @@ async function main() {
               : "long-runner";
 
       const id = slugify(cand.title, year);
-      const plot = details.overview.replace(/"/g, '\\"').replace(/\n/g, " ");
+      const plot = details.overview
+        .replace(/\\/g, "\\\\")
+        .replace(/"/g, '\\"')
+        .replace(/\r\n|\r|\n/g, " ")
+        .trim();
       const castLine = JSON.stringify(details.cast);
 
       outputLines.push(`  {
@@ -341,20 +378,20 @@ async function main() {
 
   const fileContent = `import type { RawTitle } from "../shape";
 
-/** Batch 041 — large-scale actor-filmography expansion, Phase 1 continued (remaining actors
- * after batch 040's run was cut short by a sustained connection failure to TMDB partway
- * through): ${ACTORS.length} actors across Mollywood/Kollywood/Bollywood/Korean Cinema/Hollywood.
- * Generated by scripts/expand-by-filmography.ts — plot/cast/runtime/episodes/collection/status
- * from TMDB; platforms verified via TMDB watch/providers (flatrate only, per-industry region,
- * see script for region mapping) — never guessed; qualitative tags (mood/tone/pace/cast_style/
- * era/love_factor/content_rating fallback) are TMDB-genre-driven heuristics, not hand-curated —
- * see the script's documented rule table for the exact logic. */
+/** Batch 042 — large-scale actor-filmography expansion, Phase 2: ${ACTORS.length} actors across
+ * all 9 industries, six new actors per industry (no overlap with Phase 1's 53 or the earlier
+ * hand-verified round's 5). Generated by scripts/expand-by-filmography.ts —
+ * plot/cast/runtime/episodes/collection/status from TMDB; platforms verified via TMDB
+ * watch/providers (flatrate only, per-industry region, see script for region mapping) — never
+ * guessed; qualitative tags (mood/tone/pace/cast_style/era/love_factor/content_rating fallback)
+ * are TMDB-genre-driven heuristics, not hand-curated — see the script's documented rule table
+ * for the exact logic. */
 export const RAW: RawTitle[] = [
 ${outputLines.join("\n")}
 ];
 `;
 
-  const outPath = path.resolve(__dirname, "../prisma/seed-data/batches/041-actor-filmography-expansion-3.ts");
+  const outPath = path.resolve(__dirname, "../prisma/seed-data/batches/042-actor-filmography-expansion-phase2.ts");
   writeFileSync(outPath, fileContent);
   console.log(`\nWritten to ${outPath}`);
 }

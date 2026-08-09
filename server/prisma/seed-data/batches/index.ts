@@ -49,6 +49,7 @@ import { RAW as BATCH_038 } from "./038-malayalam-tamil-priority";
 import { RAW as BATCH_039 } from "./039-actor-filmography-expansion";
 import { RAW as BATCH_040 } from "./040-actor-filmography-expansion-2";
 import { RAW as BATCH_041 } from "./041-actor-filmography-expansion-3";
+import { RAW as BATCH_042 } from "./042-actor-filmography-expansion-phase2";
 
 const ALL_RAW: RawTitle[] = [
   ...BATCH_001,
@@ -92,6 +93,7 @@ const ALL_RAW: RawTitle[] = [
   ...BATCH_039,
   ...BATCH_040,
   ...BATCH_041,
+  ...BATCH_042,
 ];
 
 export const BATCH_TITLES: TitleSeed[] = ALL_RAW.map(build);

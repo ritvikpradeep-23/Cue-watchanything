@@ -118,7 +118,7 @@ export function Navbar() {
                 to="/admin/add-title"
                 aria-label="Add title"
                 title="Add title"
-                className="opacity-70 transition-opacity hover:opacity-100"
+                className="opacity-70 transition-opacity hover:opacity-100 drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]"
               >
                 <PlusIcon />
               </Link>
@@ -127,7 +127,7 @@ export function Navbar() {
               onClick={toggleTheme}
               aria-label="Toggle theme"
               title="Toggle theme"
-              className="opacity-70 transition-opacity hover:opacity-100"
+              className="opacity-70 transition-opacity hover:opacity-100 drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]"
             >
               {theme === "dark" ? <SunIcon /> : <MoonIcon />}
             </button>
@@ -136,7 +136,7 @@ export function Navbar() {
                 onClick={handleLogout}
                 aria-label="Log out"
                 title="Log out"
-                className="opacity-70 transition-opacity hover:opacity-100"
+                className="opacity-70 transition-opacity hover:opacity-100 drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]"
               >
                 <LogoutIcon />
               </button>

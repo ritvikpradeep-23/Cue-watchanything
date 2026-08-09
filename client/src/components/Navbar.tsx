@@ -83,6 +83,7 @@ export function Navbar() {
         { to: "/chat", label: "Chat" },
         { to: "/friends", label: "Friends" },
         { to: "/profile", label: "Profile" },
+        ...(user?.role === "ADMIN" ? [{ to: "/admin/dashboard", label: "Admin" }] : []),
       ]
     : [];
 

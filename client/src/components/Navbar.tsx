@@ -101,9 +101,7 @@ export function Navbar() {
     >
       <div className="mx-auto flex h-full max-w-6xl items-center justify-between px-4">
         <Link to="/" className="flex items-center gap-2.5 text-lg font-semibold tracking-tight">
-          <span className="surface flex h-8 w-8 items-center justify-center bg-accent-500 text-sm font-semibold text-[var(--on-accent)]">
-            ?
-          </span>
+          <img src="/favicon.svg" alt="Cue" className="h-8 w-8 rounded-lg" />
           <span>Cue</span>
         </Link>
 

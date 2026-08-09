@@ -1,18 +1,30 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { apiGet } from "../lib/api";
+import { PosterImage } from "../components/ui/PosterImage";
+
+interface MilestoneTitle {
+  id: string;
+  name: string;
+  posterUrl: string;
+}
 
 interface TimelineSession {
   id: string;
   kind: string;
   createdAt: string;
-  watchedTitleId: string | null;
   topTags: string[];
+  milestoneTitles: MilestoneTitle[];
+  caption: string;
 }
 
-const POINT_SPACING = 160;
-const WAVE_HEIGHT = 60;
-const CHART_HEIGHT = 220;
+const POINT_SPACING = 220;
+const WAVE_MID = 230;
+const WAVE_HEIGHT = 35;
+const CARD_WIDTH = 168;
+const CARD_ABOVE_OFFSET = 178;
+const CARD_BELOW_OFFSET = 22;
+const TRACK_HEIGHT = WAVE_MID + WAVE_HEIGHT + CARD_BELOW_OFFSET + 170;
 
 export function TasteTimelinePage() {
   const [sessions, setSessions] = useState<TimelineSession[] | null>(null);
@@ -29,18 +41,17 @@ export function TasteTimelinePage() {
     );
   }
 
-  const width = Math.max(600, sessions.length * POINT_SPACING + 80);
-  const midY = CHART_HEIGHT / 2;
+  const width = Math.max(700, sessions.length * POINT_SPACING + 120);
   const points = sessions.map((s, i) => {
-    const x = 60 + i * POINT_SPACING;
+    const x = 90 + i * POINT_SPACING;
     // gentle wave so the journey reads as a winding path, not a flat line
-    const y = midY + Math.sin(i * 1.1) * WAVE_HEIGHT;
+    const y = WAVE_MID + Math.sin(i * 1.1) * WAVE_HEIGHT;
     return { ...s, x, y };
   });
   const pathD = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10">
+    <div className="mx-auto max-w-5xl px-4 py-10">
       <h1 className="mb-1 text-3xl font-semibold sm:text-4xl">Taste Timeline</h1>
       <p className="mb-8 text-sm font-bold text-[var(--text-muted)]">See where your taste has taken you.</p>
 
@@ -56,46 +67,53 @@ export function TasteTimelinePage() {
         </div>
       ) : (
         <div className="surface overflow-x-auto bg-[var(--bg-elevated)] p-6">
-          <svg width={width} height={CHART_HEIGHT + 70} viewBox={`0 0 ${width} ${CHART_HEIGHT + 70}`}>
-            <path d={pathD} fill="none" stroke="var(--color-accent-500)" strokeWidth={3} strokeLinecap="round" />
-            {points.map((p, i) => (
-              <g key={p.id}>
-                <circle cx={p.x} cy={p.y} r={8} fill="var(--bg-elevated)" stroke="var(--color-accent-500)" strokeWidth={3} />
-                <text
-                  x={p.x}
-                  y={p.y + (i % 2 === 0 ? -22 : 34)}
-                  textAnchor="middle"
-                  fontSize={11}
-                  fontWeight={700}
-                  fill="var(--text)"
-                >
-                  {p.kind === "onboarding" ? "Onboarding" : "Pick next show"}
-                </text>
-                <text
-                  x={p.x}
-                  y={p.y + (i % 2 === 0 ? -8 : 48)}
-                  textAnchor="middle"
-                  fontSize={10}
-                  fill="var(--text-muted)"
-                >
-                  {new Date(p.createdAt).toLocaleDateString()}
-                </text>
-                {p.topTags.slice(0, 2).map((tag, ti) => (
-                  <text
-                    key={tag}
-                    x={p.x}
-                    y={p.y + (i % 2 === 0 ? -8 : 48) + 14 * (ti + 1)}
-                    textAnchor="middle"
-                    fontSize={9}
-                    fontWeight={600}
-                    fill="var(--text-accent)"
+          <div className="relative" style={{ width, height: TRACK_HEIGHT }}>
+            <svg width={width} height={TRACK_HEIGHT} viewBox={`0 0 ${width} ${TRACK_HEIGHT}`} className="absolute left-0 top-0">
+              <path
+                d={pathD}
+                fill="none"
+                stroke="var(--color-accent-500)"
+                strokeWidth={3}
+                strokeLinecap="round"
+                strokeDasharray="1 10"
+              />
+            </svg>
+
+            {points.map((p, i) => {
+              const above = i % 2 === 0;
+              return (
+                <div key={p.id}>
+                  <div
+                    className="absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[var(--color-accent-500)] bg-[var(--bg-elevated)]"
+                    style={{ left: p.x, top: p.y }}
+                  />
+                  <div
+                    className="surface absolute -translate-x-1/2 bg-[var(--bg-elevated)] p-2.5"
+                    style={{ left: p.x, top: above ? p.y - CARD_ABOVE_OFFSET : p.y + CARD_BELOW_OFFSET, width: CARD_WIDTH }}
                   >
-                    {tag.replace(/-/g, " ")}
-                  </text>
-                ))}
-              </g>
-            ))}
-          </svg>
+                    <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wide text-[var(--text-muted)]">
+                      {p.kind === "onboarding" ? "Onboarding" : "Pick next show"} · {new Date(p.createdAt).toLocaleDateString()}
+                    </p>
+                    {p.milestoneTitles.length > 0 && (
+                      <div className="mb-2 flex gap-1">
+                        {p.milestoneTitles.map((t) => (
+                          <Link
+                            key={t.id}
+                            to={`/titles/${t.id}`}
+                            title={t.name}
+                            className="surface-interactive block w-1/3 shrink-0 overflow-hidden bg-[var(--bg-elevated)]"
+                          >
+                            <PosterImage src={t.posterUrl} alt={t.name} className="aspect-[2/3] w-full" />
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                    <p className="text-[11px] font-semibold leading-snug">{p.caption}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
 

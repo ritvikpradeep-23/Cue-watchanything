@@ -94,8 +94,24 @@ profileRouter.get("/timeline", requireAuth, async (req: AuthedRequest, res) => {
   const rows = await prisma.quizResponse.findMany({
     where: { userId: req.user!.userId },
     orderBy: { createdAt: "asc" },
-    select: { id: true, kind: true, createdAt: true, watchedTitleId: true, resultingTagProfile: true },
+    select: { id: true, kind: true, createdAt: true, watchedTitleId: true, resultingTagProfile: true, answers: true },
   });
+
+  if (rows.length === 0) return res.json({ sessions: [] });
+
+  // Resolve every title each milestone should show a poster for, in one pass: watchedTitleId
+  // for "next_show" sessions, and name-matched favorite_titles (same free-text matching
+  // computeOnboardingProfile already does for scoring) for the "onboarding" session.
+  const watchedIds = rows.map((r) => r.watchedTitleId).filter((id): id is string => !!id);
+  const watchedTitles = watchedIds.length
+    ? await prisma.title.findMany({ where: { id: { in: watchedIds } }, select: { id: true, name: true, posterUrl: true } })
+    : [];
+  const watchedById = new Map(watchedTitles.map((t) => [t.id, t]));
+
+  const hasOnboarding = rows.some((r) => r.kind === "onboarding");
+  const allTitlesForMatch = hasOnboarding
+    ? await prisma.title.findMany({ select: { id: true, name: true, posterUrl: true } })
+    : [];
 
   const sessions = rows.map((r) => {
     const parsed = JSON.parse(r.resultingTagProfile) as { tagProfile: Record<string, number> };
@@ -103,7 +119,31 @@ profileRouter.get("/timeline", requireAuth, async (req: AuthedRequest, res) => {
       .sort((a, b) => b[1] - a[1])
       .slice(0, 3)
       .map(([tag]) => tag);
-    return { id: r.id, kind: r.kind, createdAt: r.createdAt, watchedTitleId: r.watchedTitleId, topTags };
+
+    let milestoneTitles: { id: string; name: string; posterUrl: string }[] = [];
+    if (r.kind === "onboarding") {
+      const answers = JSON.parse(r.answers) as Record<string, unknown>;
+      const favoriteNames = (Array.isArray(answers["favorite_titles"]) ? answers["favorite_titles"] : [])
+        .filter((v): v is string => typeof v === "string" && v.trim().length > 0)
+        .map((v) => v.trim().toLowerCase());
+      milestoneTitles = allTitlesForMatch.filter((t) => favoriteNames.includes(t.name.toLowerCase())).slice(0, 3);
+    } else if (r.watchedTitleId) {
+      const watched = watchedById.get(r.watchedTitleId);
+      if (watched) milestoneTitles = [watched];
+    }
+
+    const tagLabel = topTags.slice(0, 2).map((t) => t.replace(/-/g, " ")).join(", ");
+    const titleNames = milestoneTitles.map((t) => t.name).join(", ");
+    const caption =
+      r.kind === "onboarding"
+        ? titleNames
+          ? `Started with ${titleNames}${tagLabel ? ` → leaning toward ${tagLabel}` : ""}`
+          : `Started your taste profile${tagLabel ? ` → leaning toward ${tagLabel}` : ""}`
+        : titleNames
+          ? `Watched ${titleNames}${tagLabel ? ` → shifted toward ${tagLabel}` : ""}`
+          : `Picked a next show${tagLabel ? ` → shifted toward ${tagLabel}` : ""}`;
+
+    return { id: r.id, kind: r.kind, createdAt: r.createdAt, watchedTitleId: r.watchedTitleId, topTags, milestoneTitles, caption };
   });
 
   res.json({ sessions });

@@ -6,6 +6,8 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { HomeRoute } from "./pages/HomeRoute";
 import { SignupPage } from "./pages/SignupPage";
 import { LoginPage } from "./pages/LoginPage";
+import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
+import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import { QuizPage } from "./pages/QuizPage";
 import { SwipePage } from "./pages/SwipePage";
 import { TitleDetailPage } from "./pages/TitleDetailPage";
@@ -33,6 +35,8 @@ function App() {
           <Route path="/" element={<HomeRoute />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/titles/:id" element={<TitleDetailPage />} />
           <Route
             path="/quiz"

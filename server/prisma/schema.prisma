@@ -65,6 +65,22 @@ model User {
   messagesReceived       Message[]              @relation("MessageRecipient")
   watchTogetherInitiated WatchTogetherSession[] @relation("WTInitiator")
   watchTogetherJoined    WatchTogetherSession[] @relation("WTPartner")
+  passwordResetTokens    PasswordResetToken[]
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  userId    String
+  // SHA-256 hash of the raw token — the raw token only ever exists in the emailed link, never
+  // stored, so a DB leak alone can't be used to reset anyone's password.
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Friendship {

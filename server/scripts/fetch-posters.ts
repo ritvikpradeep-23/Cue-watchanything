@@ -22,11 +22,13 @@
  */
 import "dotenv/config";
 import { writeFileSync } from "fs";
+import path from "path";
 import { TITLES } from "../prisma/seed-data/titles";
 import { BATCH_TITLES } from "../prisma/seed-data/batches";
 import { POSTER_URLS_FILE, loadPosterResults, type PosterResult } from "./lib/posterUrls";
 
 const ALL_TITLES = [...TITLES, ...BATCH_TITLES];
+const NEEDS_MANUAL_FILE = path.resolve(__dirname, "needs-manual-poster.json");
 
 const USER_AGENT = "WhatShouldIWatch-PosterFetch/1.0 (educational demo project; contact: n/a)";
 const OUT_FILE = POSTER_URLS_FILE;
@@ -210,8 +212,24 @@ async function main() {
   console.log(
     `\nDone. Wikipedia: ${foundWikipedia}, TMDB: ${foundTmdb}, missing (placeholder): ${missing}, already resolved (skipped): ${skipped}. Written to ${OUT_FILE}`,
   );
-  if (missing > 0) {
-    console.log("Run this script again to retry the titles still missing a poster.");
+
+  // Neither source found a poster for these — flagged explicitly rather than left as a silent
+  // placeholder, so a gap in the dataset is visible and actionable instead of invisible.
+  const stillMissing = ALL_TITLES.filter((t) => results[t.id] && !results[t.id].posterUrl).map((t) => ({
+    id: t.id,
+    name: t.name,
+    year: t.release_year,
+    type: t.type,
+  }));
+  writeFileSync(NEEDS_MANUAL_FILE, JSON.stringify(stillMissing, null, 2), "utf-8");
+  if (stillMissing.length > 0) {
+    console.log(
+      `\n${stillMissing.length} title(s) need a manual poster — neither Wikipedia nor TMDB had one. ` +
+        `Written to ${NEEDS_MANUAL_FILE}. Run this script again first (transient network errors are ` +
+        `retried automatically); anything still listed after that needs a human to source an image.`,
+    );
+  } else {
+    console.log("\nNo titles need a manual poster — every title has a resolved poster or hasn't been attempted yet.");
   }
 }
 

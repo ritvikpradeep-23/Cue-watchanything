@@ -56,6 +56,12 @@ export function AdminUsersPage() {
     if (selectedId === id) openDetail(id);
   }
 
+  async function unban(id: string) {
+    await apiPost(`/admin/users/${id}/unban`, {});
+    loadUsers();
+    if (selectedId === id) openDetail(id);
+  }
+
   return (
     <div>
       <h1 className="mb-1 text-3xl font-semibold sm:text-4xl">Users</h1>
@@ -121,30 +127,36 @@ export function AdminUsersPage() {
                             Grant admin
                           </button>
                         )}
-                        {!u.bannedAt &&
-                          (confirmingBanId === u.id ? (
-                            <>
-                              <button
-                                onClick={() => ban(u.id)}
-                                className="surface-interactive bg-red-600 px-3 py-1.5 text-xs font-semibold text-white"
-                              >
-                                Confirm permanent ban
-                              </button>
-                              <button
-                                onClick={() => setConfirmingBanId(null)}
-                                className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-semibold"
-                              >
-                                Cancel
-                              </button>
-                            </>
-                          ) : (
+                        {u.bannedAt ? (
+                          <button
+                            onClick={() => unban(u.id)}
+                            className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-semibold text-emerald-600"
+                          >
+                            Unban
+                          </button>
+                        ) : confirmingBanId === u.id ? (
+                          <>
                             <button
-                              onClick={() => setConfirmingBanId(u.id)}
-                              className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-semibold text-red-600"
+                              onClick={() => ban(u.id)}
+                              className="surface-interactive bg-red-600 px-3 py-1.5 text-xs font-semibold text-white"
                             >
-                              Ban permanently
+                              Confirm permanent ban
                             </button>
-                          ))}
+                            <button
+                              onClick={() => setConfirmingBanId(null)}
+                              className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-semibold"
+                            >
+                              Cancel
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            onClick={() => setConfirmingBanId(u.id)}
+                            className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-semibold text-red-600"
+                          >
+                            Ban permanently
+                          </button>
+                        )}
                       </div>
 
                       <div className="grid gap-4 sm:grid-cols-3">

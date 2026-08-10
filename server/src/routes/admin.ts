@@ -246,6 +246,15 @@ adminRouter.post("/users/:id/ban", requireAuth, requireAdmin, async (req: Authed
   res.json({ id: user.id, bannedAt: user.bannedAt });
 });
 
+/** Reverses a ban — clears bannedAt so the account can log in again. The row/email was never
+ * touched by ban itself, so this is a straightforward clear, not a data restore. */
+adminRouter.post("/users/:id/unban", requireAuth, requireAdmin, async (req: AuthedRequest, res) => {
+  const id = String(req.params.id);
+  const user = await prisma.user.update({ where: { id }, data: { bannedAt: null } }).catch(() => null);
+  if (!user) return res.status(404).json({ error: "User not found" });
+  res.json({ id: user.id, bannedAt: user.bannedAt });
+});
+
 /** Moderation queue — reports filed by users, most recent first. */
 adminRouter.get("/reports", requireAuth, requireAdmin, async (req, res) => {
   const status = req.query.status === "REVIEWED" ? "REVIEWED" : req.query.status === "all" ? undefined : "PENDING";

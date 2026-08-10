@@ -495,11 +495,19 @@ export function computeOnboardingProfile(answers: Answers, allTitles: TitleSeed[
   const languages: Language[] = answers["languages"] ?? [];
   const avoidGenres = computeAvoidGenreFilter(answers);
   const lengthPreference = mapLengthCommitment(answers["length_commitment"]);
+  const type = mapTypeFilter(answers["type"]);
 
   return {
     tagProfile: mergeDeltas(...deltas),
-    filters: { platforms, languages, avoidGenres, lengthPreference },
+    filters: { type, platforms, languages, avoidGenres, lengthPreference },
   };
+}
+
+/** Q1's answer is a hard filter on title.type, not just a picker for the type-specific
+ * follow-up question below — "surprise" (or no answer) means don't filter at all. */
+export function mapTypeFilter(value: string | undefined): HardFilters["type"] {
+  if (value === "movie" || value === "show" || value === "anime") return value;
+  return undefined;
 }
 
 export function mapLengthCommitment(value: string | undefined): HardFilters["lengthPreference"] {

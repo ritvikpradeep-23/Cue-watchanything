@@ -185,6 +185,26 @@ describe("buildDeck", () => {
     expect(deck.map((t) => t.id).slice(0, 2).sort()).toEqual(["a", "c"]);
   });
 
+  it("hard-excludes titles whose type doesn't match the selected type filter", () => {
+    const mixedTypes = [
+      makeTitle({ id: "movie-a", type: "movie", tags: { ...makeTitle({ id: "movie-a" }).tags, genre: ["comedy"] } }),
+      makeTitle({ id: "show-a", type: "show", tags: { ...makeTitle({ id: "show-a" }).tags, genre: ["comedy"] } }),
+      makeTitle({ id: "anime-a", type: "anime", tags: { ...makeTitle({ id: "anime-a" }).tags, genre: ["comedy"] } }),
+    ];
+    const deck = buildDeck({ comedy: 5 }, mixedTypes, { filters: { type: "movie" } });
+    expect(deck.map((t) => t.id)).toEqual(["movie-a"]);
+    expect(deck.every((t) => t.type === "movie")).toBe(true);
+  });
+
+  it("skips the type filter entirely when no type is set", () => {
+    const mixedTypes = [
+      makeTitle({ id: "movie-a", type: "movie", tags: { ...makeTitle({ id: "movie-a" }).tags, genre: ["comedy"] } }),
+      makeTitle({ id: "show-a", type: "show", tags: { ...makeTitle({ id: "show-a" }).tags, genre: ["comedy"] } }),
+    ];
+    const deck = buildDeck({ comedy: 5 }, mixedTypes);
+    expect(deck.map((t) => t.id).sort()).toEqual(["movie-a", "show-a"]);
+  });
+
   it("hard-excludes titles primarily tagged with an avoided genre, not just down-weights them", () => {
     const deck = buildDeck(
       { comedy: 5, drama: 5 },
@@ -257,6 +277,20 @@ describe("buildTop3", () => {
     const profile = { comedy: 5, "funny-witty": 5 };
     const result = buildTop3(profile, titles, { excludedIds: new Set(["high"]) });
     expect(result.picks.find((t) => t.id === "high")).toBeUndefined();
+  });
+
+  it("never returns a title whose type doesn't match a 'movie'-only type filter", () => {
+    const mixedTypes = [
+      makeTitle({ id: "m1", type: "movie", tags: { ...makeTitle({ id: "m1" }).tags, genre: ["comedy"] } }),
+      makeTitle({ id: "m2", type: "movie", tags: { ...makeTitle({ id: "m2" }).tags, genre: ["comedy"] } }),
+      makeTitle({ id: "m3", type: "movie", tags: { ...makeTitle({ id: "m3" }).tags, genre: ["comedy"] } }),
+      makeTitle({ id: "s1", type: "show", tags: { ...makeTitle({ id: "s1" }).tags, genre: ["comedy"] } }),
+      makeTitle({ id: "a1", type: "anime", tags: { ...makeTitle({ id: "a1" }).tags, genre: ["comedy"] } }),
+    ];
+    const profile = { comedy: 5 };
+    const result = buildTop3(profile, mixedTypes, { exploreExploitDial: 0.1, filters: { type: "movie" } });
+    expect(result.picks.every((t) => t.type === "movie")).toBe(true);
+    expect(result.picks.some((t) => t.type === "show" || t.type === "anime")).toBe(false);
   });
 
   // Tie-break fires at the #3-vs-#4 cutoff (per spec: "the cutoff point where only one

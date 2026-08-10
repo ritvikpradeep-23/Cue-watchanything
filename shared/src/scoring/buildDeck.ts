@@ -1,8 +1,13 @@
-import type { Genre, Language, Platform } from "../taxonomy";
+import type { Genre, Language, Platform, TitleType } from "../taxonomy";
 import type { TagProfile, TitleSeed } from "../types";
 import { scoreTitle } from "./scoreTitle";
 
 export interface HardFilters {
+  /** user's Q1 answer ("movie" | "show" | "anime") — title.type must match exactly. Omit
+   * (or "surprise") to skip the filter entirely. This used to only pick the type-specific
+   * follow-up question and was never enforced here, which let the wrong type slip into the
+   * deck/top-3 — it's a hard exclusion now, same tier as platforms/lengthPreference below. */
+  type?: TitleType;
   /** user's selected platforms (Q19) — title.platforms must intersect this set */
   platforms?: Platform[];
   /** user's total-time-commitment answer (Q20) */
@@ -16,6 +21,7 @@ export interface HardFilters {
 }
 
 export function passesHardFilters(title: TitleSeed, filters: HardFilters): boolean {
+  if (filters.type && title.type !== filters.type) return false;
   if (filters.platforms && filters.platforms.length > 0) {
     const intersects = title.platforms.some((p) => filters.platforms!.includes(p));
     if (!intersects) return false;

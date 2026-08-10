@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeOnboardingProfile, getNextOnboardingQuestion } from "@watch-recommender/shared";
+import { buildDeck, computeOnboardingProfile, getNextOnboardingQuestion } from "@watch-recommender/shared";
 import { TITLES } from "../../prisma/seed-data/titles";
 
 function answerFullQuiz(overrides: Record<string, any> = {}) {
@@ -129,5 +129,25 @@ describe("computeOnboardingProfile", () => {
     const answers = answerFullQuiz({ industry: ["Korean Cinema"] });
     const { tagProfile } = computeOnboardingProfile(answers, TITLES);
     expect(tagProfile["Korean Cinema"]).toBeGreaterThan(0);
+  });
+
+  it("hard-filters Q1's type answer instead of only steering the follow-up question", () => {
+    const answers = answerFullQuiz({ type: "movie" });
+    const { filters } = computeOnboardingProfile(answers, TITLES);
+    expect(filters.type).toBe("movie");
+  });
+
+  it("skips the type filter entirely when Q1 is 'surprise me'", () => {
+    const answers = answerFullQuiz({ type: "surprise" });
+    const { filters } = computeOnboardingProfile(answers, TITLES);
+    expect(filters.type).toBeUndefined();
+  });
+
+  it("a 'movie'-only quiz answer never yields a deck containing a show or anime", () => {
+    const answers = answerFullQuiz({ type: "movie" });
+    const { tagProfile, filters } = computeOnboardingProfile(answers, TITLES);
+    const deck = buildDeck(tagProfile, TITLES, { filters });
+    expect(deck.length).toBeGreaterThan(0);
+    expect(deck.every((t) => t.type === "movie")).toBe(true);
   });
 });

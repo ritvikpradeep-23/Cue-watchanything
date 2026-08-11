@@ -1,7 +1,7 @@
 import { randomBytes, createHash } from "crypto";
 import { Router } from "express";
 import { prisma } from "../lib/prisma";
-import { comparePassword, hashPassword, signToken } from "../lib/auth";
+import { comparePassword, hashPassword, requireAuth, signToken, type AuthedRequest } from "../lib/auth";
 import { sendNotificationEmail } from "../lib/email";
 
 export const authRouter = Router();
@@ -38,7 +38,7 @@ authRouter.post("/signup", async (req, res) => {
   const passwordHash = await hashPassword(password);
   const user = await prisma.user.create({ data: { email, passwordHash } });
 
-  const token = signToken({ userId: user.id, email: user.email, role: user.role });
+  const token = signToken({ userId: user.id, email: user.email, role: user.role, tokenVersion: user.tokenVersion });
   res.status(201).json({ token, user: { id: user.id, email: user.email, role: user.role } });
 });
 
@@ -60,7 +60,7 @@ authRouter.post("/login", async (req, res) => {
     return res.status(401).json({ error: "Invalid email or password" });
   }
 
-  const token = signToken({ userId: user.id, email: user.email, role: user.role });
+  const token = signToken({ userId: user.id, email: user.email, role: user.role, tokenVersion: user.tokenVersion });
   res.json({ token, user: { id: user.id, email: user.email, role: user.role } });
 });
 
@@ -126,4 +126,29 @@ authRouter.post("/reset-password", async (req, res) => {
   ]);
 
   res.json({ message: "Password updated. You can now log in with your new password." });
+});
+
+/** In-account change, distinct from the forgot-password email flow — requires proving you
+ * already know the current password rather than proving ownership of the inbox. */
+authRouter.post("/change-password", requireAuth, async (req: AuthedRequest, res) => {
+  const { currentPassword, newPassword } = req.body ?? {};
+  if (typeof currentPassword !== "string" || typeof newPassword !== "string") {
+    return res.status(400).json({ error: "Current and new password are required" });
+  }
+  if (newPassword.length < 8) {
+    return res.status(400).json({ error: "New password must be at least 8 characters" });
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: req.user!.userId } });
+  if (!user) return res.status(404).json({ error: "User not found" });
+
+  const valid = await comparePassword(currentPassword, user.passwordHash);
+  if (!valid) {
+    return res.status(401).json({ error: "Current password is incorrect" });
+  }
+
+  const passwordHash = await hashPassword(newPassword);
+  await prisma.user.update({ where: { id: user.id }, data: { passwordHash } });
+
+  res.json({ message: "Password updated." });
 });

@@ -23,6 +23,12 @@ export function ProfilePage() {
   const [socialError, setSocialError] = useState<string | null>(null);
   const [socialSaved, setSocialSaved] = useState(false);
   const [blocked, setBlocked] = useState<BlockedUser[] | null>(null);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordSaved, setPasswordSaved] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
 
   useEffect(() => {
     apiGet<ProfileData>("/profile").then((res) => {
@@ -65,6 +71,29 @@ export function ProfilePage() {
   async function unblock(id: string) {
     await apiDelete(`/social/block/${id}`);
     setBlocked((prev) => prev?.filter((b) => b.id !== id) ?? null);
+  }
+
+  async function handleChangePassword() {
+    setPasswordError(null);
+    setPasswordSaved(false);
+
+    if (newPassword !== confirmNewPassword) {
+      setPasswordError("New passwords don't match");
+      return;
+    }
+
+    setChangingPassword(true);
+    try {
+      await apiPost("/auth/change-password", { currentPassword, newPassword });
+      setPasswordSaved(true);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmNewPassword("");
+    } catch (e) {
+      setPasswordError(e instanceof ApiError ? e.message : "Failed to update password");
+    } finally {
+      setChangingPassword(false);
+    }
   }
 
   if (!data) {
@@ -154,6 +183,51 @@ export function ProfilePage() {
         </div>
         {socialError && <p className="mt-2 text-sm font-bold text-red-600">{socialError}</p>}
         {socialSaved && <p className="mt-2 text-sm font-bold text-[var(--text-accent)]">Saved</p>}
+      </div>
+
+      <div className="surface mt-6 bg-[var(--bg-elevated)] p-6">
+        <h2 className="mb-1 text-xl font-semibold tracking-tight sm:text-2xl">Change password</h2>
+        <p className="mb-4 text-sm font-medium text-[var(--text-muted)]">
+          Enter your current password and a new one. Locked out instead?{" "}
+          <Link to="/forgot-password" className="font-semibold text-[var(--text-accent)] hover:underline">
+            Use the email reset link
+          </Link>{" "}
+          from the login page.
+        </p>
+        <div className="flex max-w-sm flex-col gap-3">
+          <input
+            type="password"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+            placeholder="Current password"
+            className="w-full rounded-xl border-2 border-[var(--ink)] bg-transparent px-3 py-2 text-sm outline-none"
+          />
+          <input
+            type="password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            placeholder="New password (min 8 characters)"
+            minLength={8}
+            className="w-full rounded-xl border-2 border-[var(--ink)] bg-transparent px-3 py-2 text-sm outline-none"
+          />
+          <input
+            type="password"
+            value={confirmNewPassword}
+            onChange={(e) => setConfirmNewPassword(e.target.value)}
+            placeholder="Confirm new password"
+            minLength={8}
+            className="w-full rounded-xl border-2 border-[var(--ink)] bg-transparent px-3 py-2 text-sm outline-none"
+          />
+          <button
+            onClick={handleChangePassword}
+            disabled={changingPassword || !currentPassword || newPassword.length < 8}
+            className="surface-interactive self-start bg-accent-500 px-4 py-2 text-sm font-semibold text-[var(--on-accent)] disabled:opacity-50"
+          >
+            {changingPassword ? "Updating…" : "Update password"}
+          </button>
+        </div>
+        {passwordError && <p className="mt-2 text-sm font-bold text-red-600">{passwordError}</p>}
+        {passwordSaved && <p className="mt-2 text-sm font-bold text-[var(--text-accent)]">Password updated</p>}
       </div>
 
       {blocked && blocked.length > 0 && (

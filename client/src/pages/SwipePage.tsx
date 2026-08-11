@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SwipeCard, type DeckTitle } from "../components/SwipeCard";
+import { TitleDetailModal } from "../components/TitleDetailModal";
 import { apiGet, apiPost, ApiError } from "../lib/api";
 
 interface RegretWarning {
@@ -15,6 +16,7 @@ export function SwipePage() {
   const [error, setError] = useState<string | null>(null);
   const [regretWarning, setRegretWarning] = useState<RegretWarning | null>(null);
   const [comfortZone, setComfortZone] = useState(() => localStorage.getItem("watchrec_comfort_zone") === "true");
+  const [detailTitleId, setDetailTitleId] = useState<string | null>(null);
   const avoidGenres = useRef<string[]>([]);
   const dismissTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -140,7 +142,7 @@ export function SwipePage() {
                 title={title}
                 stackIndex={i}
                 onSwipe={handleSwipe}
-                onOpenDetail={() => navigate(`/titles/${title.id}`)}
+                onOpenDetail={() => setDetailTitleId(title.id)}
               />
             ))
             .reverse()
@@ -196,6 +198,8 @@ export function SwipePage() {
           </div>
         </div>
       )}
+
+      <TitleDetailModal titleId={detailTitleId} onClose={() => setDetailTitleId(null)} />
     </div>
   );
 }

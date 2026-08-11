@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { PosterImage } from "../components/ui/PosterImage";
+import { TitleDetailModal } from "../components/TitleDetailModal";
 import { apiGet, apiPost } from "../lib/api";
 
 interface HistoryItem {
@@ -17,6 +18,7 @@ export function HistoryPage() {
   const navigate = useNavigate();
   const [items, setItems] = useState<HistoryItem[] | null>(null);
   const [drafts, setDrafts] = useState<Record<string, { rating: number; comment: string }>>({});
+  const [detailTitleId, setDetailTitleId] = useState<string | null>(null);
 
   async function load() {
     const res = await apiGet<{ items: HistoryItem[] }>("/history");
@@ -85,7 +87,12 @@ export function HistoryPage() {
                       Pick next from this →
                     </Link>
                   </div>
-                  <p className="mt-1 line-clamp-2 text-sm text-[var(--text-muted)]">{item.plotSummary}</p>
+                  <p
+                    onClick={() => setDetailTitleId(item.id)}
+                    className="mt-1 line-clamp-2 cursor-pointer text-sm text-[var(--text-muted)] hover:text-[var(--text)]"
+                  >
+                    {item.plotSummary}
+                  </p>
 
                   <div className="mt-3 flex items-center gap-1">
                     {[1, 2, 3, 4, 5].map((n) => (
@@ -122,6 +129,8 @@ export function HistoryPage() {
           })}
         </div>
       )}
+
+      <TitleDetailModal titleId={detailTitleId} onClose={() => setDetailTitleId(null)} />
     </div>
   );
 }

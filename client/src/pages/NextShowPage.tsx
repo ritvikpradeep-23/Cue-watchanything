@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getNextNextShowQuestion, type NextShowContext, type HardFilters, type TagProfile, type TitleSeed } from "@watch-recommender/shared";
 import { QuizWizard } from "../components/QuizWizard";
+import { TitleDetailModal } from "../components/TitleDetailModal";
 import { PosterImage } from "../components/ui/PosterImage";
 import { TasteRadarChart } from "../components/ui/TasteRadarChart";
 import { apiGet, apiPost, ApiError } from "../lib/api";
@@ -27,6 +28,7 @@ export function NextShowPage() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<SubmitResult | null>(null);
   const [lastAnswers, setLastAnswers] = useState<Record<string, any>>({});
+  const [detailTitleId, setDetailTitleId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!watchedTitleId) return;
@@ -82,7 +84,12 @@ export function NextShowPage() {
                 <Link to={`/titles/${t.id}`} className="font-semibold hover:text-[var(--text-accent)]">
                   {t.name}
                 </Link>
-                <p className="mt-1 line-clamp-3 text-sm text-[var(--text-muted)]">{t.plotSummary}</p>
+                <p
+                  onClick={() => setDetailTitleId(t.id)}
+                  className="mt-1 line-clamp-3 cursor-pointer text-sm text-[var(--text-muted)] hover:text-[var(--text)]"
+                >
+                  {t.plotSummary}
+                </p>
                 {ctx?.baseProfile && (
                   <div className="mt-2 flex justify-center">
                     <TasteRadarChart userProfile={ctx.baseProfile} tags={t.tags as any} size={160} />
@@ -101,6 +108,8 @@ export function NextShowPage() {
             </div>
           ))}
         </div>
+
+        <TitleDetailModal titleId={detailTitleId} onClose={() => setDetailTitleId(null)} />
       </div>
     );
   }

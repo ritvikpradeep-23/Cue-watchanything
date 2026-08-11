@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { PosterImage } from "../components/ui/PosterImage";
+import { TitleDetailModal } from "../components/TitleDetailModal";
 import { apiGet, apiPost } from "../lib/api";
 
 interface WatchlistItem {
@@ -19,6 +20,7 @@ interface WatchlistItem {
 
 export function WatchlistPage() {
   const [items, setItems] = useState<WatchlistItem[] | null>(null);
+  const [detailTitleId, setDetailTitleId] = useState<string | null>(null);
 
   async function load() {
     const res = await apiGet<{ items: WatchlistItem[] }>("/watchlist");
@@ -69,7 +71,12 @@ export function WatchlistPage() {
                   </Link>
                   {item.superLiked && <span className="chip bg-amber-400 px-2 py-0.5 text-[10px] text-[var(--ink)]">★ Super</span>}
                 </div>
-                <p className="mt-1 line-clamp-2 text-sm text-[var(--text-muted)]">{item.plotSummary}</p>
+                <p
+                  onClick={() => setDetailTitleId(item.id)}
+                  className="mt-1 line-clamp-2 cursor-pointer text-sm text-[var(--text-muted)] hover:text-[var(--text)]"
+                >
+                  {item.plotSummary}
+                </p>
                 <p className="mt-1 text-xs font-bold text-[var(--text-accent)]">
                   {item.seasons ? `${item.seasons} seasons` : item.runtimeMinutes ? `${item.runtimeMinutes} min` : ""}
                   {" · "}
@@ -86,6 +93,8 @@ export function WatchlistPage() {
           ))}
         </div>
       )}
+
+      <TitleDetailModal titleId={detailTitleId} onClose={() => setDetailTitleId(null)} />
     </div>
   );
 }

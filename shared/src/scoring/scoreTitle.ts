@@ -1,7 +1,10 @@
 import type { TagProfile, TitleSeed, TitleTags } from "../types";
 import { TAG_CATEGORY } from "../taxonomy";
 
-/** Flattens every tag category on a title into one list of tag strings. */
+/** Flattens every tag category on a title into one list of tag strings. The newer optional
+ * categories (runtime_bucket, rewatch_value, etc.) are missing entirely on titles seeded
+ * before those fields existed — default to [] rather than spreading undefined, which would
+ * throw. */
 export function flattenTags(tags: TitleTags): string[] {
   return [
     ...tags.genre,
@@ -19,6 +22,14 @@ export function flattenTags(tags: TitleTags): string[] {
     ...tags.length_bucket,
     ...tags.love_factor,
     ...tags.industry,
+    ...(tags.runtime_bucket ?? []),
+    ...(tags.episode_count_bucket ?? []),
+    ...(tags.rewatch_value ?? []),
+    ...(tags.prestige_vs_blockbuster ?? []),
+    ...(tags.show_format ?? []),
+    ...(tags.anthology_vs_continuous ?? []),
+    ...(tags.binge_vs_weekly ?? []),
+    ...(tags.demographic ?? []),
   ];
 }
 

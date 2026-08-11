@@ -72,6 +72,25 @@ function defaultIndustry(r: RawTitle): Industry[] {
   return ["Hollywood"];
 }
 
+/** Derived purely from runtime_minutes — never hand-tagged/guessed. Movies only; other types
+ * have no runtime_minutes and get no bucket. */
+function deriveRuntimeBucket(r: RawTitle): TitleSeed["tags"]["runtime_bucket"] {
+  if (r.runtime == null) return [];
+  if (r.runtime < 90) return ["short"];
+  if (r.runtime <= 120) return ["standard"];
+  if (r.runtime <= 150) return ["long"];
+  return ["epic"];
+}
+
+/** Derived purely from episode count — never hand-tagged/guessed. Titles with no episode
+ * count get no bucket. */
+function deriveEpisodeCountBucket(r: RawTitle): TitleSeed["tags"]["episode_count_bucket"] {
+  if (r.episodes == null) return [];
+  if (r.episodes <= 13) return ["short"];
+  if (r.episodes <= 30) return ["standard"];
+  return ["long-runner"];
+}
+
 export function build(r: RawTitle): TitleSeed {
   return {
     id: r.id,
@@ -102,6 +121,16 @@ export function build(r: RawTitle): TitleSeed {
       length_bucket: r.length,
       love_factor: r.love,
       industry: r.industry ?? defaultIndustry(r),
+      runtime_bucket: deriveRuntimeBucket(r),
+      episode_count_bucket: deriveEpisodeCountBucket(r),
+      // No reliable derivation from existing fields, and not hand-tagged across the catalog
+      // yet — left empty rather than guessed (see quiz spec).
+      rewatch_value: [],
+      prestige_vs_blockbuster: [],
+      show_format: [],
+      anthology_vs_continuous: [],
+      binge_vs_weekly: [],
+      demographic: [],
     },
   };
 }

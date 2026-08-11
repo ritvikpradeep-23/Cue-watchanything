@@ -118,6 +118,17 @@ export const INDUSTRIES = [
   "Latin American Cinema",
 ] as const;
 
+/** Derived purely from runtime_minutes (movies) — computed at seed-build time, never guessed. */
+export const RUNTIME_BUCKETS = ["short", "standard", "long", "epic"] as const;
+export const REWATCH_VALUES = ["one-time", "rewatchable"] as const;
+export const PRESTIGE_VS_BLOCKBUSTER = ["prestige", "blockbuster"] as const;
+export const SHOW_FORMATS = ["sitcom-ensemble", "prestige-drama", "thriller-suspense", "procedural"] as const;
+export const ANTHOLOGY_VS_CONTINUOUS = ["anthology", "continuous-storyline"] as const;
+export const BINGE_VS_WEEKLY = ["binge-preferred", "weekly-preferred"] as const;
+/** Derived purely from episodes (anime) — computed at seed-build time, never guessed. */
+export const EPISODE_COUNT_BUCKETS = ["short", "standard", "long-runner"] as const;
+export const DEMOGRAPHICS = ["shonen", "seinen", "shojo", "josei"] as const;
+
 export type Genre = (typeof GENRES)[number];
 export type Mood = (typeof MOODS)[number];
 export type Pace = (typeof PACES)[number];
@@ -136,6 +147,14 @@ export type TitleType = (typeof TITLE_TYPES)[number];
 export type Platform = (typeof PLATFORMS)[number];
 export type Language = (typeof LANGUAGES)[number];
 export type Industry = (typeof INDUSTRIES)[number];
+export type RuntimeBucket = (typeof RUNTIME_BUCKETS)[number];
+export type RewatchValue = (typeof REWATCH_VALUES)[number];
+export type PrestigeVsBlockbuster = (typeof PRESTIGE_VS_BLOCKBUSTER)[number];
+export type ShowFormat = (typeof SHOW_FORMATS)[number];
+export type AnthologyVsContinuous = (typeof ANTHOLOGY_VS_CONTINUOUS)[number];
+export type BingeVsWeekly = (typeof BINGE_VS_WEEKLY)[number];
+export type EpisodeCountBucket = (typeof EPISODE_COUNT_BUCKETS)[number];
+export type Demographic = (typeof DEMOGRAPHICS)[number];
 
 /** Every valid tag string across every category, flattened — used for delta/weight maps. */
 export type Tag =
@@ -153,7 +172,15 @@ export type Tag =
   | Recency
   | LengthBucket
   | LoveFactor
-  | Industry;
+  | Industry
+  | RuntimeBucket
+  | RewatchValue
+  | PrestigeVsBlockbuster
+  | ShowFormat
+  | AnthologyVsContinuous
+  | BingeVsWeekly
+  | EpisodeCountBucket
+  | Demographic;
 
 export const ALL_TAGS: Tag[] = [
   ...GENRES,
@@ -171,6 +198,14 @@ export const ALL_TAGS: Tag[] = [
   ...LENGTH_BUCKETS,
   ...LOVE_FACTORS,
   ...INDUSTRIES,
+  ...RUNTIME_BUCKETS,
+  ...REWATCH_VALUES,
+  ...PRESTIGE_VS_BLOCKBUSTER,
+  ...SHOW_FORMATS,
+  ...ANTHOLOGY_VS_CONTINUOUS,
+  ...BINGE_VS_WEEKLY,
+  ...EPISODE_COUNT_BUCKETS,
+  ...DEMOGRAPHICS,
 ];
 
 /** tag -> which taxonomy category it belongs to (used by tag-check question generation) */
@@ -189,5 +224,13 @@ export const TAG_CATEGORY: Record<string, string> = {
   ...Object.fromEntries(RECENCIES.map((t) => [t, "recency"])),
   ...Object.fromEntries(LENGTH_BUCKETS.map((t) => [t, "length_bucket"])),
   ...Object.fromEntries(LOVE_FACTORS.map((t) => [t, "love_factor"])),
+  ...Object.fromEntries(RUNTIME_BUCKETS.map((t) => [t, "runtime_bucket"])),
+  ...Object.fromEntries(REWATCH_VALUES.map((t) => [t, "rewatch_value"])),
+  ...Object.fromEntries(PRESTIGE_VS_BLOCKBUSTER.map((t) => [t, "prestige_vs_blockbuster"])),
+  ...Object.fromEntries(SHOW_FORMATS.map((t) => [t, "show_format"])),
+  ...Object.fromEntries(ANTHOLOGY_VS_CONTINUOUS.map((t) => [t, "anthology_vs_continuous"])),
+  ...Object.fromEntries(BINGE_VS_WEEKLY.map((t) => [t, "binge_vs_weekly"])),
+  ...Object.fromEntries(EPISODE_COUNT_BUCKETS.map((t) => [t, "episode_count_bucket"])),
+  ...Object.fromEntries(DEMOGRAPHICS.map((t) => [t, "demographic"])),
   ...Object.fromEntries(INDUSTRIES.map((t) => [t, "industry"])),
 };

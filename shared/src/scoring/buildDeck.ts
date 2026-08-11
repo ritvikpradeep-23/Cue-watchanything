@@ -75,6 +75,9 @@ export interface BuildDeckOptions {
   excludedIds?: Set<string>;
   filters?: HardFilters;
   deckSize?: number; // ceiling only now, clamped to [15, 50] — see MIN_DECK/MAX_DECK
+  /** learned per-category weight multipliers, see scoreTitle — omit for the hand-coded-only
+   * behavior (unaffected). */
+  learnedWeights?: Record<string, number>;
 }
 
 /** Scores, filters, and ranks the full catalog down to a swipeable shortlist. Only titles
@@ -94,7 +97,7 @@ export function buildDeck(
   );
 
   const scored = eligible
-    .map((title) => ({ title, score: scoreTitle(userProfile, title) }))
+    .map((title) => ({ title, score: scoreTitle(userProfile, title, options.learnedWeights) }))
     .sort((a, b) => b.score - a.score);
 
   if (scored.length === 0) return [];

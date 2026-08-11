@@ -33,11 +33,20 @@ export function flattenTags(tags: TitleTags): string[] {
   ];
 }
 
-/** score = sum over all tags the title has of the user's weight for that tag (0 if absent). */
-export function scoreTitle(userProfile: TagProfile, title: TitleSeed): number {
+/** score = sum over all tags the title has of the user's weight for that tag (0 if absent),
+ * each optionally scaled by a learned per-category multiplier (see
+ * cue-ml-weight-tuning-spec-Main.md) — how much a match in that category actually predicts a
+ * like, derived from real swipe data rather than the hand-coded WEIGHT constants alone.
+ * Omitting `learnedWeights` (or passing none) is a no-op multiplier of 1 for every category,
+ * so every existing caller/test is unaffected — this is the ONLY thing the learned-weight
+ * layer touches, per that spec's explicit scope limit. */
+export function scoreTitle(userProfile: TagProfile, title: TitleSeed, learnedWeights?: Record<string, number>): number {
   let score = 0;
   for (const tag of flattenTags(title.tags)) {
-    score += userProfile[tag] ?? 0;
+    const base = userProfile[tag] ?? 0;
+    if (base === 0) continue;
+    const multiplier = learnedWeights ? (learnedWeights[TAG_CATEGORY[tag]] ?? 1) : 1;
+    score += base * multiplier;
   }
   return score;
 }

@@ -22,6 +22,8 @@ export interface BuildTop3Options {
   tieThreshold?: number;
   /** id of the title the user chose when the tie-break question fired */
   tieBreakWinnerId?: string;
+  /** learned per-category weight multipliers, see scoreTitle — omit for unaffected behavior */
+  learnedWeights?: Record<string, number>;
 }
 
 const PREFERRED_TIE_CATEGORIES = ["mood", "love_factor", "genre", "tone", "pace"];

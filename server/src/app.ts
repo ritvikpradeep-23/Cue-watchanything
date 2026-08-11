@@ -16,6 +16,7 @@ import { adminRouter } from "./routes/admin";
 import { socialRouter } from "./routes/social";
 import { actorsRouter } from "./routes/actors";
 import { directorsRouter } from "./routes/directors";
+import { cronRouter } from "./routes/cron";
 
 export const app = express();
 
@@ -39,6 +40,7 @@ app.use("/api/admin", adminRouter);
 app.use("/api/social", socialRouter);
 app.use("/api/actors", actorsRouter);
 app.use("/api/directors", directorsRouter);
+app.use("/api/cron", cronRouter);
 
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error(err);

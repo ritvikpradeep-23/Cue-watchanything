@@ -242,6 +242,20 @@ model TitleDirector {
   @@index([directorId])
 }
 
+// Learned weight tuning (see cue-ml-weight-tuning-spec-Main.md): a small logistic-regression
+// layer that periodically re-derives the per-category weights scoreTitle uses, from real
+// swipe data, instead of the hand-coded WEIGHT constants alone. Only one row should have
+// isActive true at a time — see lib/learnedWeights.ts.
+model LearnedWeights {
+  id                String   @id @default(uuid())
+  weights           String // JSON-encoded {category: weight}
+  trainedAt         DateTime @default(now())
+  trainingRowCount  Int
+  isActive          Boolean  @default(false)
+
+  @@index([isActive])
+}
+
 model UserTitleAction {
   id                     String     @id @default(uuid())
   userId                 String

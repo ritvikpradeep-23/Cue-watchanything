@@ -7,9 +7,11 @@
  *   5. Compute known_for_styles for every director once links are in place.
  *   6. Report counts.
  *
- * Idempotent: an existing Actor/Director with the same name is reused (by exact-name lookup
- * built once at the start), never duplicated, and TitleActor/TitleDirector links use
- * upsert-by-unique-constraint so rerunning is always safe.
+ * Idempotent AND batched — an earlier version of this script did one row/link at a time (up to
+ * ~13,000 individual round trips for ~5000 actors), which was both slow enough to look hung and
+ * prone to exhausting Neon's pooled-connection limit. This version does one bulk read of what
+ * already exists, computes the diff in memory, and writes only what's missing in large
+ * createMany batches.
  *
  * Run with: npx tsx scripts/backfill-people.ts
  */
@@ -17,14 +19,16 @@ import "dotenv/config";
 import { prisma } from "../src/lib/prisma";
 import { recomputeKnownForStyles } from "../src/lib/directors";
 
-// Lower than seed-batches.ts's CHUNK_SIZE=8 — this script's write volume (thousands of unique
-// actor names, each its own create + N title links) exhausted the pool at 8-way concurrency.
-const CHUNK_SIZE = 3;
+const WRITE_BATCH = 500;
 
-async function chunked<T>(items: T[], size: number, fn: (item: T) => Promise<void>) {
-  for (let i = 0; i < items.length; i += size) {
-    await Promise.all(items.slice(i, i + size).map(fn));
+async function batchCreateMany<T>(rows: T[], fn: (batch: T[]) => Promise<{ count: number }>): Promise<number> {
+  let total = 0;
+  for (let i = 0; i < rows.length; i += WRITE_BATCH) {
+    const batch = rows.slice(i, i + WRITE_BATCH);
+    const result = await fn(batch);
+    total += result.count;
   }
+  return total;
 }
 
 async function main() {
@@ -59,29 +63,32 @@ async function main() {
   const existingActors = await prisma.actor.findMany({ select: { id: true, name: true } });
   const actorIdByName = new Map(existingActors.map((a) => [a.name, a.id]));
 
-  let actorsCreated = 0;
-  const actorNames = [...actorTitles.keys()];
-  await chunked(actorNames, CHUNK_SIZE, async (name) => {
-    if (actorIdByName.has(name)) return;
-    const { industries } = actorTitles.get(name)!;
-    const actor = await prisma.actor.create({
-      data: { name, industry: JSON.stringify([...industries]) },
-    });
-    actorIdByName.set(name, actor.id);
-    actorsCreated++;
-  });
-  console.log(`Created ${actorsCreated} new actor rows (${existingActors.length} already existed).`);
+  const actorsToCreate = [...actorTitles.entries()]
+    .filter(([name]) => !actorIdByName.has(name))
+    .map(([name, { industries }]) => ({ name, industry: JSON.stringify([...industries]) }));
+  if (actorsToCreate.length > 0) {
+    await batchCreateMany(actorsToCreate, (batch) => prisma.actor.createMany({ data: batch, skipDuplicates: true }));
+    // re-fetch to get ids for the rows we just created
+    const refreshed = await prisma.actor.findMany({ select: { id: true, name: true } });
+    for (const a of refreshed) actorIdByName.set(a.name, a.id);
+  }
+  console.log(`Created ${actorsToCreate.length} new actor rows (${existingActors.length} already existed).`);
 
-  let actorLinksCreated = 0;
+  const existingActorLinks = new Set(
+    (await prisma.titleActor.findMany({ select: { titleId: true, actorId: true } })).map(
+      (l) => `${l.titleId}:${l.actorId}`,
+    ),
+  );
+  const actorLinksToCreate: { titleId: string; actorId: string }[] = [];
   for (const [name, { titleIds }] of actorTitles) {
     const actorId = actorIdByName.get(name)!;
-    await chunked([...titleIds], CHUNK_SIZE, async (titleId) => {
-      const result = await prisma.titleActor
-        .createMany({ data: [{ titleId, actorId }], skipDuplicates: true })
-        .catch(() => null);
-      if (result && result.count > 0) actorLinksCreated++;
-    });
+    for (const titleId of titleIds) {
+      if (!existingActorLinks.has(`${titleId}:${actorId}`)) actorLinksToCreate.push({ titleId, actorId });
+    }
   }
+  const actorLinksCreated = await batchCreateMany(actorLinksToCreate, (batch) =>
+    prisma.titleActor.createMany({ data: batch, skipDuplicates: true }),
+  );
   console.log(`Created ${actorLinksCreated} new title-actor links.`);
 
   // ---- directors ----
@@ -102,37 +109,37 @@ async function main() {
   const existingDirectors = await prisma.director.findMany({ select: { id: true, name: true } });
   const directorIdByName = new Map(existingDirectors.map((d) => [d.name, d.id]));
 
-  let directorsCreated = 0;
-  const directorNames = [...directorTitles.keys()];
-  await chunked(directorNames, CHUNK_SIZE, async (name) => {
-    if (directorIdByName.has(name)) return;
-    const { industries } = directorTitles.get(name)!;
-    const director = await prisma.director.create({
-      data: { name, industry: JSON.stringify([...industries]) },
-    });
-    directorIdByName.set(name, director.id);
-    directorsCreated++;
-  });
-  console.log(`Created ${directorsCreated} new director rows (${existingDirectors.length} already existed).`);
+  const directorsToCreate = [...directorTitles.entries()]
+    .filter(([name]) => !directorIdByName.has(name))
+    .map(([name, { industries }]) => ({ name, industry: JSON.stringify([...industries]) }));
+  if (directorsToCreate.length > 0) {
+    await batchCreateMany(directorsToCreate, (batch) => prisma.director.createMany({ data: batch, skipDuplicates: true }));
+    const refreshed = await prisma.director.findMany({ select: { id: true, name: true } });
+    for (const d of refreshed) directorIdByName.set(d.name, d.id);
+  }
+  console.log(`Created ${directorsToCreate.length} new director rows (${existingDirectors.length} already existed).`);
 
-  let directorLinksCreated = 0;
+  const existingDirectorLinks = new Set(
+    (await prisma.titleDirector.findMany({ select: { titleId: true, directorId: true } })).map(
+      (l) => `${l.titleId}:${l.directorId}`,
+    ),
+  );
+  const directorLinksToCreate: { titleId: string; directorId: string }[] = [];
   const directorsToRecompute = new Set<string>();
   for (const [name, { titleIds }] of directorTitles) {
     const directorId = directorIdByName.get(name)!;
-    await chunked([...titleIds], CHUNK_SIZE, async (titleId) => {
-      const result = await prisma.titleDirector
-        .createMany({ data: [{ titleId, directorId }], skipDuplicates: true })
-        .catch(() => null);
-      if (result && result.count > 0) {
-        directorLinksCreated++;
+    for (const titleId of titleIds) {
+      if (!existingDirectorLinks.has(`${titleId}:${directorId}`)) {
+        directorLinksToCreate.push({ titleId, directorId });
         directorsToRecompute.add(directorId);
       }
-    });
+    }
   }
+  const directorLinksCreated = await batchCreateMany(directorLinksToCreate, (batch) =>
+    prisma.titleDirector.createMany({ data: batch, skipDuplicates: true }),
+  );
   console.log(`Created ${directorLinksCreated} new title-director links.`);
 
-  // known_for_styles for every director that got a new link this run, plus any director with
-  // no styles computed yet at all (covers a fresh/first run).
   const directorsMissingStyles = await prisma.director.findMany({
     where: { knownForStyles: "[]" },
     select: { id: true },
@@ -140,13 +147,22 @@ async function main() {
   for (const d of directorsMissingStyles) directorsToRecompute.add(d.id);
 
   console.log(`Computing known_for_styles for ${directorsToRecompute.size} directors...`);
-  await chunked([...directorsToRecompute], CHUNK_SIZE, (id) => recomputeKnownForStyles(id));
+  const recomputeIds = [...directorsToRecompute];
+  // Sequential, not chunked-concurrent — this step kept hitting transient Neon pool errors at
+  // even modest concurrency right after a run of heavy batched writes. Cheap per-director, so
+  // sequential is still fast enough at this data size (~1500 directors).
+  let recomputed = 0;
+  for (const id of recomputeIds) {
+    await recomputeKnownForStyles(id);
+    recomputed++;
+    if (recomputed % 200 === 0) console.log(`  recomputed ${recomputed}/${recomputeIds.length}...`);
+  }
 
   // ---- report ----
   const titlesWithNoDirector = titles.filter((t) => JSON.parse(t.directors || "[]").length === 0).length;
   console.log("\n=== BACKFILL SUMMARY ===");
-  console.log(`Actors: ${actorTitles.size} total (${actorsCreated} new), ${actorLinksCreated} new links`);
-  console.log(`Directors: ${directorTitles.size} total (${directorsCreated} new), ${directorLinksCreated} new links`);
+  console.log(`Actors: ${actorTitles.size} total (${actorsToCreate.length} new), ${actorLinksCreated} new links`);
+  console.log(`Directors: ${directorTitles.size} total (${directorsToCreate.length} new), ${directorLinksCreated} new links`);
   console.log(`Titles with no resolved director: ${titlesWithNoDirector}/${titles.length}`);
 }
 

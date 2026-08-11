@@ -38,6 +38,8 @@ export interface NextShowContext {
   watchedTitle: TitleSeed;
   allTitles: TitleSeed[];
   excludedIds: Set<string>;
+  /** learned per-category weight multipliers, see scoreTitle — omit for unaffected behavior */
+  learnedWeights?: Record<string, number>;
 }
 
 function staticQuestions(watchedTitle: TitleSeed): QuizQuestion[] {
@@ -279,6 +281,7 @@ function runBuildTop3(answers: Answers, ctx: NextShowContext): BuildTop3Result {
     filters: buildFilters(answers, ctx.baseFilters),
     exploreExploitDial: dial,
     tieBreakWinnerId: answers["tie_breaker"],
+    learnedWeights: ctx.learnedWeights,
   });
 }
 

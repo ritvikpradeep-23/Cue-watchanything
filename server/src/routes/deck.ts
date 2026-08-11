@@ -2,6 +2,7 @@ import { Router } from "express";
 import { requireAuth, AuthedRequest } from "../lib/auth";
 import { getAllTitleSeeds, toApiTitleFromSeed } from "../lib/titles";
 import { getLatestTagProfile, getSwipedTitleIds, computeComfortZoneBoost } from "../lib/userProfile";
+import { getActiveWeights } from "../lib/learnedWeights";
 import { buildDeck, applyDelta } from "@watch-recommender/shared";
 
 export const deckRouter = Router();
@@ -19,9 +20,11 @@ deckRouter.get("/", requireAuth, async (req: AuthedRequest, res) => {
   }
 
   const excludedIds = await getSwipedTitleIds(req.user!.userId);
+  const learnedWeights = await getActiveWeights();
   const deck = buildDeck(tagProfile, await getAllTitleSeeds(), {
     excludedIds,
     filters: profile.filters,
+    learnedWeights: learnedWeights ?? undefined,
   });
 
   res.json({ deck: deck.map(toApiTitleFromSeed), avoidGenres: profile.filters.avoidGenres ?? [] });

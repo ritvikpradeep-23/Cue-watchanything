@@ -3,6 +3,7 @@ import { requireAuth, AuthedRequest } from "../lib/auth";
 import { prisma } from "../lib/prisma";
 import { toApiTitleFromSeed, getAllTitleSeeds } from "../lib/titles";
 import { getLatestTagProfile, getSwipedTitleIds } from "../lib/userProfile";
+import { getActiveWeights } from "../lib/learnedWeights";
 import { sendNotificationEmail } from "../lib/email";
 import { getBlockedUserIds, isBlocked, areFriends, canInteract, CHAT_SIMILARITY_THRESHOLD } from "../lib/social";
 import { compareProfiles, mergeProfiles, buildDeck } from "@watch-recommender/shared";
@@ -389,7 +390,11 @@ async function watchTogetherDeck(sessionId: string, mergedProfile: Record<string
   const excludedIds = await prisma.userTitleAction
     .findMany({ where: { watchTogetherSessionId: sessionId }, select: { titleId: true } })
     .then((rows) => new Set(rows.map((r) => r.titleId)));
-  const deck = buildDeck(mergedProfile, await getAllTitleSeeds(), { excludedIds });
+  const learnedWeights = await getActiveWeights();
+  const deck = buildDeck(mergedProfile, await getAllTitleSeeds(), {
+    excludedIds,
+    learnedWeights: learnedWeights ?? undefined,
+  });
   return deck.map(toApiTitleFromSeed);
 }
 

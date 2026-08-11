@@ -3,6 +3,7 @@ import { requireAuth, AuthedRequest } from "../lib/auth";
 import { prisma } from "../lib/prisma";
 import { getAllTitleSeeds, getTitleSeedById, toApiTitle, toApiTitleFromSeed } from "../lib/titles";
 import { getLatestTagProfile, getSwipedTitleIds } from "../lib/userProfile";
+import { getActiveWeights } from "../lib/learnedWeights";
 import {
   getNextNextShowQuestion,
   submitNextShow,
@@ -34,12 +35,14 @@ async function buildContext(userId: string, watchedTitleId: string): Promise<Nex
   if (!profile) return { error: "Complete the onboarding quiz first", status: 409 };
 
   const excludedIds = await getSwipedTitleIds(userId);
+  const learnedWeights = await getActiveWeights();
   return {
     baseProfile: profile.tagProfile,
     baseFilters: profile.filters,
     watchedTitle,
     allTitles: await getAllTitleSeeds(),
     excludedIds,
+    learnedWeights: learnedWeights ?? undefined,
   };
 }
 

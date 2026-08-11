@@ -1,6 +1,10 @@
-import type { Genre, Language, Platform, TitleType } from "../taxonomy";
+import type { ContentRating, Genre, Intensity, Language, Platform, TitleType } from "../taxonomy";
 import type { TagProfile, TitleSeed } from "../types";
 import { scoreTitle } from "./scoreTitle";
+
+/** family < teen < mature — a contentRating filter excludes anything stricter than the
+ * selected level, never anything milder (a "mature" selection doesn't exclude family titles). */
+const CONTENT_RATING_ORDER: Record<ContentRating, number> = { family: 0, teen: 1, mature: 2 };
 
 export interface HardFilters {
   /** user's Q1 answer ("movie" | "show" | "anime") — title.type must match exactly. Omit
@@ -18,6 +22,14 @@ export interface HardFilters {
   /** genres marked "avoid" that weren't rerouted by the conflict-check — titles primarily
    * tagged with any of these are excluded outright, not just down-weighted. */
   avoidGenres?: Genre[];
+  /** Q8's content-comfort answer — a hard ceiling, not a weight. "family" hard-excludes
+   * "mature" (and "teen"), "teen" hard-excludes "mature", "mature" excludes nothing. A title
+   * carrying multiple content_rating tags is judged by its strictest one. */
+  maxContentRating?: ContentRating;
+  /** Q8b's "not okay with X" answers — titles carrying any of these intensity tags are
+   * excluded outright, not just down-weighted (see WEIGHT.intensityNotOk for the "okay with"
+   * case, which stays a soft positive weight). */
+  excludeIntensity?: Intensity[];
 }
 
 export function passesHardFilters(title: TitleSeed, filters: HardFilters): boolean {
@@ -36,6 +48,15 @@ export function passesHardFilters(title: TitleSeed, filters: HardFilters): boole
   if (filters.avoidGenres && filters.avoidGenres.length > 0) {
     const intersectsAvoid = title.tags.genre.some((g) => filters.avoidGenres!.includes(g));
     if (intersectsAvoid) return false;
+  }
+  if (filters.maxContentRating) {
+    const maxAllowed = CONTENT_RATING_ORDER[filters.maxContentRating];
+    const tooStrict = title.tags.content_rating.some((cr) => CONTENT_RATING_ORDER[cr] > maxAllowed);
+    if (tooStrict) return false;
+  }
+  if (filters.excludeIntensity && filters.excludeIntensity.length > 0) {
+    const hasExcluded = title.tags.intensity.some((i) => filters.excludeIntensity!.includes(i));
+    if (hasExcluded) return false;
   }
   return true;
 }

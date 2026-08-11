@@ -9,7 +9,7 @@ import {
   PLATFORMS,
   TONES,
 } from "../taxonomy";
-import type { Language, Platform } from "../taxonomy";
+import type { ContentRating, Intensity, Language, Platform } from "../taxonomy";
 import type { TagProfile, TitleSeed } from "../types";
 import type { HardFilters } from "../scoring/buildDeck";
 import { mergeDeltas } from "../scoring/delta";
@@ -31,9 +31,10 @@ const WEIGHT = {
   genre: 3,
   mood: 1.5,
   moodFollowup: 3,
-  contentComfort: 3,
+  // contentComfort removed — Q8 is now a hard filter (maxContentRating), not a weighted tag.
   intensityOk: 1.5,
-  intensityNotOk: -3,
+  // intensityNotOk removed — a "not okay" answer is now a hard exclusion (excludeIntensity),
+  // not a negative weight.
   familyFollowup: 1.5,
   pace: 2,
   tone: 2,
@@ -46,6 +47,16 @@ const WEIGHT = {
   recency: 0.75, // low-signal
   timeNow: 0.5,
   favoriteSeed: 0.5,
+  // type-path questions (movie/show/anime) — concrete, high-signal per the spec's own framing
+  runtimeBucket: 2,
+  rewatchValue: 2,
+  prestigeVsBlockbuster: 2,
+  showFormat: 3, // deliberately concrete/high-signal, per spec
+  seasonCommitment: 2,
+  anthologyVsContinuous: 2,
+  bingeVsWeekly: 1, // viewing-habit preference, lower-signal than taste itself
+  episodeCountBucket: 2,
+  demographic: 2,
 } as const;
 
 const label = (s: string) => s.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
@@ -62,6 +73,18 @@ const BASELINE_QUESTIONS: QuizQuestion[] = [
       { value: "movie", label: "A movie" },
       { value: "anime", label: "Anime" },
       { value: "surprise", label: "Surprise me" },
+    ],
+  },
+  // Q2 — language is asked immediately after type, before anything else, and applied as a
+  // hard filter at scoring time (see filters.languages in buildDeck) — an independent filter
+  // from `type`, not linked to it (see edge cases in the quiz spec).
+  {
+    id: "languages",
+    prompt: "What language(s) do you want to watch in?",
+    kind: "multi",
+    options: [
+      ...LANGUAGES.map((l) => ({ value: l, label: l })),
+      { value: "any", label: "Any language, I don't mind subtitles" },
     ],
   },
   {
@@ -128,6 +151,32 @@ const BASELINE_QUESTIONS: QuizQuestion[] = [
   },
 ];
 
+/** Platforms plausible for a given language, shown first — display-order nicety only, never
+ * hides a platform outright (every platform still appears, just reordered). */
+const LANGUAGE_PLATFORM_AFFINITY: Partial<Record<string, string[]>> = {
+  Hindi: ["Prime Video", "Disney+ Hotstar", "Netflix"],
+  Telugu: ["Prime Video", "Disney+ Hotstar", "Netflix"],
+  Tamil: ["Prime Video", "Disney+ Hotstar", "Netflix"],
+  Malayalam: ["Prime Video", "Disney+ Hotstar", "Netflix"],
+  Japanese: ["Crunchyroll", "HIDIVE", "Netflix"],
+  Korean: ["Netflix", "Disney+ Hotstar"],
+};
+
+function platformsQuestion(answers: Answers): QuizQuestion {
+  const languages: string[] = answers["languages"] ?? [];
+  const priority = new Set<string>();
+  for (const lang of languages) {
+    for (const p of LANGUAGE_PLATFORM_AFFINITY[lang] ?? []) priority.add(p);
+  }
+  const ordered = [...priority, ...PLATFORMS.filter((p) => !priority.has(p))];
+  return {
+    id: "platforms",
+    prompt: "Which platforms do you have access to?",
+    kind: "multi",
+    options: ordered.map((p) => ({ value: p, label: p })),
+  };
+}
+
 const CLOSING_QUESTIONS: QuizQuestion[] = [
   {
     id: "favorite_titles",
@@ -149,21 +198,8 @@ const CLOSING_QUESTIONS: QuizQuestion[] = [
       { value: "hidden-gem", label: "A hidden gem" },
     ],
   },
-  {
-    id: "platforms",
-    prompt: "Which platforms do you have access to?",
-    kind: "multi",
-    options: PLATFORMS.map((p) => ({ value: p, label: p })),
-  },
-  {
-    id: "languages",
-    prompt: "Which language(s) do you want to watch in?",
-    kind: "multi",
-    options: [
-      ...LANGUAGES.map((l) => ({ value: l, label: l })),
-      { value: "any", label: "Any language, I don't mind subtitles" },
-    ],
-  },
+  // platforms is asked here via platformsQuestion(answers) in the walk function, not this
+  // static array, since its option order depends on the language answer.
   {
     id: "industry",
     prompt: "Any particular film industries you're drawn to?",
@@ -173,18 +209,19 @@ const CLOSING_QUESTIONS: QuizQuestion[] = [
       { value: "no-preference", label: "No preference" },
     ],
   },
-  {
-    id: "length_commitment",
-    prompt: "How much time are you realistically willing to put into this overall?",
-    kind: "single",
-    options: [
-      { value: "single-sitting", label: "A single sitting (movie or one-off)" },
-      { value: "short-binge", label: "A short binge (one season)" },
-      { value: "multi-season", label: "A full multi-season commitment" },
-      { value: "no-cap", label: "No cap — long-runners are fine" },
-    ],
-  },
 ];
+
+const LENGTH_COMMITMENT_QUESTION: QuizQuestion = {
+  id: "length_commitment",
+  prompt: "How much time are you realistically willing to put into this overall?",
+  kind: "single",
+  options: [
+    { value: "single-sitting", label: "A single sitting (movie or one-off)" },
+    { value: "short-binge", label: "A short binge (one season)" },
+    { value: "multi-season", label: "A full multi-season commitment" },
+    { value: "no-cap", label: "No cap — long-runners are fine" },
+  ],
+};
 
 // ---------- branch question builders ----------
 
@@ -314,10 +351,160 @@ function typeFollowupQuestion(type: string): QuizQuestion | null {
   }
 }
 
+// ---------- type-specific path question builders ----------
+// Fires after the shared baseline (through industry/length_commitment), skipped entirely when
+// type is "surprise" (or unanswered) — the type-specific path questions are ONLY reachable
+// through their own type's branch below, so e.g. a favorite title matching an anime title can
+// never surface the anime demographic question while type is "movie" (see quiz spec edge cases).
+
+const MOVIE_PATH_QUESTIONS: QuizQuestion[] = [
+  {
+    id: "runtime_tolerance",
+    prompt: "Runtime tolerance?",
+    kind: "single",
+    options: [
+      { value: "short", label: "Short (under 90 min)" },
+      { value: "standard", label: "Standard (90-120 min)" },
+      { value: "long", label: "Long (120-150 min)" },
+      { value: "epic", label: "Epic (150+ min)" },
+    ],
+  },
+  // movie_structure_followup is dispatched via typeFollowupQuestion() below, not this array —
+  // same question, now asked as part of the movie path instead of before genres_enjoy.
+  {
+    id: "rewatch_value",
+    prompt: "A one-time experience, or something you'd want to watch again?",
+    kind: "single",
+    options: [
+      { value: "one-time", label: "One-time experience" },
+      { value: "rewatchable", label: "Want to watch it again" },
+    ],
+  },
+  {
+    id: "prestige_vs_blockbuster",
+    prompt: "Prestige/awards-style, or blockbuster/popcorn entertainment?",
+    kind: "single",
+    options: [
+      { value: "prestige", label: "Prestige/awards-style" },
+      { value: "blockbuster", label: "Blockbuster/popcorn entertainment" },
+    ],
+  },
+];
+
+const SHOW_PATH_QUESTIONS: QuizQuestion[] = [
+  {
+    id: "show_format",
+    prompt: "What kind of show?",
+    kind: "single",
+    options: [
+      { value: "sitcom-ensemble", label: "Comedy/sitcom ensemble (Friends, Brooklyn 99 style)" },
+      { value: "prestige-drama", label: "Prestige drama (slow-building, character-driven)" },
+      { value: "thriller-suspense", label: "Thriller/suspense (edge-of-your-seat)" },
+      { value: "procedural", label: "Procedural (case-of-the-week structure)" },
+    ],
+  },
+  // show_structure_followup is dispatched via typeFollowupQuestion() below, not this array.
+  {
+    id: "season_commitment",
+    prompt: "Season commitment?",
+    kind: "single",
+    options: [
+      { value: "limited-series", label: "Limited series (1 season)" },
+      { value: "multi-season-ok", label: "Multi-season okay" },
+      { value: "long-runner-ok", label: "Long-runner okay" },
+    ],
+  },
+  {
+    id: "anthology_vs_continuous",
+    prompt: "A different story/cast each season, or one continuous storyline?",
+    kind: "single",
+    options: [
+      { value: "anthology", label: "Different story/cast each season" },
+      { value: "continuous-storyline", label: "One continuous storyline" },
+    ],
+  },
+  {
+    id: "binge_vs_weekly",
+    prompt: "Binge it all, or a weekly-release pace?",
+    kind: "single",
+    options: [
+      { value: "binge-preferred", label: "Binge it all" },
+      { value: "weekly-preferred", label: "Weekly-release pace" },
+    ],
+  },
+];
+
+const ANIME_EPISODE_COUNT_QUESTION: QuizQuestion = {
+  id: "episode_count_tolerance",
+  prompt: "Episode-count tolerance?",
+  kind: "single",
+  options: [
+    { value: "short", label: "Short (12-13 episodes)" },
+    { value: "standard", label: "Standard (24-26 episodes)" },
+    { value: "long-runner", label: "Long-runner (50-100+ episodes)" },
+  ],
+};
+
+const ANIME_DEMOGRAPHIC_QUESTION: QuizQuestion = {
+  id: "demographic",
+  prompt: "Any demographic category you gravitate toward?",
+  kind: "single",
+  options: [
+    { value: "shonen", label: "Shonen" },
+    { value: "seinen", label: "Seinen" },
+    { value: "shojo", label: "Shojo" },
+    { value: "josei", label: "Josei" },
+  ],
+};
+
+/** True only if a Q12 favorite title matches a title tagged type:anime in the dataset — the
+ * gate for the anime path's bonus demographic question. Requires the caller to pass the
+ * dataset (allTitles); with no dataset available, conservatively returns false rather than
+ * asking a question we can't actually justify. */
+function favoriteMatchesAnime(answers: Answers, allTitles?: { name: string; type: string }[]): boolean {
+  if (!allTitles || allTitles.length === 0) return false;
+  const favorites: string[] = (answers["favorite_titles"] ?? []).map((t: string) => t.trim().toLowerCase());
+  if (favorites.length === 0) return false;
+  return allTitles.some((t) => t.type === "anime" && favorites.includes(t.name.toLowerCase()));
+}
+
+function typePathQuestions(
+  type: string,
+  answers: Answers,
+  allTitles?: { name: string; type: string }[],
+): QuizQuestion[] {
+  if (type === "movie") {
+    const structureFollowup = typeFollowupQuestion("movie")!;
+    return [MOVIE_PATH_QUESTIONS[0], structureFollowup, MOVIE_PATH_QUESTIONS[1], MOVIE_PATH_QUESTIONS[2]];
+  }
+  if (type === "show") {
+    const structureFollowup = typeFollowupQuestion("show")!;
+    return [
+      SHOW_PATH_QUESTIONS[0],
+      structureFollowup,
+      SHOW_PATH_QUESTIONS[1],
+      SHOW_PATH_QUESTIONS[2],
+      SHOW_PATH_QUESTIONS[3],
+    ];
+  }
+  if (type === "anime") {
+    const animeFollowup = typeFollowupQuestion("anime")!;
+    const questions = [animeFollowup, ANIME_EPISODE_COUNT_QUESTION];
+    if (favoriteMatchesAnime(answers, allTitles)) questions.push(ANIME_DEMOGRAPHIC_QUESTION);
+    return questions;
+  }
+  return [];
+}
+
 // ---------- ordered slot walk ----------
 
-/** Returns the next unanswered question, or null when the quiz is complete. Called fresh each time — no hidden state. */
-export function getNextOnboardingQuestion(answers: Answers): QuizQuestion | null {
+/** Returns the next unanswered question, or null when the quiz is complete. Called fresh each
+ * time — no hidden state. `allTitles` (name+type only needed) gates the anime path's
+ * conditional demographic question; omit it and that question is simply never asked. */
+export function getNextOnboardingQuestion(
+  answers: Answers,
+  allTitles?: { name: string; type: string }[],
+): QuizQuestion | null {
   for (const q of BASELINE_QUESTIONS) {
     if (!(q.id in answers)) return q;
   }
@@ -327,9 +514,6 @@ export function getNextOnboardingQuestion(answers: Answers): QuizQuestion | null
 
   const comfortFollowup = contentComfortFollowupQuestion(answers["content_comfort"]);
   if (comfortFollowup && !(comfortFollowup.id in answers)) return comfortFollowup;
-
-  const typeFollowup = typeFollowupQuestion(answers["type"]);
-  if (typeFollowup && !(typeFollowup.id in answers)) return typeFollowup;
 
   if (!("genres_enjoy" in answers)) {
     return {
@@ -354,7 +538,29 @@ export function getNextOnboardingQuestion(answers: Answers): QuizQuestion | null
     if (!(q.id in answers)) return q;
   }
 
+  // favorite_titles, love_factor, recency come from CLOSING_QUESTIONS; platforms is dynamic
+  // (language-dependent option order) so it's dispatched here instead of from that array.
   for (const q of CLOSING_QUESTIONS) {
+    if (q.id === "favorite_titles" || q.id === "love_factor" || q.id === "recency") {
+      if (!(q.id in answers)) return q;
+    }
+  }
+  if (!("platforms" in answers)) return platformsQuestion(answers);
+  const industryQuestion = CLOSING_QUESTIONS.find((q) => q.id === "industry")!;
+  if (!("industry" in answers)) return industryQuestion;
+
+  const type = answers["type"];
+
+  // length_commitment is the shared baseline's generic "total time" question — season_commitment
+  // (show) and episode_count_tolerance (anime) replace it for those paths, so it's only asked
+  // for movie/surprise.
+  if ((type === "movie" || type === "surprise" || !type) && !("length_commitment" in answers)) {
+    return LENGTH_COMMITMENT_QUESTION;
+  }
+
+  if (!type || type === "surprise") return null; // no type-specific path for "surprise me"
+
+  for (const q of typePathQuestions(type, answers, allTitles)) {
     if (!(q.id in answers)) return q;
   }
 
@@ -420,17 +626,25 @@ export function computeOnboardingProfile(answers: Answers, allTitles: TitleSeed[
   if (answers["pace"]) deltas.push({ [answers["pace"]]: WEIGHT.pace });
   if (answers["tone"]) deltas.push({ [answers["tone"]]: WEIGHT.tone });
   if (answers["cast_style"]) deltas.push({ [answers["cast_style"]]: WEIGHT.castStyle });
-  if (answers["content_comfort"]) deltas.push({ [answers["content_comfort"]]: WEIGHT.contentComfort });
+  // content_comfort is now a HARD FILTER (filters.maxContentRating below), not a weighted tag —
+  // a "family-friendly" answer must exclude mature titles outright, not just get outscored by
+  // family-tagged ones. Same pattern as genres_avoid.
   if (answers["setting"] && answers["setting"] !== "no-preference") {
     deltas.push({ [answers["setting"]]: WEIGHT.eraSetting });
   }
 
+  const excludeIntensity: Intensity[] = [];
   if (answers["mature_followup"]) {
     const { graphic_violence_ok, heavy_themes_ok } = answers["mature_followup"];
-    deltas.push({
-      "graphic-violence": graphic_violence_ok === "ok" ? WEIGHT.intensityOk : WEIGHT.intensityNotOk,
-      "heavy-themes": heavy_themes_ok === "ok" ? WEIGHT.intensityOk : WEIGHT.intensityNotOk,
-    });
+    // "okay with X" stays a soft positive weight; "not okay" is now a HARD FILTER
+    // (excludeIntensity below) instead of a negative weight — a title carrying an
+    // explicitly-rejected intensity tag must never surface, not just score lower.
+    const delta: TagProfile = {};
+    if (graphic_violence_ok === "ok") delta["graphic-violence"] = WEIGHT.intensityOk;
+    else excludeIntensity.push("graphic-violence");
+    if (heavy_themes_ok === "ok") delta["heavy-themes"] = WEIGHT.intensityOk;
+    else excludeIntensity.push("heavy-themes");
+    deltas.push(delta);
   }
   if (answers["family_followup"]) {
     deltas.push({ [answers["family_followup"] === "yes" ? "family" : "teen"]: WEIGHT.familyFollowup });
@@ -447,6 +661,34 @@ export function computeOnboardingProfile(answers: Answers, allTitles: TitleSeed[
     if (ongoing_ok === "completed") d["completed"] = WEIGHT.animeFollowup;
     deltas.push(d);
   }
+
+  // ---- type-specific path (movie/show/anime) ----
+  if (answers["runtime_tolerance"]) deltas.push({ [answers["runtime_tolerance"]]: WEIGHT.runtimeBucket });
+  if (answers["rewatch_value"]) deltas.push({ [answers["rewatch_value"]]: WEIGHT.rewatchValue });
+  if (answers["prestige_vs_blockbuster"]) {
+    deltas.push({ [answers["prestige_vs_blockbuster"]]: WEIGHT.prestigeVsBlockbuster });
+  }
+  if (answers["show_format"]) deltas.push({ [answers["show_format"]]: WEIGHT.showFormat });
+  if (answers["season_commitment"]) {
+    // Maps onto the existing length_bucket tag, same axis as time_now/length_commitment,
+    // rather than a parallel new category — see quiz spec's "replaces the generic time
+    // commitment question" note.
+    const seasonToLengthBucket: Record<string, string> = {
+      "limited-series": "short-binge",
+      "multi-season-ok": "multi-season",
+      "long-runner-ok": "long-runner",
+    };
+    const mapped = seasonToLengthBucket[answers["season_commitment"]];
+    if (mapped) deltas.push({ [mapped]: WEIGHT.seasonCommitment });
+  }
+  if (answers["anthology_vs_continuous"]) {
+    deltas.push({ [answers["anthology_vs_continuous"]]: WEIGHT.anthologyVsContinuous });
+  }
+  if (answers["binge_vs_weekly"]) deltas.push({ [answers["binge_vs_weekly"]]: WEIGHT.bingeVsWeekly });
+  if (answers["episode_count_tolerance"]) {
+    deltas.push({ [answers["episode_count_tolerance"]]: WEIGHT.episodeCountBucket });
+  }
+  if (answers["demographic"]) deltas.push({ [answers["demographic"]]: WEIGHT.demographic });
 
   const genresEnjoy: string[] = answers["genres_enjoy"] ?? [];
   const enjoyDelta: TagProfile = {};
@@ -496,10 +738,19 @@ export function computeOnboardingProfile(answers: Answers, allTitles: TitleSeed[
   const avoidGenres = computeAvoidGenreFilter(answers);
   const lengthPreference = mapLengthCommitment(answers["length_commitment"]);
   const type = mapTypeFilter(answers["type"]);
+  const maxContentRating: ContentRating | undefined = answers["content_comfort"];
 
   return {
     tagProfile: mergeDeltas(...deltas),
-    filters: { type, platforms, languages, avoidGenres, lengthPreference },
+    filters: {
+      type,
+      platforms,
+      languages,
+      avoidGenres,
+      lengthPreference,
+      maxContentRating,
+      excludeIntensity: excludeIntensity.length > 0 ? excludeIntensity : undefined,
+    },
   };
 }
 

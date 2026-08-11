@@ -11,6 +11,8 @@ import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import { QuizPage } from "./pages/QuizPage";
 import { SwipePage } from "./pages/SwipePage";
 import { TitleDetailPage } from "./pages/TitleDetailPage";
+import { PersonGridPage } from "./pages/PersonGridPage";
+import { PersonDetailPage } from "./pages/PersonDetailPage";
 import { WatchlistPage } from "./pages/WatchlistPage";
 import { HistoryPage } from "./pages/HistoryPage";
 import { NextShowPage } from "./pages/NextShowPage";
@@ -38,6 +40,10 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/titles/:id" element={<TitleDetailPage />} />
+          <Route path="/actors" element={<PersonGridPage kind="actor" />} />
+          <Route path="/actors/:id" element={<PersonDetailPage kind="actor" />} />
+          <Route path="/directors" element={<PersonGridPage kind="director" />} />
+          <Route path="/directors/:id" element={<PersonDetailPage kind="director" />} />
           <Route
             path="/quiz"
             element={

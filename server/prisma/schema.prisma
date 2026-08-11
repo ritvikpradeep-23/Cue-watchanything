@@ -171,12 +171,75 @@ model Title {
   posterUrl      String
   tags           String // JSON-encoded TitleTags object (includes industry)
   dateAdded      DateTime  @default(now())
+  // Kept alongside the actors/title_actors join (not replaced by it) for backward
+  // compatibility with the existing flat cast-name search in Browse & Search — new/backfilled
+  // titles populate both, per the actor/director finder spec.
+  directors      String    @default("[]") // JSON-encoded string[], mirrors cast
 
   actions          UserTitleAction[]
   ratings          Rating[]
   sharedInMessages Message[]
+  titleActors      TitleActor[]
+  titleDirectors   TitleDirector[]
 
   @@index([type])
+}
+
+model Actor {
+  id       String  @id @default(uuid())
+  name     String
+  photoUrl String? // null until resolved via the Image Sourcing Pipeline — see needs-manual-photo.json
+  industry String // JSON-encoded string[] — same vocabulary as Title.tags.industry
+  bio      String?
+
+  createdAt DateTime @default(now())
+
+  titles TitleActor[]
+
+  @@index([name])
+}
+
+model TitleActor {
+  id      String @id @default(uuid())
+  titleId String
+  actorId String
+
+  title Title @relation(fields: [titleId], references: [id], onDelete: Cascade)
+  actor Actor @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@unique([titleId, actorId])
+  @@index([actorId])
+}
+
+model Director {
+  id       String  @id @default(uuid())
+  name     String
+  photoUrl String? // null until resolved — see needs-manual-photo.json
+  industry String // JSON-encoded string[]
+  // Computed field — top 2-3 genres by frequency across this director's linked titles, ties
+  // broken by whichever genre appears in their highest-rated title. Recomputed on-write
+  // whenever a new TitleDirector row links to this director (see lib/directors.ts), never a
+  // batch job — write volume here is low.
+  knownForStyles String @default("[]") // JSON-encoded string[]
+  bio            String?
+
+  createdAt DateTime @default(now())
+
+  titles TitleDirector[]
+
+  @@index([name])
+}
+
+model TitleDirector {
+  id         String @id @default(uuid())
+  titleId    String
+  directorId String
+
+  title    Title    @relation(fields: [titleId], references: [id], onDelete: Cascade)
+  director Director @relation(fields: [directorId], references: [id], onDelete: Cascade)
+
+  @@unique([titleId, directorId])
+  @@index([directorId])
 }
 
 model UserTitleAction {

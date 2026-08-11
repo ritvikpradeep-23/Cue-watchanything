@@ -35,5 +35,14 @@ browseRouter.get("/", async (req, res) => {
     return true;
   });
 
-  res.json({ titles: matched.slice(0, RESULT_LIMIT).map((row) => toApiTitle(row)) });
+  // Cross-link into the Actor Finder: a search matching an actor's name surfaces a direct
+  // link to their profile (/actors/:id), not just the filtered title grid — see the actor
+  // finder spec's edge cases.
+  let actorMatch: { id: string; name: string } | null = null;
+  if (query) {
+    const actor = await prisma.actor.findFirst({ where: { name: { contains: query, mode: "insensitive" } } });
+    if (actor) actorMatch = { id: actor.id, name: actor.name };
+  }
+
+  res.json({ titles: matched.slice(0, RESULT_LIMIT).map((row) => toApiTitle(row)), actorMatch });
 });

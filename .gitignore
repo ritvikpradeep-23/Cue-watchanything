@@ -13,3 +13,5 @@ build/
 .claude/skills/
 skills-lock.json
 server/scripts/poster-urls.json
+server/scripts/director-credits.json
+server/scripts/photo-urls.json

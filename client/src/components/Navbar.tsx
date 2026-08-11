@@ -79,6 +79,8 @@ export function Navbar() {
         { to: "/swipe", label: "Swipe" },
         { to: "/watchlist", label: "Watchlist" },
         { to: "/history", label: "History" },
+        { to: "/actors", label: "Actors" },
+        { to: "/directors", label: "Directors" },
         { to: "/twins", label: "Twins" },
         { to: "/chat", label: "Chat" },
         { to: "/friends", label: "Friends" },

@@ -18,6 +18,7 @@ export function DashboardPage() {
   const [genreFilter, setGenreFilter] = useState<string | null>(null);
   const [browseResults, setBrowseResults] = useState<DeckTitle[]>([]);
   const [browseLoading, setBrowseLoading] = useState(false);
+  const [actorMatch, setActorMatch] = useState<{ id: string; name: string } | null>(null);
   const [becauseYouLoved, setBecauseYouLoved] = useState<{ name: string; titles: DeckTitle[] } | null>(null);
   const watchlistDrag = useDragScroll<HTMLDivElement>();
 
@@ -67,8 +68,11 @@ export function DashboardPage() {
       if (searchQuery.trim()) params.set("query", searchQuery.trim());
       if (industryFilter) params.set("industry", industryFilter);
       if (genreFilter) params.set("genre", genreFilter);
-      apiGet<{ titles: DeckTitle[] }>(`/browse?${params.toString()}`)
-        .then((res) => setBrowseResults(res.titles))
+      apiGet<{ titles: DeckTitle[]; actorMatch: { id: string; name: string } | null }>(`/browse?${params.toString()}`)
+        .then((res) => {
+          setBrowseResults(res.titles);
+          setActorMatch(res.actorMatch);
+        })
         .finally(() => setBrowseLoading(false));
     }, 250);
     return () => clearTimeout(handle);
@@ -162,6 +166,14 @@ export function DashboardPage() {
 
         {activeSearch && (
           <div className="mt-4">
+            {actorMatch && (
+              <Link
+                to={`/actors/${actorMatch.id}`}
+                className="surface-interactive mb-3 block bg-accent-500 px-4 py-2.5 text-sm font-semibold text-[var(--on-accent)]"
+              >
+                View {actorMatch.name}'s profile →
+              </Link>
+            )}
             {browseLoading && browseResults.length === 0 ? (
               <div className="flex justify-center py-8">
                 <div className="h-6 w-6 animate-spin rounded-full border-2 border-accent-500 border-t-transparent" />

@@ -30,6 +30,15 @@ export async function api<T = any>(path: string, options: RequestInit = {}): Pro
   const body = isJson ? await res.json() : undefined;
 
   if (!res.ok) {
+    // A 401 while we *were* sending a token means the session itself is no longer valid (kicked,
+    // banned, or naturally expired) rather than a login-page credential failure (which never
+    // sends a token in the first place) — clear it and bounce to login instead of leaving the
+    // app showing a stale "logged in" UI that just fails every subsequent request.
+    if (res.status === 401 && token) {
+      setToken(null);
+      localStorage.removeItem("watchrec_user");
+      window.location.href = "/login";
+    }
     throw new ApiError(res.status, body?.error ?? `Request failed (${res.status})`);
   }
   return body as T;

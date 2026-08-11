@@ -24,6 +24,7 @@ export function AdminUsersPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [detail, setDetail] = useState<UserDetail | null>(null);
   const [confirmingBanId, setConfirmingBanId] = useState<string | null>(null);
+  const [kickedId, setKickedId] = useState<string | null>(null);
 
   function loadUsers() {
     setUsers(null);
@@ -60,6 +61,12 @@ export function AdminUsersPage() {
     await apiPost(`/admin/users/${id}/unban`, {});
     loadUsers();
     if (selectedId === id) openDetail(id);
+  }
+
+  async function kick(id: string) {
+    await apiPost(`/admin/users/${id}/kick`, {});
+    setKickedId(id);
+    setTimeout(() => setKickedId((cur) => (cur === id ? null : cur)), 3000);
   }
 
   return (
@@ -127,6 +134,13 @@ export function AdminUsersPage() {
                             Grant admin
                           </button>
                         )}
+                        <button
+                          onClick={() => kick(u.id)}
+                          disabled={kickedId === u.id}
+                          className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-semibold disabled:opacity-60"
+                        >
+                          {kickedId === u.id ? "Kicked — logged out" : "Kick (force logout)"}
+                        </button>
                         {u.bannedAt ? (
                           <button
                             onClick={() => unban(u.id)}

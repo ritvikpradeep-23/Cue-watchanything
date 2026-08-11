@@ -44,6 +44,9 @@ model User {
   createdAt    DateTime  @default(now())
   role         Role      @default(USER)
   bannedAt     DateTime?
+  // Bumped by admin "kick" — embedded in the JWT at login and checked on every authenticated
+  // request; a mismatch means the token predates the kick, forcing re-login without banning.
+  tokenVersion Int       @default(0)
 
   // Social & Taste Twins — nullable: existing accounts have no username until they set one,
   // and social features (search, twins, chat, friends) require it first. No fabricated default.

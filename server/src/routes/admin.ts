@@ -255,6 +255,21 @@ adminRouter.post("/users/:id/unban", requireAuth, requireAdmin, async (req: Auth
   res.json({ id: user.id, bannedAt: user.bannedAt });
 });
 
+/** Force-logout, distinct from ban — bumps tokenVersion so every already-issued JWT for this
+ * user fails requireAuth's version check on its next request, without touching bannedAt. The
+ * user can log back in immediately afterward and gets a fresh token with the new version. */
+adminRouter.post("/users/:id/kick", requireAuth, requireAdmin, async (req: AuthedRequest, res) => {
+  const id = String(req.params.id);
+  if (id === req.user!.userId) {
+    return res.status(400).json({ error: "You can't kick yourself" });
+  }
+  const user = await prisma.user
+    .update({ where: { id }, data: { tokenVersion: { increment: 1 } } })
+    .catch(() => null);
+  if (!user) return res.status(404).json({ error: "User not found" });
+  res.json({ id: user.id, tokenVersion: user.tokenVersion });
+});
+
 /** Moderation queue — reports filed by users, most recent first. */
 adminRouter.get("/reports", requireAuth, requireAdmin, async (req, res) => {
   const status = req.query.status === "REVIEWED" ? "REVIEWED" : req.query.status === "all" ? undefined : "PENDING";

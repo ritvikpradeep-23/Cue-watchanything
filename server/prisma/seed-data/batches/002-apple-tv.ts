@@ -357,7 +357,7 @@ export const RAW: RawTitle[] = [
     id: "the-banker", name: "The Banker", type: "movie",
     plot: "Two Black entrepreneurs in the 1960s train a white man to pose as the face of their real-estate empire, since no bank of the era would ever knowingly do business with them directly.",
     cast: ["Anthony Mackie", "Samuel L. Jackson", "Nicholas Hoult"], runtime: 120, year: 2020,
-    platforms: ["Apple TV"], genre: ["drama"], mood: ["intense", "hopeful"], pace: ["slow-burn"],
+    platforms: ["Apple TV"], genre: ["drama"], mood: ["intense", "feel-good"], pace: ["slow-burn"],
     tone: ["hopeful"], cast_style: ["ensemble"], content_rating: ["teen"], intensity: ["heavy-themes"],
     era: ["historical"], structure: ["standalone"], recency: ["hidden-gem"],
     length: ["single-sitting"], love: ["characters", "emotional-weight"],

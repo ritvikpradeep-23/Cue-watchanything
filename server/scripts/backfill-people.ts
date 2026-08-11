@@ -17,7 +17,9 @@ import "dotenv/config";
 import { prisma } from "../src/lib/prisma";
 import { recomputeKnownForStyles } from "../src/lib/directors";
 
-const CHUNK_SIZE = 8; // same Neon pooled-connection workaround as seed-batches.ts
+// Lower than seed-batches.ts's CHUNK_SIZE=8 — this script's write volume (thousands of unique
+// actor names, each its own create + N title links) exhausted the pool at 8-way concurrency.
+const CHUNK_SIZE = 3;
 
 async function chunked<T>(items: T[], size: number, fn: (item: T) => Promise<void>) {
   for (let i = 0; i < items.length; i += size) {

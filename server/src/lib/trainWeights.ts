@@ -25,7 +25,8 @@ const VALIDATION_SPLIT = 0.2;
 
 export type TrainWeightsResult =
   | { status: "skipped"; reason: string }
-  | { status: "promoted"; rowCount: number; validationAccuracy: number; weights: Record<string, number> };
+  | { status: "promoted"; rowCount: number; validationAccuracy: number; weights: Record<string, number> }
+  | { status: "dry_run"; rowCount: number; validationAccuracy: number; weights: Record<string, number> };
 
 function passesSanityCheck(
   newWeights: Record<string, number>,
@@ -48,9 +49,16 @@ function passesSanityCheck(
   return { ok: true };
 }
 
-export async function runWeightTraining(): Promise<TrainWeightsResult> {
+export async function runWeightTraining(options?: { includeSynthetic?: boolean; dryRun?: boolean }): Promise<TrainWeightsResult> {
   const interactions = await prisma.userTitleAction.findMany({
-    where: { action: { in: ["pass", "like", "super_like"] } },
+    where: {
+      action: { in: ["pass", "like", "super_like"] },
+      // Synthetic swipes (scripts/seed-synthetic-swipes.ts) exist only to validate this
+      // pipeline before real usage clears MIN_INTERACTIONS — excluded by default so they can
+      // never silently bias production weights. The CLI script passes includeSynthetic: true
+      // explicitly to test against them; the Vercel Cron endpoint never does.
+      ...(options?.includeSynthetic ? {} : { user: { isSynthetic: false } }),
+    },
     select: { userId: true, action: true, title: true },
   });
 
@@ -126,6 +134,13 @@ export async function runWeightTraining(): Promise<TrainWeightsResult> {
   const sanity = passesSanityCheck(newWeights, previousWeights, validationAccuracy);
   if (!sanity.ok) {
     return { status: "skipped", reason: `failed sanity check: ${sanity.reason}` };
+  }
+
+  if (options?.dryRun) {
+    // Computes and validates a real model but never touches is_active — for exercising the
+    // pipeline (e.g. against scripts/seed-synthetic-swipes.ts) without changing what live
+    // scoring actually uses.
+    return { status: "dry_run", rowCount: X.length, validationAccuracy, weights: newWeights };
   }
 
   await prisma.$transaction([

@@ -54,6 +54,12 @@ model User {
   avatarUrl    String?
   discoverable Boolean @default(true)
 
+  // Set only by scripts/seed-synthetic-swipes.ts to test the Learned Weight Tuning pipeline
+  // (cue-ml-weight-tuning-spec-Main.md) before real usage clears the 500-interaction threshold.
+  // runWeightTraining() excludes these by default (see lib/trainWeights.ts) so synthetic data
+  // can never silently bias production weights — see scripts/cleanup-synthetic-swipes.ts.
+  isSynthetic Boolean @default(false)
+
   actions         UserTitleAction[]
   ratings         Rating[]
   quizResponses   QuizResponse[]
@@ -69,6 +75,8 @@ model User {
   watchTogetherInitiated WatchTogetherSession[] @relation("WTInitiator")
   watchTogetherJoined    WatchTogetherSession[] @relation("WTPartner")
   passwordResetTokens    PasswordResetToken[]
+
+  @@index([isSynthetic])
 }
 
 model PasswordResetToken {

@@ -14,6 +14,14 @@ cronRouter.get("/train-weights", async (req, res) => {
     return res.status(401).json({ error: "Not authorized" });
   }
 
-  const result = await runWeightTraining();
-  res.json(result);
+  // Real usage hasn't cleared MIN_INTERACTIONS on its own yet (see
+  // scripts/seed-synthetic-swipes.ts), so the nightly run is deliberately including synthetic
+  // test data for now, at the owner's explicit request, rather than silently skipping every
+  // night until real volume catches up. Set TRAIN_INCLUDE_SYNTHETIC=false in the environment
+  // (no redeploy needed) once real usage alone is enough — or run
+  // `npm run cleanup:synthetic-swipes -- --delete` to remove the synthetic rows outright,
+  // which has the same effect without touching this flag.
+  const includeSynthetic = process.env.TRAIN_INCLUDE_SYNTHETIC !== "false";
+  const result = await runWeightTraining({ includeSynthetic });
+  res.json({ ...result, includeSynthetic });
 });

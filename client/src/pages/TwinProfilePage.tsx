@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { UsernameGate } from "../components/UsernameGate";
-import { apiGet, apiPost, ApiError } from "../lib/api";
+import { apiDelete, apiGet, apiPost, ApiError } from "../lib/api";
 
 interface TwinProfile {
   user: { id: string; username: string; avatarUrl: string | null; createdAt: string };
   topTags: { tag: string; weight: number }[];
   ratings: { titleId: string; titleName: string; rating: number; comment: string | null }[];
   isFriend: boolean;
+  pendingOutgoingRequest: boolean;
   isSelf: boolean;
   similarity: number;
   canChat: boolean;
@@ -36,8 +37,20 @@ function TwinProfilePageInner() {
 
   async function sendFriendRequest() {
     if (!profile) return;
-    await apiPost(`/social/friends/${profile.user.id}/request`, {});
-    setStatus("Friend request sent");
+    try {
+      await apiPost(`/social/friends/${profile.user.id}/request`, {});
+      setStatus("Friend request sent");
+      load();
+    } catch (e) {
+      setStatus(e instanceof ApiError ? e.message : "Failed to send friend request");
+    }
+  }
+
+  async function cancelFriendRequest() {
+    if (!profile) return;
+    await apiDelete(`/social/friends/${profile.user.id}/request`);
+    setStatus(null);
+    load();
   }
 
   async function startWatchTogether() {
@@ -105,9 +118,14 @@ function TwinProfilePageInner() {
               Message
             </Link>
           )}
-          {!profile.isFriend && (
+          {!profile.isFriend && !profile.pendingOutgoingRequest && (
             <button onClick={sendFriendRequest} className="surface-interactive bg-[var(--bg-elevated)] px-4 py-2 text-sm font-semibold">
               Add friend
+            </button>
+          )}
+          {!profile.isFriend && profile.pendingOutgoingRequest && (
+            <button onClick={cancelFriendRequest} className="surface-interactive bg-[var(--bg-elevated)] px-4 py-2 text-sm font-semibold">
+              Cancel friend request
             </button>
           )}
           {profile.canChat && (

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { UsernameGate } from "../components/UsernameGate";
-import { apiGet, apiPost } from "../lib/api";
+import { apiDelete, apiGet, apiPost } from "../lib/api";
 
 interface PublicUser {
   id: string;
@@ -37,6 +37,11 @@ function FriendsPageInner() {
 
   async function respond(requesterId: string, accept: boolean) {
     await apiPost(`/social/friends/${requesterId}/respond`, { accept });
+    load();
+  }
+
+  async function cancelRequest(addresseeId: string) {
+    await apiDelete(`/social/friends/${addresseeId}/request`);
     load();
   }
 
@@ -86,7 +91,15 @@ function FriendsPageInner() {
             {data.outgoingRequests.map((r) => (
               <div key={r.id} className="surface flex items-center justify-between gap-3 bg-[var(--bg-elevated)] p-3">
                 <span className="text-sm font-bold">{r.user.username}</span>
-                <span className="chip bg-[var(--bg-sunken)] px-2 py-1 text-[10px]">Pending</span>
+                <div className="flex items-center gap-2">
+                  <span className="chip bg-[var(--bg-sunken)] px-2 py-1 text-[10px]">Pending</span>
+                  <button
+                    onClick={() => cancelRequest(r.user.id)}
+                    className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-semibold"
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
             ))}
           </div>

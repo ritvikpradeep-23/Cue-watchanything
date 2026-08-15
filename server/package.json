@@ -18,7 +18,8 @@
     "fetch-posters": "tsx scripts/fetch-posters.ts",
     "generate-posters": "tsx scripts/generate-posters.ts",
     "seed:synthetic-swipes": "tsx scripts/seed-synthetic-swipes.ts",
-    "cleanup:synthetic-swipes": "tsx scripts/cleanup-synthetic-swipes.ts"
+    "cleanup:synthetic-swipes": "tsx scripts/cleanup-synthetic-swipes.ts",
+    "weight-trends": "tsx scripts/weight-trends.ts"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

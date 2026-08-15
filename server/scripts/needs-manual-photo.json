@@ -1,15 +1,5 @@
 [
   {
-    "id": "484a133b-936b-4503-98fe-956a34a7a09d",
-    "name": "Huh Joon-ho",
-    "kind": "actor"
-  },
-  {
-    "id": "fbd74a3f-a772-4096-b253-c419b53c51f2",
-    "name": "Lee Eun-ju",
-    "kind": "actor"
-  },
-  {
     "id": "320b9aa0-06c3-4cab-a88d-1122cff229a6",
     "name": "Shazia Malik",
     "kind": "actor"
@@ -105,11 +95,6 @@
     "kind": "actor"
   },
   {
-    "id": "d7de2983-cf95-4040-a93a-e277f2ea5c39",
-    "name": "Ken Watanabe",
-    "kind": "actor"
-  },
-  {
     "id": "d96f027b-2571-4a2e-99fd-4c263bf78f1a",
     "name": "Pia Watson",
     "kind": "actor"
@@ -117,11 +102,6 @@
   {
     "id": "3926d192-d720-443d-9e58-453f87db4003",
     "name": "Arache Mansour",
-    "kind": "actor"
-  },
-  {
-    "id": "bd8b7775-d062-4b19-b094-d247e5bce64a",
-    "name": "Prem Prakash",
     "kind": "actor"
   },
   {
@@ -137,16 +117,6 @@
   {
     "id": "645de3f1-9e91-444c-91bb-085005a46a2c",
     "name": "Joo Hyun",
-    "kind": "actor"
-  },
-  {
-    "id": "56f4427c-d53f-4d53-a206-4e25faf6b4be",
-    "name": "Mohammad Ali Baig",
-    "kind": "actor"
-  },
-  {
-    "id": "7af332ce-4902-4912-b6c5-fbb1af02a950",
-    "name": "Park Jeong-min",
     "kind": "actor"
   },
   {
@@ -172,11 +142,6 @@
   {
     "id": "b29cd387-5f70-4a2e-a2a4-5b176f77c17e",
     "name": "Varsha Valsan",
-    "kind": "actor"
-  },
-  {
-    "id": "0cd5524d-7124-4475-b415-339e3273c6e5",
-    "name": "Nikita Efremov",
     "kind": "actor"
   },
   {
@@ -320,23 +285,8 @@
     "kind": "actor"
   },
   {
-    "id": "7143f553-e661-49ac-b3ab-5e70194349d2",
-    "name": "Oh Jung-se",
-    "kind": "actor"
-  },
-  {
     "id": "d8d3904f-75aa-4764-9629-fbc957f8d80e",
     "name": "Lee Se-eun",
-    "kind": "actor"
-  },
-  {
-    "id": "0b0ea89a-9f10-4120-b060-a0273621bff7",
-    "name": "Kim Rae-won",
-    "kind": "actor"
-  },
-  {
-    "id": "d7221841-142f-49f4-b14a-0de1bbe6e2a6",
-    "name": "Aoi Yūki",
     "kind": "actor"
   },
   {
@@ -555,16 +505,6 @@
     "kind": "actor"
   },
   {
-    "id": "0d2f820e-bf70-411b-a1a6-1d8ccd7a7132",
-    "name": "Kim So-jin",
-    "kind": "actor"
-  },
-  {
-    "id": "03530365-c26f-4f3c-b727-bff7c2b4ecd7",
-    "name": "Chandra Mohan",
-    "kind": "actor"
-  },
-  {
     "id": "b86d83a5-61ca-425e-a7b1-a7b6fb6db0ab",
     "name": "Lee Soo-kyung",
     "kind": "actor"
@@ -612,11 +552,6 @@
   {
     "id": "d2937225-fab8-4dd9-8011-b551239d03cd",
     "name": "Karthik Nagarajan",
-    "kind": "actor"
-  },
-  {
-    "id": "74bde4b5-6301-47c7-b15a-a1ae5677d6ea",
-    "name": "Kim Yeong-ok",
     "kind": "actor"
   },
   {
@@ -795,11 +730,6 @@
     "kind": "actor"
   },
   {
-    "id": "67b360be-84de-4167-b989-20678ad8f387",
-    "name": "Manjot Singh",
-    "kind": "actor"
-  },
-  {
     "id": "7b1c8237-b933-4b08-8388-fa7cba01fb55",
     "name": "Chandni",
     "kind": "actor"
@@ -807,11 +737,6 @@
   {
     "id": "d86a03aa-09f7-4f41-8fc8-01e6e1f13d58",
     "name": "Baby Joshika Maya",
-    "kind": "actor"
-  },
-  {
-    "id": "f82a1f76-8127-4f97-aad1-949f1d6df1a5",
-    "name": "Im Won-hee",
     "kind": "actor"
   },
   {
@@ -862,11 +787,6 @@
   {
     "id": "a18e1fe9-648a-4d6a-b1a0-44dad3c7022a",
     "name": "Hiroki Doi",
-    "kind": "actor"
-  },
-  {
-    "id": "2fab48db-9e1f-46c0-9ba5-1d2610c7c441",
-    "name": "Sara Takatsuki",
     "kind": "actor"
   },
   {
@@ -1037,11 +957,6 @@
   {
     "id": "ab73f8a5-06b4-4f51-bdd8-87bce9b5f3cc",
     "name": "Ryota Suzuki",
-    "kind": "actor"
-  },
-  {
-    "id": "25f406bb-d5b9-47c1-8f5e-e582286677e6",
-    "name": "Vijayalakshmi",
     "kind": "actor"
   },
   {
@@ -1280,16 +1195,6 @@
     "kind": "actor"
   },
   {
-    "id": "075f6134-0289-41a2-954c-86001133583a",
-    "name": "Tessa Ía",
-    "kind": "actor"
-  },
-  {
-    "id": "231eab14-cec7-4bca-bb20-d60a1e70fc83",
-    "name": "Ashokan",
-    "kind": "actor"
-  },
-  {
     "id": "7aa27c39-2c80-4eb7-a598-846b183d6090",
     "name": "Blas Jaramillo",
     "kind": "actor"
@@ -1332,11 +1237,6 @@
   {
     "id": "d93becd1-531b-4bd6-945b-b86b1206b892",
     "name": "Baby Sara",
-    "kind": "actor"
-  },
-  {
-    "id": "9b42f1c3-bf04-4e9f-8356-5c0129fda045",
-    "name": "Lee Won-jong",
     "kind": "actor"
   },
   {
@@ -1510,11 +1410,6 @@
     "kind": "actor"
   },
   {
-    "id": "6b065169-215b-4382-a6d4-bab5e4fc195c",
-    "name": "Rio Yamashita",
-    "kind": "actor"
-  },
-  {
     "id": "b509cdd0-fe51-4dd3-99e0-ef2e546b96ac",
     "name": "Ranganath",
     "kind": "actor"
@@ -1530,11 +1425,6 @@
     "kind": "actor"
   },
   {
-    "id": "87ae6e6d-e7de-4252-b14f-0b20d25dab6c",
-    "name": "Arata Furuta",
-    "kind": "actor"
-  },
-  {
     "id": "8d198144-63ae-4b73-8824-f1d1d7efb140",
     "name": "Ryohei Matsuoka",
     "kind": "actor"
@@ -1547,16 +1437,6 @@
   {
     "id": "aeee7a1c-e973-42a9-b01a-9e304369ba7e",
     "name": "Patricia Lang",
-    "kind": "actor"
-  },
-  {
-    "id": "75f44662-3dde-4e9e-bef2-804476165ef6",
-    "name": "Park Yong-woo",
-    "kind": "actor"
-  },
-  {
-    "id": "a4766a0f-8217-4d4f-aac3-59f236f00326",
-    "name": "Jung Ho-yeon",
     "kind": "actor"
   },
   {
@@ -1800,11 +1680,6 @@
     "kind": "actor"
   },
   {
-    "id": "fda0ad20-89b8-4057-b7ab-b8dc02501910",
-    "name": "Choi Sung-eun",
-    "kind": "actor"
-  },
-  {
     "id": "44a17986-9aca-4ffa-96f9-83f63d7c3c8b",
     "name": "Kim Min-joo",
     "kind": "actor"
@@ -1917,11 +1792,6 @@
   {
     "id": "648cfb72-f14b-4d91-93c6-b62284308716",
     "name": "Ankitha",
-    "kind": "actor"
-  },
-  {
-    "id": "2103e763-96ef-47eb-9a65-672881735e18",
-    "name": "Muga Tsukaji",
     "kind": "actor"
   },
   {
@@ -2052,11 +1922,6 @@
   {
     "id": "acbcf2d2-f07f-432c-ab8d-ed782785828e",
     "name": "Raj Mehta",
-    "kind": "director"
-  },
-  {
-    "id": "9ae66a71-b6c0-4246-9be7-ad732595dae7",
-    "name": "Arunima Sharma",
     "kind": "director"
   },
   {
@@ -2300,18 +2165,8 @@
     "kind": "director"
   },
   {
-    "id": "7299263d-9260-4f22-9bb2-96e067ff5a5a",
-    "name": "Venu Sriram",
-    "kind": "director"
-  },
-  {
     "id": "1c9877f3-f18a-45e2-a7a4-073c5e9dc32d",
     "name": "Ufuk Genc",
-    "kind": "director"
-  },
-  {
-    "id": "cf1c9215-8d82-42d5-b6b1-acf07add2a38",
-    "name": "Srikanth Addala",
     "kind": "director"
   },
   {
@@ -2547,11 +2402,6 @@
   {
     "id": "d007ab9b-db86-4102-a602-d18f3d3783be",
     "name": "Bharat Kamma",
-    "kind": "director"
-  },
-  {
-    "id": "ac5124af-dac3-4b60-b1b6-dd3917d5c69f",
-    "name": "Prakash Jha",
     "kind": "director"
   },
   {
@@ -2797,11 +2647,6 @@
   {
     "id": "a99aabfd-8c94-44b4-afcd-c2104a476248",
     "name": "Kenjirō Fujii",
-    "kind": "director"
-  },
-  {
-    "id": "cd93895c-aca1-4833-ab3d-85502801bc9e",
-    "name": "Woo Min-ho",
     "kind": "director"
   },
   {
@@ -3265,11 +3110,6 @@
     "kind": "director"
   },
   {
-    "id": "b1914649-0b4d-4708-b3a7-e78a0f513afa",
-    "name": "John Crowley",
-    "kind": "director"
-  },
-  {
     "id": "01528af2-fd7b-4d5a-a4ce-a611e501732e",
     "name": "Sudheer Varma",
     "kind": "director"
@@ -3535,11 +3375,6 @@
     "kind": "director"
   },
   {
-    "id": "67481d3c-3488-4685-ae37-bc013e7a3ffc",
-    "name": "Milan Luthria",
-    "kind": "director"
-  },
-  {
     "id": "ce8bc06b-8418-45ce-aa52-04a13b6ba773",
     "name": "Shintaro Shimosawa",
     "kind": "director"
@@ -3757,11 +3592,6 @@
   {
     "id": "6b83bccd-a4f9-457f-b298-afb529961f3a",
     "name": "Sankalp Reddy",
-    "kind": "director"
-  },
-  {
-    "id": "75bdfa16-689f-4404-b58f-dc6eca6064ea",
-    "name": "Kishore Tirumala",
     "kind": "director"
   },
   {

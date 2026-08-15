@@ -95,7 +95,7 @@ socialRouter.get("/users/:username", requireAuth, async (req: AuthedRequest, res
     return res.status(404).json({ error: "User not found" });
   }
 
-  const [topTags, ratings, friends, interaction] = await Promise.all([
+  const [topTags, ratings, friends, interaction, pendingOutgoingRequest] = await Promise.all([
     topTagsFor(user.id),
     prisma.rating.findMany({
       where: { userId: user.id },
@@ -104,6 +104,11 @@ socialRouter.get("/users/:username", requireAuth, async (req: AuthedRequest, res
     }),
     isSelf ? true : areFriends(myId, user.id),
     isSelf ? { eligible: false, similarity: 1 } : canInteract(myId, user.id),
+    isSelf
+      ? false
+      : prisma.friendship
+          .findFirst({ where: { requesterId: myId, addresseeId: user.id, status: "PENDING" } })
+          .then((f) => f !== null),
   ]);
 
   let watchlist: unknown[] = [];
@@ -123,6 +128,7 @@ socialRouter.get("/users/:username", requireAuth, async (req: AuthedRequest, res
     topTags,
     ratings: ratings.map((r) => ({ titleId: r.titleId, titleName: r.title.name, rating: r.rating, comment: r.comment })),
     isFriend: isSelf ? false : friends,
+    pendingOutgoingRequest,
     isSelf,
     similarity: interaction.similarity,
     // reuses the exact same eligibility check message-send/watch-together enforce server-side,
@@ -152,6 +158,21 @@ socialRouter.post("/friends/:userId/request", requireAuth, async (req: AuthedReq
 
   const friendship = await prisma.friendship.create({ data: { requesterId: myId, addresseeId: otherId } });
   res.status(201).json({ id: friendship.id, status: friendship.status });
+});
+
+/** Lets the requester take back a request they sent before the other person has responded to
+ * it — distinct from /respond, which only the addressee can call. */
+socialRouter.delete("/friends/:userId/request", requireAuth, async (req: AuthedRequest, res) => {
+  const myId = req.user!.userId;
+  const otherId = String(req.params.userId);
+
+  const friendship = await prisma.friendship.findFirst({
+    where: { requesterId: myId, addresseeId: otherId, status: "PENDING" },
+  });
+  if (!friendship) return res.status(404).json({ error: "No pending outgoing request to that user" });
+
+  await prisma.friendship.delete({ where: { id: friendship.id } });
+  res.json({ ok: true });
 });
 
 socialRouter.post("/friends/:userId/respond", requireAuth, async (req: AuthedRequest, res) => {

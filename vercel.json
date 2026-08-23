@@ -1,6 +1,6 @@
 {
   "installCommand": "npm install",
-  "buildCommand": "echo '--- DIAGNOSTIC ---' && pwd && ls -la && echo '--- root package.json ---' && cat package.json && echo '--- npm workspaces list ---' && npm query .workspace && echo '--- end diagnostic ---' && npm run build --workspace shared && npm run prisma:deploy --workspace server && npm run prisma:generate --workspace server && npm run seed --workspace server && npm run build --workspace client",
+  "buildCommand": "npm run build --workspace shared && npm run prisma:deploy --workspace server && npm run prisma:generate --workspace server && npm run seed --workspace server && npm run build --workspace client",
   "outputDirectory": "client/dist",
   "rewrites": [
     { "source": "/api/:path*", "destination": "/api" },

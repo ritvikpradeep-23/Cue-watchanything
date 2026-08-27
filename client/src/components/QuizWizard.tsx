@@ -159,11 +159,11 @@ export function QuizWizard({ title, subtitle, getNext, onComplete, storageKey }:
       <div className="mb-6 text-center">
         <p className="chip inline-flex bg-accent-500 px-3 py-1 text-xs text-[var(--on-accent)]">{title}</p>
         {subtitle && <p className="mt-2 text-sm font-medium text-[var(--text-muted)]">{subtitle}</p>}
-        <p className="mt-3 text-xs font-bold text-[var(--text-muted)]">Question {history.length + 1}</p>
+        <p className="mt-3 text-xs font-medium text-[var(--text-muted)]">Question {history.length + 1}</p>
       </div>
 
       {error && (
-        <div className="surface mb-4 bg-red-100 px-4 py-3 text-sm font-bold text-red-700">
+        <div className="surface mb-4 bg-[color-mix(in_srgb,var(--color-accent-500)_12%,var(--bg-elevated))] px-4 py-3 text-sm font-normal text-[var(--text-accent)]">
           {error}
         </div>
       )}
@@ -173,7 +173,7 @@ export function QuizWizard({ title, subtitle, getNext, onComplete, storageKey }:
           {history.length > 0 && (
             <button
               onClick={goBack}
-              className="mb-4 text-xs font-bold text-[var(--text-muted)] hover:text-[var(--text-accent)]"
+              className="mb-4 text-xs font-medium text-[var(--text-muted)] hover:text-[var(--text-accent)]"
             >
               ← Back
             </button>
@@ -186,7 +186,7 @@ export function QuizWizard({ title, subtitle, getNext, onComplete, storageKey }:
                 <button
                   key={o.value}
                   onClick={() => submitAnswer(o.value)}
-                  className="surface-interactive bg-[var(--bg-elevated)] px-4 py-3 text-left text-sm font-bold hover:bg-accent-500 hover:text-[var(--on-accent)]"
+                  className="surface-interactive bg-[var(--bg-elevated)] px-4 py-3 text-left text-sm font-medium hover:bg-accent-500 hover:text-[var(--on-accent)]"
                 >
                   {o.label}
                 </button>
@@ -284,7 +284,7 @@ export function QuizWizard({ title, subtitle, getNext, onComplete, storageKey }:
               <div className="flex flex-col gap-4">
                 {question.toggles?.map((t) => (
                   <div key={t.key}>
-                    <p className="mb-2 text-sm font-bold text-[var(--text-muted)]">{t.label}</p>
+                    <p className="mb-2 text-sm font-medium text-[var(--text-muted)]">{t.label}</p>
                     <div className="flex gap-2">
                       {t.options.map((o) => (
                         <button

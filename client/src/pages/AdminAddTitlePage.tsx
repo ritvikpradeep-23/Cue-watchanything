@@ -55,7 +55,7 @@ function TagPicker({
 }) {
   return (
     <div className="mb-3">
-      <p className="mb-1.5 text-xs font-semibold tracking-wide text-[var(--text-muted)]">{section.label}</p>
+      <p className="mb-1.5 text-xs font-normal tracking-wide text-[var(--text-muted)]">{section.label}</p>
       <div className="flex flex-wrap gap-1.5">
         {section.options.map((opt) => {
           const isSelected = selected.includes(opt);
@@ -100,7 +100,7 @@ export function AdminAddTitlePage() {
   if (user?.role !== "ADMIN") {
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center">
-        <p className="surface p-6 font-bold">Admin access required.</p>
+        <p className="surface p-6 font-medium">Admin access required.</p>
       </div>
     );
   }
@@ -165,7 +165,7 @@ export function AdminAddTitlePage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10">
+    <div className="mx-auto max-w-4xl px-4 py-10">
       <h1 className="mb-1 text-3xl font-semibold sm:text-4xl">Add a title</h1>
       <p className="mb-6 text-sm text-[var(--text-muted)]">
         Inserted straight into the catalog — no seed rebuild or redeploy needed.
@@ -174,7 +174,7 @@ export function AdminAddTitlePage() {
       <div className="surface flex flex-col gap-4 p-6">
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="mb-1 block text-xs font-semibold">Name</label>
+            <label className="mb-1 block text-xs font-normal">Name</label>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -182,7 +182,7 @@ export function AdminAddTitlePage() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-semibold">Type</label>
+            <label className="mb-1 block text-xs font-normal">Type</label>
             <select
               value={type}
               onChange={(e) => setType(e.target.value)}
@@ -198,7 +198,7 @@ export function AdminAddTitlePage() {
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-semibold">Plot summary</label>
+          <label className="mb-1 block text-xs font-normal">Plot summary</label>
           <textarea
             value={plot}
             onChange={(e) => setPlot(e.target.value)}
@@ -208,7 +208,7 @@ export function AdminAddTitlePage() {
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-semibold">Cast (comma-separated)</label>
+          <label className="mb-1 block text-xs font-normal">Cast (comma-separated)</label>
           <input
             value={cast}
             onChange={(e) => setCast(e.target.value)}
@@ -218,7 +218,7 @@ export function AdminAddTitlePage() {
 
         <div className="grid gap-4 sm:grid-cols-4">
           <div>
-            <label className="mb-1 block text-xs font-semibold">Year</label>
+            <label className="mb-1 block text-xs font-normal">Year</label>
             <input
               type="number"
               value={year}
@@ -227,7 +227,7 @@ export function AdminAddTitlePage() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-semibold">Seasons</label>
+            <label className="mb-1 block text-xs font-normal">Seasons</label>
             <input
               type="number"
               value={seasons}
@@ -236,7 +236,7 @@ export function AdminAddTitlePage() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-semibold">Episodes</label>
+            <label className="mb-1 block text-xs font-normal">Episodes</label>
             <input
               type="number"
               value={episodes}
@@ -245,7 +245,7 @@ export function AdminAddTitlePage() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-semibold">Runtime (min)</label>
+            <label className="mb-1 block text-xs font-normal">Runtime (min)</label>
             <input
               type="number"
               value={runtime}
@@ -256,7 +256,7 @@ export function AdminAddTitlePage() {
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-semibold">
+          <label className="mb-1 block text-xs font-normal">
             Poster URL <span className="normal-case text-[var(--text-muted)]">(optional — a retro placeholder is generated if left blank)</span>
           </label>
           <input
@@ -268,7 +268,7 @@ export function AdminAddTitlePage() {
         </div>
 
         <div>
-          <p className="mb-1.5 text-xs font-semibold tracking-wide">Platforms</p>
+          <p className="mb-1.5 text-xs font-normal tracking-wide">Platforms</p>
           <div className="flex flex-wrap gap-1.5">
             {PLATFORMS.map((p) => (
               <button
@@ -286,7 +286,7 @@ export function AdminAddTitlePage() {
         </div>
 
         <div>
-          <p className="mb-1.5 text-xs font-semibold tracking-wide">Languages</p>
+          <p className="mb-1.5 text-xs font-normal tracking-wide">Languages</p>
           <div className="flex flex-wrap gap-1.5">
             {LANGUAGES.map((l) => (
               <button
@@ -304,7 +304,7 @@ export function AdminAddTitlePage() {
         </div>
 
         <hr className="border-[var(--border)]" />
-        <p className="text-sm font-semibold">Tags</p>
+        <p className="text-sm font-normal">Tags</p>
         {TAG_SECTIONS.map((section) => (
           <TagPicker
             key={section.key}
@@ -315,7 +315,7 @@ export function AdminAddTitlePage() {
         ))}
 
         {status && (
-          <p className={`text-sm font-bold ${status.kind === "ok" ? "text-emerald-600" : "text-red-600"}`}>
+          <p className={`text-sm font-medium ${status.kind === "ok" ? "text-[var(--text-success)]" : "text-[var(--text-accent)]"}`}>
             {status.message}
           </p>
         )}

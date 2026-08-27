@@ -13,12 +13,12 @@ interface TwinUser {
 function TwinCard({ u }: { u: TwinUser }) {
   return (
     <Link to={`/twins/${u.username}`} className="surface-interactive flex items-center gap-3 bg-[var(--bg-elevated)] p-3">
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-accent-500 text-sm font-semibold text-[var(--on-accent)]">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-accent-500 text-sm font-normal text-[var(--on-accent)]">
         {u.avatarUrl ? <img src={u.avatarUrl} alt="" className="h-full w-full object-cover" /> : u.username[0]?.toUpperCase()}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-bold">{u.username}</p>
-        <p className="text-xs font-semibold text-[var(--text-muted)]">{Math.round(u.similarity * 100)}% match</p>
+        <p className="truncate text-sm font-medium">{u.username}</p>
+        <p className="text-xs font-normal text-[var(--text-muted)]">{Math.round(u.similarity * 100)}% match</p>
       </div>
     </Link>
   );
@@ -49,7 +49,7 @@ function TwinsPageInner() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-10">
       <h1 className="mb-1 text-3xl font-semibold sm:text-4xl">Taste twins</h1>
-      <p className="mb-6 text-sm font-bold text-[var(--text-muted)]">Find people whose taste overlaps with yours.</p>
+      <p className="mb-6 text-sm font-medium text-[var(--text-muted)]">Find people whose taste overlaps with yours.</p>
 
       <input
         value={query}
@@ -61,7 +61,7 @@ function TwinsPageInner() {
       {results ? (
         <div className="flex flex-col gap-2">
           {results.length === 0 ? (
-            <p className="text-sm font-semibold text-[var(--text-muted)]">No users found.</p>
+            <p className="text-sm font-normal text-[var(--text-muted)]">No users found.</p>
           ) : (
             results.map((u) => <TwinCard key={u.id} u={u} />)
           )}
@@ -72,8 +72,12 @@ function TwinsPageInner() {
           {!suggested ? (
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent-500 border-t-transparent" />
           ) : suggested.length === 0 ? (
-            <p className="surface p-4 text-sm font-semibold text-[var(--text-muted)]">
-              No suggestions yet — take the quiz and swipe a bit first.
+            <p className="surface p-4 text-sm font-normal text-[var(--text-muted)]">
+              No suggestions yet —{" "}
+              <Link to="/quiz" className="font-medium text-[var(--text-accent)] hover:underline">
+                take the quiz
+              </Link>{" "}
+              and swipe a bit first.
             </p>
           ) : (
             <div className="flex flex-col gap-2">

@@ -5,6 +5,16 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cue</title>
+    <!-- Inter Tight — the app's single typeface (display + body). A variable font, so this one
+         request covers the whole 400-700 range the type scale uses. preconnect because the font
+         file lives on a different origin than the stylesheet; display=swap so text paints in the
+         fallback immediately rather than blocking on the download. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <script>
       // Applied before first paint so there's no flash of the wrong theme — dark is the
       // default until the user explicitly toggles (see src/lib/theme-context.tsx).

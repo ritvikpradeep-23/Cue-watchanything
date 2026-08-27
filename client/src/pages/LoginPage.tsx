@@ -28,11 +28,11 @@ export function LoginPage() {
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-sm flex-col justify-center px-4 py-16">
       <h1 className="mb-1 text-3xl font-semibold sm:text-4xl">Welcome back</h1>
-      <p className="mb-6 text-sm font-bold text-[var(--text-muted)]">Log in to pick up your watchlist.</p>
+      <p className="mb-6 text-sm font-medium text-[var(--text-muted)]">Log in to pick up your watchlist.</p>
 
       <form onSubmit={handleSubmit} className="surface flex flex-col gap-4 bg-[var(--bg-elevated)] p-6">
         <div>
-          <label className="mb-1 block text-xs font-semibold">Email</label>
+          <label className="mb-1 block text-xs font-normal">Email</label>
           <input
             type="email"
             required
@@ -43,8 +43,8 @@ export function LoginPage() {
         </div>
         <div>
           <div className="mb-1 flex items-center justify-between">
-            <label className="text-xs font-semibold">Password</label>
-            <Link to="/forgot-password" className="text-xs font-semibold text-[var(--text-accent)] hover:underline">
+            <label className="text-xs font-normal">Password</label>
+            <Link to="/forgot-password" className="text-xs font-normal text-[var(--text-accent)] hover:underline">
               Forgot password?
             </Link>
           </div>
@@ -57,7 +57,7 @@ export function LoginPage() {
           />
         </div>
 
-        {error && <p className="text-sm font-bold text-red-600">{error}</p>}
+        {error && <p className="text-sm font-medium text-[var(--text-accent)]">{error}</p>}
 
         <button
           type="submit"
@@ -70,7 +70,7 @@ export function LoginPage() {
 
       <p className="mt-6 text-center text-sm font-medium text-[var(--text-muted)]">
         No account yet?{" "}
-        <Link to="/signup" className="font-semibold text-[var(--text-accent)] hover:underline">
+        <Link to="/signup" className="font-medium text-[var(--text-accent)] hover:underline">
           Sign up
         </Link>
       </p>

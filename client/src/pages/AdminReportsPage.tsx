@@ -34,7 +34,7 @@ export function AdminReportsPage() {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="mb-1 text-3xl font-semibold sm:text-4xl">Reports</h1>
-          <p className="text-sm font-bold text-[var(--text-muted)]">User-filed reports queued for review.</p>
+          <p className="text-sm font-medium text-[var(--text-muted)]">User-filed reports queued for review.</p>
         </div>
         <button
           onClick={() => setShowAll((s) => !s)}
@@ -49,7 +49,7 @@ export function AdminReportsPage() {
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent-500 border-t-transparent" />
         </div>
       ) : reports.length === 0 ? (
-        <p className="surface p-6 text-center text-sm font-semibold text-[var(--text-muted)]">
+        <p className="surface p-6 text-center text-sm font-normal text-[var(--text-muted)]">
           Nothing to review.
         </p>
       ) : (
@@ -58,11 +58,11 @@ export function AdminReportsPage() {
             <div key={r.id} className="surface bg-[var(--bg-elevated)] p-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-sm font-bold">
+                  <p className="text-sm font-medium">
                     {r.reporterEmail} reported {r.reportedUserEmail}
                   </p>
                   <p className="mt-1 text-sm text-[var(--text-muted)]">{r.reason}</p>
-                  <p className="mt-2 text-xs font-semibold text-[var(--text-muted)]">
+                  <p className="mt-2 text-xs font-normal text-[var(--text-muted)]">
                     {new Date(r.createdAt).toLocaleString()}
                     {r.status === "REVIEWED" && r.reviewedAt && ` · reviewed ${new Date(r.reviewedAt).toLocaleDateString()}`}
                   </p>
@@ -70,7 +70,7 @@ export function AdminReportsPage() {
                 {r.status === "PENDING" ? (
                   <button
                     onClick={() => resolve(r.id)}
-                    className="surface-interactive shrink-0 bg-accent-500 px-3 py-1.5 text-xs font-semibold text-[var(--on-accent)]"
+                    className="surface-interactive shrink-0 bg-accent-500 px-3 py-1.5 text-xs font-medium text-[var(--on-accent)]"
                   >
                     Mark reviewed
                   </button>

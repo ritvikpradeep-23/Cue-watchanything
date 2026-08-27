@@ -72,7 +72,7 @@ export function AdminUsersPage() {
   return (
     <div>
       <h1 className="mb-1 text-3xl font-semibold sm:text-4xl">Users</h1>
-      <p className="mb-6 text-sm font-bold text-[var(--text-muted)]">{total} accounts</p>
+      <p className="mb-6 text-sm font-medium text-[var(--text-muted)]">{total} accounts</p>
 
       <input
         value={query}
@@ -97,14 +97,14 @@ export function AdminUsersPage() {
                 className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left hover:bg-[var(--bg-sunken)]/40"
               >
                 <div>
-                  <p className="text-sm font-bold">{u.email}</p>
-                  <p className="text-xs font-semibold text-[var(--text-muted)]">
+                  <p className="text-sm font-medium">{u.email}</p>
+                  <p className="text-xs font-normal text-[var(--text-muted)]">
                     Joined {new Date(u.createdAt).toLocaleDateString()}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
                   {u.bannedAt && (
-                    <span className="chip bg-red-600 px-2 py-0.5 text-[10px] text-white">Banned</span>
+                    <span className="chip bg-accent-600 px-2 py-0.5 text-[10px] text-[var(--on-accent)]">Banned</span>
                   )}
                   {u.role === "ADMIN" && (
                     <span className="chip bg-accent-500 px-2 py-0.5 text-[10px] text-[var(--on-accent)]">Admin</span>
@@ -122,14 +122,14 @@ export function AdminUsersPage() {
                         {u.role === "ADMIN" ? (
                           <button
                             onClick={() => setRole(u.id, "USER")}
-                            className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-semibold"
+                            className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-medium"
                           >
                             Revoke admin
                           </button>
                         ) : (
                           <button
                             onClick={() => setRole(u.id, "ADMIN")}
-                            className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-semibold"
+                            className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-medium"
                           >
                             Grant admin
                           </button>
@@ -137,14 +137,14 @@ export function AdminUsersPage() {
                         <button
                           onClick={() => kick(u.id)}
                           disabled={kickedId === u.id}
-                          className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-semibold disabled:opacity-60"
+                          className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-medium disabled:opacity-60"
                         >
                           {kickedId === u.id ? "Kicked — logged out" : "Kick (force logout)"}
                         </button>
                         {u.bannedAt ? (
                           <button
                             onClick={() => unban(u.id)}
-                            className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-semibold text-emerald-600"
+                            className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-medium text-[var(--text-success)]"
                           >
                             Unban
                           </button>
@@ -152,13 +152,13 @@ export function AdminUsersPage() {
                           <>
                             <button
                               onClick={() => ban(u.id)}
-                              className="surface-interactive bg-red-600 px-3 py-1.5 text-xs font-semibold text-white"
+                              className="surface-interactive bg-accent-600 px-3 py-1.5 text-xs font-medium text-[var(--on-accent)]"
                             >
                               Confirm permanent ban
                             </button>
                             <button
                               onClick={() => setConfirmingBanId(null)}
-                              className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-semibold"
+                              className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-medium"
                             >
                               Cancel
                             </button>
@@ -166,7 +166,7 @@ export function AdminUsersPage() {
                         ) : (
                           <button
                             onClick={() => setConfirmingBanId(u.id)}
-                            className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-semibold text-red-600"
+                            className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-medium text-[var(--text-accent)]"
                           >
                             Ban permanently
                           </button>
@@ -175,33 +175,33 @@ export function AdminUsersPage() {
 
                       <div className="grid gap-4 sm:grid-cols-3">
                         <div>
-                          <p className="mb-2 text-xs font-bold tracking-wide text-[var(--text-muted)]">
+                          <p className="mb-2 text-xs font-medium tracking-wide text-[var(--text-muted)]">
                             Recent activity ({detail.actions.length})
                           </p>
                           <ul className="flex flex-col gap-1 text-xs">
                             {detail.actions.slice(0, 10).map((a) => (
                               <li key={a.id} className="text-[var(--text-muted)]">
-                                <span className="font-bold text-[var(--text)]">{a.action}</span> {a.titleName}
+                                <span className="font-medium text-[var(--text)]">{a.action}</span> {a.titleName}
                               </li>
                             ))}
                             {detail.actions.length === 0 && <li className="text-[var(--text-muted)]">None</li>}
                           </ul>
                         </div>
                         <div>
-                          <p className="mb-2 text-xs font-bold tracking-wide text-[var(--text-muted)]">
+                          <p className="mb-2 text-xs font-medium tracking-wide text-[var(--text-muted)]">
                             Ratings ({detail.ratings.length})
                           </p>
                           <ul className="flex flex-col gap-1 text-xs">
                             {detail.ratings.map((r) => (
                               <li key={r.id} className="text-[var(--text-muted)]">
-                                <span className="font-bold text-[var(--text)]">{"★".repeat(r.rating)}</span> {r.titleName}
+                                <span className="font-medium text-[var(--text)]">{"★".repeat(r.rating)}</span> {r.titleName}
                               </li>
                             ))}
                             {detail.ratings.length === 0 && <li className="text-[var(--text-muted)]">None</li>}
                           </ul>
                         </div>
                         <div>
-                          <p className="mb-2 text-xs font-bold tracking-wide text-[var(--text-muted)]">
+                          <p className="mb-2 text-xs font-medium tracking-wide text-[var(--text-muted)]">
                             Quiz history ({detail.quizResponses.length})
                           </p>
                           <ul className="flex flex-col gap-1 text-xs">
@@ -228,15 +228,15 @@ export function AdminUsersPage() {
         <button
           disabled={page <= 1}
           onClick={() => setPage((p) => p - 1)}
-          className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-semibold disabled:opacity-40"
+          className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-medium disabled:opacity-40"
         >
           ← Prev
         </button>
-        <span className="text-xs font-bold text-[var(--text-muted)]">Page {page}</span>
+        <span className="text-xs font-medium text-[var(--text-muted)]">Page {page}</span>
         <button
           disabled={page * 25 >= total}
           onClick={() => setPage((p) => p + 1)}
-          className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-semibold disabled:opacity-40"
+          className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-medium disabled:opacity-40"
         >
           Next →
         </button>

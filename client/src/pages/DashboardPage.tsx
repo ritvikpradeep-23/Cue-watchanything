@@ -99,11 +99,11 @@ export function DashboardPage() {
           <div className="mt-5 flex gap-3">
             <Link
               to="/swipe"
-              className="surface-interactive bg-accent-500 px-5 py-2.5 text-sm font-semibold text-[var(--on-accent)]"
+              className="surface-interactive bg-accent-500 px-5 py-2.5 text-sm font-medium text-[var(--on-accent)]"
             >
               Go to swipe deck
             </Link>
-            <Link to="/watchlist" className="surface-interactive bg-[var(--bg-elevated)] px-5 py-2.5 text-sm font-semibold">
+            <Link to="/watchlist" className="surface-interactive bg-[var(--bg-elevated)] px-5 py-2.5 text-sm font-medium">
               My watchlist
             </Link>
           </div>
@@ -169,30 +169,32 @@ export function DashboardPage() {
             {actorMatch && (
               <Link
                 to={`/actors/${actorMatch.id}`}
-                className="surface-interactive mb-3 block bg-accent-500 px-4 py-2.5 text-sm font-semibold text-[var(--on-accent)]"
+                className="surface-interactive mb-3 block bg-accent-500 px-4 py-2.5 text-sm font-medium text-[var(--on-accent)]"
               >
                 View {actorMatch.name}'s profile →
               </Link>
             )}
             {browseLoading && browseResults.length === 0 ? (
-              <div className="flex justify-center py-8">
-                <div className="h-6 w-6 animate-spin rounded-full border-2 border-accent-500 border-t-transparent" />
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-6">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="skeleton aspect-[2/3] w-full" />
+                ))}
               </div>
             ) : browseResults.length === 0 ? (
-              <p className="surface p-4 text-sm font-semibold text-[var(--text-muted)]">No titles match.</p>
+              <p className="surface p-4 text-sm font-normal text-[var(--text-muted)]">No titles match.</p>
             ) : (
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-6">
                 {browseResults.map((t) => (
                   <Link
                     key={t.id}
                     to={`/titles/${t.id}`}
-                    className="surface-interactive block overflow-hidden bg-[var(--bg-elevated)]"
+                    className="poster-card group relative z-0 block transition-transform duration-200 ease-spring will-change-transform hover:z-20 hover:scale-105 focus-visible:z-20 focus-visible:scale-105"
                   >
                     <div className="aspect-[2/3] w-full overflow-hidden">
                       <PosterImage src={t.posterUrl} alt={t.name} className="h-full w-full" />
                     </div>
-                    <div className="border-t border-[var(--border)]/10 p-1.5">
-                      <p className="truncate text-xs font-semibold">{t.name}</p>
+                    <div className="border-t border-[var(--border)]/10 bg-[var(--bg-elevated)] p-1.5">
+                      <p className="truncate text-xs font-normal">{t.name}</p>
                     </div>
                   </Link>
                 ))}
@@ -223,14 +225,14 @@ export function DashboardPage() {
               <Link
                 key={t.id}
                 to={`/titles/${t.id}`}
-                className="surface-interactive group block w-28 shrink-0 overflow-hidden bg-[var(--bg-elevated)] sm:w-32"
+                className="poster-card group relative z-0 block w-28 shrink-0 transition-transform duration-200 ease-spring will-change-transform hover:z-20 hover:scale-105 focus-visible:z-20 focus-visible:scale-105 sm:w-32"
               >
                 <div className="aspect-[2/3] w-full overflow-hidden">
                   <PosterImage src={t.posterUrl} alt={t.name} className="h-full w-full" />
                 </div>
-                <div className="border-t border-[var(--border)]/10 p-1.5">
-                  <p className="truncate text-xs font-semibold">{t.name}</p>
-                  <p className="truncate text-[10px] font-bold text-[var(--text-accent)]">{t.platforms?.[0] ?? "—"}</p>
+                <div className="border-t border-[var(--border)]/10 bg-[var(--bg-elevated)] p-1.5">
+                  <p className="truncate text-xs font-normal">{t.name}</p>
+                  <p className="truncate text-[10px] font-medium text-[var(--text-accent)]">{t.platforms?.[0] ?? "—"}</p>
                 </div>
               </Link>
             ))}
@@ -240,9 +242,9 @@ export function DashboardPage() {
 
       {watchlist && watchlist.length === 0 && (
         <div className="surface mb-10 p-6 text-center">
-          <p className="font-semibold text-[var(--text-muted)]">
+          <p className="font-normal text-[var(--text-muted)]">
             Nothing in your watchlist yet.{" "}
-            <Link to="/swipe" className="font-bold text-[var(--text-accent)] underline">
+            <Link to="/swipe" className="font-medium text-[var(--text-accent)] underline">
               Go swipe
             </Link>{" "}
             to start saving titles.
@@ -270,11 +272,17 @@ export function DashboardPage() {
           return <TitleCarousel key={genre} heading={genre.replace(/-/g, " ")} titles={titles} />;
         })}
 
-      {!catalog && (
-        <div className="flex justify-center py-16">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-accent-500 border-t-transparent" />
-        </div>
-      )}
+      {!catalog &&
+        Array.from({ length: 2 }).map((_, row) => (
+          <div key={row} className="mb-10">
+            <div className="skeleton mb-3 h-6 w-40" />
+            <div className="flex gap-4 overflow-hidden">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="skeleton aspect-[2/3] w-40 shrink-0 sm:w-48" />
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

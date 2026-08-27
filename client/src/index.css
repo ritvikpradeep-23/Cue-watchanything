@@ -1,8 +1,18 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-display: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  /* Inter Tight — one grotesque for both display and body (loaded in index.html). A tight,
+   * slightly condensed grotesque in the same family as the faces real streaming platforms use;
+   * hierarchy comes from size/color, not from pairing two different typefaces. --font-display
+   * is kept as a separate variable (the h1-h3 rule below reads it) so a future display/body
+   * split is a one-line change, but the two deliberately resolve to the same face today. */
+  --font-sans: "Inter Tight", system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-display: "Inter Tight", system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  /* Slight-overshoot spring easing for hover/press motion on cards and carousels — registers
+   * as the `ease-spring` Tailwind utility too. Kept to short durations (180-220ms) wherever
+   * it's used so it reads crisp and physical, not bouncy or toy-like. */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
   /* deep crimson/red — the app's single accent color (this has changed twice now: purple ->
    * orange -> this; there is deliberately only ever ONE color variable scale for it, so a
@@ -17,20 +27,44 @@
   --color-accent-700: #841024;
   --color-accent-800: #5e0c1a;
   --color-accent-900: #3d0810;
+
+  /* ---------- functional status colors ----------
+   * Crimson stays the ONLY brand/decorative accent (CTAs, links, ratings-adjacent chrome).
+   * These three exist purely to keep swipe/rating semantics legible (like vs. pass vs.
+   * super-like need to read at a glance mid-swipe) — desaturated to sit quietly on
+   * near-black rather than reading as extra accent colors. "Danger" is deliberately NOT a
+   * fourth hue: destructive actions and error text reuse the accent scale directly
+   * (var(--text-accent) / --color-accent-600), since a warning-red next to a brand-red would
+   * be the exact "more than one accent" mistake this pass exists to remove. */
+  --color-success-400: #6fa876;
+  --color-success-500: #4c8a54;
+  --color-success-600: #3a6f42;
+
+  --color-gold-400: #c9a94f;
+  --color-gold-500: #b08d33;
+  --color-gold-600: #8f7128;
+
+  /* "pass"/dismiss is a neutral, not a color — a swipe-left isn't an error, it's just not a
+   * match, so it gets the same warm-neutral family as --border/--text-muted instead of a red
+   * or rose that would visually compete with the crimson accent. */
+  --color-dismiss-400: #a89da1;
+  --color-dismiss-500: #857a7e;
+  --color-dismiss-600: #665c60;
 }
 
 :root {
-  /* light mode: warm, slightly deeper cream than before for better separation from elevated
-   * panels, and darkened --text-muted a notch for real body-text contrast against it */
-  --bg: #f5efe3;
-  --bg-elevated: #fffdf9;
-  --bg-sunken: #f8dfe1;
+  /* light mode: a neutral warm-white, not the cream/pink pairing this used to be (#f5efe3 bg,
+   * #f8dfe1 sunken) — that pairing was itself residue from the abandoned retro/pop direction
+   * and read as a different product from dark mode. Still warm-toned (not cool grey), just
+   * restrained enough that both themes read as the same app. */
+  --bg: #f7f5f2;
+  --bg-elevated: #ffffff;
+  --bg-sunken: #ece8e3;
   --text: #1a1410;
   --text-muted: #5c5044;
   --border: #1a1410;
   --ink: #1a1410;
   --ring: var(--color-accent-600);
-  --shadow-offset: 5px;
   color-scheme: light;
   /* text color for anything sitting on a solid/striped accent background (buttons, badges,
    * the hero stripe). Accent-500/600 are dark-ish saturated reds in BOTH themes, so this is a
@@ -43,8 +77,24 @@
    * dark red on near-black in dark mode (~2.6:1, fails WCAG). This flips per theme instead of
    * being a hardcoded Tailwind class, unlike --on-accent which is intentionally fixed. */
   --text-accent: var(--color-accent-600);
+  /* same flip, same reason, applied to the three functional status colors — measured contrast
+   * against --bg-elevated: gold-400/dismiss-400 fall to ~2.3-2.6:1 on white (fails even the
+   * 3:1 large-text floor), success-600 falls to ~3.0:1 on near-black (fails the 4.5:1 small-text
+   * floor). The darker/600 shade for light mode, lighter/400 for dark, exactly mirrors
+   * --text-accent above. */
+  --text-success: var(--color-success-600);
+  --text-gold: var(--color-gold-600);
+  --text-dismiss: var(--color-dismiss-600);
 
-  /* ---------- spacing scale — 4/8/12/16/24/32/48px steps, single source of truth for any
+  /* ---------- page container widths — three steps, applied via plain Tailwind max-w-* utilities
+   * (not a CSS var; documented here so it stays one decision instead of a different arbitrary
+   * width per page):
+   *   max-w-2xl   narrow / single-column   forms, auth pages, profile, friends
+   *   max-w-4xl   standard content         most detail pages, landing sections, admin forms
+   *   max-w-6xl   wide / grid or data      person grids, browse, data-heavy pages
+   * max-w-[1800px] (carousel-heavy dashboard/title pages) is a known, deliberate exception —
+   * left outside this scale, not touched here.
+   * ---------- spacing scale — 4/8/12/16/24/32/48px steps, single source of truth for any
    * custom CSS (Tailwind utilities already follow this scale natively: p-1..p-12 etc.) ---------- */
   --space-1: 0.25rem; /* 4px */
   --space-2: 0.5rem; /* 8px */
@@ -68,10 +118,27 @@
   --ring: var(--color-accent-400);
   color-scheme: dark;
   --text-accent: var(--color-accent-400);
+  --text-success: var(--color-success-400);
+  --text-gold: var(--color-gold-400);
+  --text-dismiss: var(--color-dismiss-400);
 }
 
 * {
   border-color: var(--border);
+}
+
+/* Standard a11y reset: anyone with prefers-reduced-motion set gets every transition/animation
+ * (card hover lift, carousel reveal, spring easing, etc.) collapsed to effectively-instant
+ * rather than hunting down each transform individually — this is the one rule in the app that
+ * needs !important, since it has to win over every component's own transition declaration
+ * regardless of layer order. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Real streaming platforms run genuinely flat near-black in dark mode — no tinted glow behind
@@ -89,13 +156,21 @@ body {
 }
 
 /* ---------- type scale — restrained, content-forward sizing (no poster-style display type,
- * no forced uppercase) — documented here as the single source of truth to audit against:
+ * no forced uppercase) — the single source of truth to audit against:
  *   hero / landing headline   text-4xl sm:text-6xl font-semibold tracking-tight
  *   page title (h1)           text-3xl sm:text-4xl font-semibold
  *   section header (h2)       text-xl sm:text-2xl font-semibold tracking-tight
+ *   eyebrow / small label     text-sm font-medium tracking-wide text-[var(--text-muted)]
  *   card title (h3)           text-sm font-medium
  *   body text                 text-sm font-normal (font-medium for emphasis)
- *   caption / meta            text-xs text-[var(--text-muted)]
+ *   caption / meta            text-xs font-normal text-[var(--text-muted)]
+ *   primary CTA button        font-semibold (the ONLY non-heading use of semibold)
+ *   secondary button / link   font-medium
+ *
+ * Weight discipline: hierarchy comes from SIZE + COLOR, not weight. font-bold is not used
+ * anywhere in the app. This block used to be aspirational — the codebase violated it in ~93%
+ * of weight declarations (198 semibold / 80 bold / 0 normal in JSX), which is what made the UI
+ * read as loud rather than premium; it is now actually enforced.
  * ---------------------------------------------------------------------------------------- */
 h1, h2, h3 {
   font-family: var(--font-display);
@@ -103,20 +178,25 @@ h1, h2, h3 {
   letter-spacing: -0.01em;
 }
 
+/* was `color: #1a0e33` — a hardcoded dark purple, literal residue from the app's earlier
+ * purple accent era. Selection now stays within the accent scale in both themes. */
 ::selection {
   background: var(--color-accent-300);
-  color: #1a0e33;
+  color: var(--color-accent-900);
 }
 
+/* Full color always — real streaming platforms never desaturate cover art, it IS the product.
+ * (Used to force grayscale-until-hover/focus; removed per the redesign pass — hover/elevation
+ * feedback now comes from .poster-card's scale + z-index instead, not a color change.) The
+ * `active` modifier survives as a small brightness lift, repurposed for the one place this
+ * component already needed a "highlighted" state: SwipeCard's in-progress drag. */
 .poster-image {
-  filter: grayscale(100%) brightness(0.85);
-  transition: filter 0.35s ease, transform 0.35s ease;
+  filter: brightness(1);
+  transition: filter 0.2s ease, transform 0.35s ease;
 }
 
-.poster-image:hover,
-.poster-image:focus-visible,
 .poster-image.poster-image--active {
-  filter: grayscale(0%) brightness(1);
+  filter: brightness(1.08);
 }
 
 /* Every text input/textarea/select in the app pairs `outline-none` with the pop-styled
@@ -148,6 +228,23 @@ select:focus-visible {
   animation: quiz-question-in 0.18s ease-out;
 }
 
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Placeholder shape for carousel/grid content that's still loading — sized and positioned by
+ * the caller to match the real content's layout (a poster tile, a grid cell), so the page
+ * doesn't jump once data arrives, unlike a centered spinner that reveals nothing about what's
+ * coming. Already covered by the prefers-reduced-motion rule above (animation-duration is
+ * forced to ~0), so no separate opt-out needed here. */
+.skeleton {
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--bg-sunken) 25%, var(--bg-elevated) 50%, var(--bg-sunken) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
 /* ---------- design system ----------
  * In @layer components: `@import "tailwindcss"` puts Tailwind's own utilities in a later,
  * higher-priority layer than any @layer you declare, so a plain (unlayered) CSS class here
@@ -165,18 +262,23 @@ select:focus-visible {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24);
 }
 
-/* interactive version — subtle lift + shadow on hover/focus instead of a hard offset shadow */
+/* interactive version — subtle lift + shadow on hover/focus instead of a hard offset shadow.
+ * The lift itself uses --ease-spring (a slight overshoot) so it reads as a physical nudge;
+ * box-shadow/border-color stay on a plain ease — a spring curve on color/opacity properties
+ * doesn't read as "overshoot," it reads as a flicker, so only the transform gets it. */
 .surface-interactive {
   border-radius: 8px;
   border: 1px solid color-mix(in srgb, var(--border) 12%, transparent);
   background: var(--bg-elevated);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: transform 0.2s var(--ease-spring), box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .surface-interactive:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.32);
+  /* tinted, not flat black — carries a hint of the accent's dark end so the shadow feels like
+   * it belongs to this palette rather than a generic UI-kit shadow. */
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--color-accent-900) 15%, rgba(0, 0, 0, 0.32));
   border-color: color-mix(in srgb, var(--border) 24%, transparent);
 }
 
@@ -185,6 +287,23 @@ select:focus-visible {
 }
 
 .surface-interactive:focus-visible {
+  outline: 2px solid var(--color-accent-500);
+  outline-offset: 2px;
+}
+
+/* Poster/photo grid tiles — the artwork itself IS the card. No border, no drop shadow (a
+ * black shadow barely reads against a near-black background anyway, and a border around
+ * cover art is exactly the generic "border+shadow+background" card the redesign brief calls
+ * out). Elevation on hover comes from scale + z-index at each call site instead (see
+ * TitleCarousel), matching how real streaming-platform poster tiles behave — this class only
+ * owns the shared chrome (radius, clipping, a fallback tone visible while the image loads). */
+.poster-card {
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--bg-sunken);
+}
+
+.poster-card:focus-visible {
   outline: 2px solid var(--color-accent-500);
   outline-offset: 2px;
 }

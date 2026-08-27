@@ -28,11 +28,11 @@ export function SignupPage() {
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-sm flex-col justify-center px-4 py-16">
       <h1 className="mb-1 text-3xl font-semibold sm:text-4xl">Create your account</h1>
-      <p className="mb-6 text-sm font-bold text-[var(--text-muted)]">Takes a minute. No credit card, no third-party login.</p>
+      <p className="mb-6 text-sm font-medium text-[var(--text-muted)]">Takes a minute. No credit card, no third-party login.</p>
 
       <form onSubmit={handleSubmit} className="surface flex flex-col gap-4 bg-[var(--bg-elevated)] p-6">
         <div>
-          <label className="mb-1 block text-xs font-semibold">Email</label>
+          <label className="mb-1 block text-xs font-normal">Email</label>
           <input
             type="email"
             required
@@ -42,7 +42,7 @@ export function SignupPage() {
           />
         </div>
         <div>
-          <label className="mb-1 block text-xs font-semibold">Password</label>
+          <label className="mb-1 block text-xs font-normal">Password</label>
           <input
             type="password"
             required
@@ -54,7 +54,7 @@ export function SignupPage() {
           <p className="mt-1 text-xs text-[var(--text-muted)]">At least 8 characters.</p>
         </div>
 
-        {error && <p className="text-sm font-bold text-red-600">{error}</p>}
+        {error && <p className="text-sm font-medium text-[var(--text-accent)]">{error}</p>}
 
         <button
           type="submit"
@@ -67,7 +67,7 @@ export function SignupPage() {
 
       <p className="mt-6 text-center text-sm font-medium text-[var(--text-muted)]">
         Already have an account?{" "}
-        <Link to="/login" className="font-semibold text-[var(--text-accent)] hover:underline">
+        <Link to="/login" className="font-medium text-[var(--text-accent)] hover:underline">
           Log in
         </Link>
       </p>

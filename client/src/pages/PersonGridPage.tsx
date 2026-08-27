@@ -65,7 +65,7 @@ export function PersonGridPage({ kind }: PersonGridPageProps) {
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
       <h1 className="mb-1 text-3xl font-semibold sm:text-4xl">{label}</h1>
-      <p className="mb-6 text-sm font-bold text-[var(--text-muted)]">{total} {label.toLowerCase()}</p>
+      <p className="mb-6 text-sm font-medium text-[var(--text-muted)]">{total} {label.toLowerCase()}</p>
 
       <div className="mb-3 flex flex-wrap gap-1.5">
         <button
@@ -114,11 +114,18 @@ export function PersonGridPage({ kind }: PersonGridPageProps) {
       )}
 
       {loading ? (
-        <div className="flex justify-center py-16">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent-500 border-t-transparent" />
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 md:grid-cols-6">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div key={i} className="poster-card">
+              <div className="skeleton aspect-square w-full rounded-none" />
+              <div className="border-t border-[var(--border)]/10 bg-[var(--bg-elevated)] p-2">
+                <div className="skeleton h-3 w-3/4" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : people.length === 0 ? (
-        <p className="surface p-4 text-sm font-semibold text-[var(--text-muted)]">
+        <p className="surface p-4 text-sm font-normal text-[var(--text-muted)]">
           No {label.toLowerCase()} match this filter.
         </p>
       ) : (
@@ -128,15 +135,15 @@ export function PersonGridPage({ kind }: PersonGridPageProps) {
               <Link
                 key={p.id}
                 to={`/${kind}s/${p.id}`}
-                className="surface-interactive block overflow-hidden bg-[var(--bg-elevated)]"
+                className="poster-card group relative z-0 block transition-transform duration-200 ease-spring will-change-transform hover:z-20 hover:scale-105 focus-visible:z-20 focus-visible:scale-105"
               >
                 <div className="aspect-square w-full overflow-hidden">
                   <PersonPhoto src={p.photoUrl} name={p.name} className="h-full w-full" />
                 </div>
-                <div className="border-t border-[var(--border)]/10 p-2">
-                  <p className="truncate text-xs font-semibold">{p.name}</p>
+                <div className="border-t border-[var(--border)]/10 bg-[var(--bg-elevated)] p-2">
+                  <p className="truncate text-xs font-normal">{p.name}</p>
                   {kind === "director" && p.knownForStyles && p.knownForStyles.length > 0 && (
-                    <p className="mt-0.5 truncate text-[10px] font-bold text-[var(--text-accent)]">
+                    <p className="mt-0.5 truncate text-[10px] font-medium text-[var(--text-accent)]">
                       {p.knownForStyles.slice(0, 2).map((s) => s.replace(/-/g, " ")).join(" · ")}
                     </p>
                   )}
@@ -149,7 +156,7 @@ export function PersonGridPage({ kind }: PersonGridPageProps) {
             <div className="mt-6 flex justify-center">
               <button
                 onClick={loadMore}
-                className="surface-interactive bg-[var(--bg-elevated)] px-5 py-2.5 text-sm font-semibold"
+                className="surface-interactive bg-[var(--bg-elevated)] px-5 py-2.5 text-sm font-medium"
               >
                 Load more
               </button>

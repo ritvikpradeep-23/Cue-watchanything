@@ -18,7 +18,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <div className="mx-auto flex max-w-6xl gap-8 px-4 py-8">
       <aside className="w-44 shrink-0">
-        <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">
+        <p className="mb-2 px-3 text-xs font-normal uppercase tracking-wide text-[var(--text-muted)]">
           Admin
         </p>
         <nav className="flex flex-col gap-1">

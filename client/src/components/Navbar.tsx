@@ -150,7 +150,7 @@ export function Navbar() {
                 </NavLink>
                 <Link
                   to="/signup"
-                  className="surface-interactive bg-accent-500 px-4 py-1.5 text-xs font-semibold text-[var(--on-accent)]"
+                  className="surface-interactive bg-accent-500 px-4 py-1.5 text-xs font-medium text-[var(--on-accent)]"
                 >
                   Get started
                 </Link>
@@ -219,7 +219,7 @@ export function Navbar() {
               <Link
                 to="/signup"
                 onClick={() => setOpen(false)}
-                className="surface-interactive bg-accent-500 px-3 py-2 text-center text-sm font-semibold text-[var(--on-accent)]"
+                className="surface-interactive bg-accent-500 px-3 py-2 text-center text-sm font-medium text-[var(--on-accent)]"
               >
                 Get started
               </Link>

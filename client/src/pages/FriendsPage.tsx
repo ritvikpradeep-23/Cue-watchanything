@@ -18,10 +18,10 @@ interface FriendsData {
 function UserRow({ u }: { u: PublicUser }) {
   return (
     <Link to={`/twins/${u.username}`} className="surface-interactive flex items-center gap-3 bg-[var(--bg-elevated)] p-3">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-accent-500 text-xs font-semibold text-[var(--on-accent)]">
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-accent-500 text-xs font-normal text-[var(--on-accent)]">
         {u.avatarUrl ? <img src={u.avatarUrl} alt="" className="h-full w-full object-cover" /> : u.username[0]?.toUpperCase()}
       </div>
-      <p className="text-sm font-bold">{u.username}</p>
+      <p className="text-sm font-medium">{u.username}</p>
     </Link>
   );
 }
@@ -63,17 +63,17 @@ function FriendsPageInner() {
           <div className="flex flex-col gap-2">
             {data.incomingRequests.map((r) => (
               <div key={r.id} className="surface flex items-center justify-between gap-3 bg-[var(--bg-elevated)] p-3">
-                <span className="text-sm font-bold">{r.user.username}</span>
+                <span className="text-sm font-medium">{r.user.username}</span>
                 <div className="flex gap-2">
                   <button
                     onClick={() => respond(r.user.id, true)}
-                    className="surface-interactive bg-accent-500 px-3 py-1.5 text-xs font-semibold text-[var(--on-accent)]"
+                    className="surface-interactive bg-accent-500 px-3 py-1.5 text-xs font-medium text-[var(--on-accent)]"
                   >
                     Accept
                   </button>
                   <button
                     onClick={() => respond(r.user.id, false)}
-                    className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-semibold"
+                    className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-medium"
                   >
                     Decline
                   </button>
@@ -90,12 +90,12 @@ function FriendsPageInner() {
           <div className="flex flex-col gap-2">
             {data.outgoingRequests.map((r) => (
               <div key={r.id} className="surface flex items-center justify-between gap-3 bg-[var(--bg-elevated)] p-3">
-                <span className="text-sm font-bold">{r.user.username}</span>
+                <span className="text-sm font-medium">{r.user.username}</span>
                 <div className="flex items-center gap-2">
                   <span className="chip bg-[var(--bg-sunken)] px-2 py-1 text-[10px]">Pending</span>
                   <button
                     onClick={() => cancelRequest(r.user.id)}
-                    className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-semibold"
+                    className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-medium"
                   >
                     Cancel
                   </button>
@@ -110,9 +110,9 @@ function FriendsPageInner() {
         Your friends {data.friends.length > 0 && `(${data.friends.length})`}
       </h2>
       {data.friends.length === 0 ? (
-        <p className="surface p-4 text-sm font-semibold text-[var(--text-muted)]">
+        <p className="surface p-4 text-sm font-normal text-[var(--text-muted)]">
           No friends yet.{" "}
-          <Link to="/twins" className="font-bold text-[var(--text-accent)] underline">
+          <Link to="/twins" className="font-medium text-[var(--text-accent)] underline">
             Find taste twins
           </Link>{" "}
           to get started.

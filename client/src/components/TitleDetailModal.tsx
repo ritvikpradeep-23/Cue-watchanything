@@ -77,7 +77,7 @@ function InfoSection({ icon, label, children }: { icon: React.ReactNode; label: 
     <div className="flex gap-2">
       <span className="mt-0.5 shrink-0 text-[var(--text-muted)]">{icon}</span>
       <div className="min-w-0">
-        <p className="text-xs font-bold tracking-wide text-[var(--text-muted)]">{label}</p>
+        <p className="text-xs font-medium tracking-wide text-[var(--text-muted)]">{label}</p>
         <div className="mt-0.5 text-sm font-medium">{children}</div>
       </div>
     </div>
@@ -147,7 +147,7 @@ export function TitleDetailModal({ titleId, onClose }: TitleDetailModalProps) {
               >
                 {title.name}
               </Link>
-              <p className="mt-1 text-sm font-bold text-[var(--text-muted)]">
+              <p className="mt-1 text-sm font-medium text-[var(--text-muted)]">
                 {title.releaseYear} · {title.type.toUpperCase()}
               </p>
 
@@ -194,7 +194,7 @@ export function TitleDetailModal({ titleId, onClose }: TitleDetailModalProps) {
               <Link
                 to={`/titles/${title.id}`}
                 onClick={onClose}
-                className="surface-interactive mt-5 inline-block bg-accent-500 px-4 py-2 text-sm font-semibold text-[var(--on-accent)]"
+                className="surface-interactive mt-5 inline-block bg-accent-500 px-4 py-2 text-sm font-medium text-[var(--on-accent)]"
               >
                 Full details, ratings & reviews →
               </Link>

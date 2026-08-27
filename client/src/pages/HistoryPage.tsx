@@ -49,12 +49,12 @@ export function HistoryPage() {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-semibold sm:text-4xl">Watched history</h1>
-          <p className="mt-1 text-sm font-bold text-[var(--text-muted)]">Rate what you've finished, and get 3 picks for what's next.</p>
+          <p className="mt-1 text-sm font-medium text-[var(--text-muted)]">Rate what you've finished, and get 3 picks for what's next.</p>
         </div>
         {items.length > 0 && (
           <Link
             to={`/next-show/${items[0].id}`}
-            className="surface-interactive bg-accent-500 px-4 py-2.5 text-sm font-semibold text-[var(--on-accent)]"
+            className="surface-interactive bg-accent-500 px-4 py-2.5 text-sm font-medium text-[var(--on-accent)]"
           >
             Pick next show
           </Link>
@@ -62,9 +62,9 @@ export function HistoryPage() {
       </div>
 
       {items.length === 0 ? (
-        <div className="surface p-10 text-center font-semibold text-[var(--text-muted)]">
+        <div className="surface p-10 text-center font-normal text-[var(--text-muted)]">
           Nothing marked watched yet. Mark something from your{" "}
-          <button onClick={() => navigate("/watchlist")} className="font-semibold text-[var(--text-accent)] hover:underline">
+          <button onClick={() => navigate("/watchlist")} className="font-medium text-[var(--text-accent)] hover:underline">
             watchlist
           </button>
           .
@@ -80,10 +80,10 @@ export function HistoryPage() {
                 </Link>
                 <div className="flex-1">
                   <div className="flex items-center justify-between gap-2">
-                    <Link to={`/titles/${item.id}`} className="font-semibold hover:text-[var(--text-accent)]">
+                    <Link to={`/titles/${item.id}`} className="font-medium hover:text-[var(--text-accent)]">
                       {item.name}
                     </Link>
-                    <Link to={`/next-show/${item.id}`} className="text-xs font-bold text-[var(--text-accent)] hover:underline">
+                    <Link to={`/next-show/${item.id}`} className="text-xs font-medium text-[var(--text-accent)] hover:underline">
                       Pick next from this →
                     </Link>
                   </div>
@@ -119,7 +119,7 @@ export function HistoryPage() {
                   <button
                     onClick={() => submitRating(item.id)}
                     disabled={draft.rating < 1}
-                    className="surface-interactive mt-2 bg-accent-500 px-3 py-1.5 text-xs font-semibold text-[var(--on-accent)] disabled:opacity-40"
+                    className="surface-interactive mt-2 bg-accent-500 px-3 py-1.5 text-xs font-medium text-[var(--on-accent)] disabled:opacity-40"
                   >
                     {item.myRating ? "Update rating" : "Save rating"}
                   </button>

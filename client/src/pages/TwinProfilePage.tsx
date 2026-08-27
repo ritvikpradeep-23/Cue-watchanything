@@ -74,7 +74,7 @@ function TwinProfilePageInner() {
   if (notFound) {
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center">
-        <p className="surface p-6 font-semibold text-[var(--text-muted)]">
+        <p className="surface p-6 font-normal text-[var(--text-muted)]">
           That user isn't available — they may not exist, or you may have blocked each other.
         </p>
       </div>
@@ -101,7 +101,7 @@ function TwinProfilePageInner() {
         </div>
         <div>
           <h1 className="text-2xl font-semibold">{profile.user.username}</h1>
-          <p className="text-xs font-bold text-[var(--text-muted)]">
+          <p className="text-xs font-medium text-[var(--text-muted)]">
             Joined {new Date(profile.user.createdAt).toLocaleDateString()}
             {!profile.isSelf && ` · ${Math.round(profile.similarity * 100)}% match`}
           </p>
@@ -113,40 +113,40 @@ function TwinProfilePageInner() {
           {profile.canChat && (
             <Link
               to={`/chat/${profile.user.id}`}
-              className="surface-interactive bg-accent-500 px-4 py-2 text-sm font-semibold text-[var(--on-accent)]"
+              className="surface-interactive bg-accent-500 px-4 py-2 text-sm font-medium text-[var(--on-accent)]"
             >
               Message
             </Link>
           )}
           {!profile.isFriend && !profile.pendingOutgoingRequest && (
-            <button onClick={sendFriendRequest} className="surface-interactive bg-[var(--bg-elevated)] px-4 py-2 text-sm font-semibold">
+            <button onClick={sendFriendRequest} className="surface-interactive bg-[var(--bg-elevated)] px-4 py-2 text-sm font-medium">
               Add friend
             </button>
           )}
           {!profile.isFriend && profile.pendingOutgoingRequest && (
-            <button onClick={cancelFriendRequest} className="surface-interactive bg-[var(--bg-elevated)] px-4 py-2 text-sm font-semibold">
+            <button onClick={cancelFriendRequest} className="surface-interactive bg-[var(--bg-elevated)] px-4 py-2 text-sm font-medium">
               Cancel friend request
             </button>
           )}
           {profile.canChat && (
-            <button onClick={startWatchTogether} className="surface-interactive bg-[var(--bg-elevated)] px-4 py-2 text-sm font-semibold">
+            <button onClick={startWatchTogether} className="surface-interactive bg-[var(--bg-elevated)] px-4 py-2 text-sm font-medium">
               Watch together
             </button>
           )}
           <button
             onClick={() => setConfirmingReport(true)}
-            className="surface-interactive bg-[var(--bg-elevated)] px-4 py-2 text-sm font-semibold text-red-600"
+            className="surface-interactive bg-[var(--bg-elevated)] px-4 py-2 text-sm font-medium text-[var(--text-accent)]"
           >
             Report
           </button>
         </div>
       )}
 
-      {status && <p className="mb-4 text-sm font-bold text-[var(--text-accent)]">{status}</p>}
+      {status && <p className="mb-4 text-sm font-medium text-[var(--text-accent)]">{status}</p>}
 
       {confirmingReport && (
         <div className="surface mb-6 flex flex-col gap-3 bg-[var(--bg-elevated)] p-4">
-          <p className="text-sm font-semibold">Reporting blocks this user for you and queues it for admin review.</p>
+          <p className="text-sm font-normal">Reporting blocks this user for you and queues it for admin review.</p>
           <textarea
             value={reportReason}
             onChange={(e) => setReportReason(e.target.value)}
@@ -158,13 +158,13 @@ function TwinProfilePageInner() {
             <button
               onClick={submitReport}
               disabled={!reportReason.trim()}
-              className="surface-interactive bg-red-600 px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+              className="surface-interactive bg-accent-600 px-3 py-1.5 text-xs font-medium text-[var(--on-accent)] disabled:opacity-50"
             >
               Submit report
             </button>
             <button
               onClick={() => setConfirmingReport(false)}
-              className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-semibold"
+              className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-medium"
             >
               Cancel
             </button>
@@ -173,7 +173,7 @@ function TwinProfilePageInner() {
       )}
 
       <div className="surface mb-6 bg-[var(--bg-elevated)] p-5">
-        <h2 className="mb-3 text-sm font-semibold tracking-wide">Taste profile</h2>
+        <h2 className="mb-3 text-sm font-medium tracking-wide">Taste profile</h2>
         {profile.topTags.length === 0 ? (
           <p className="text-sm text-[var(--text-muted)]">No taste profile yet.</p>
         ) : (
@@ -189,10 +189,10 @@ function TwinProfilePageInner() {
 
       {(profile.isFriend || profile.isSelf) && profile.watchlist.length > 0 && (
         <div className="surface mb-6 bg-[var(--bg-elevated)] p-5">
-          <h2 className="mb-3 text-sm font-semibold tracking-wide">Watchlist</h2>
+          <h2 className="mb-3 text-sm font-medium tracking-wide">Watchlist</h2>
           <div className="flex flex-wrap gap-2">
             {profile.watchlist.map((t) => (
-              <Link key={t.id} to={`/titles/${t.id}`} className="text-xs font-semibold text-[var(--text-accent)] hover:underline">
+              <Link key={t.id} to={`/titles/${t.id}`} className="text-xs font-normal text-[var(--text-accent)] hover:underline">
                 {t.name}
               </Link>
             ))}
@@ -201,14 +201,14 @@ function TwinProfilePageInner() {
       )}
 
       <div className="surface bg-[var(--bg-elevated)] p-5">
-        <h2 className="mb-3 text-sm font-semibold tracking-wide">Ratings & reviews</h2>
+        <h2 className="mb-3 text-sm font-medium tracking-wide">Ratings & reviews</h2>
         {profile.ratings.length === 0 ? (
           <p className="text-sm text-[var(--text-muted)]">No ratings yet.</p>
         ) : (
           <div className="flex flex-col gap-2">
             {profile.ratings.map((r) => (
               <div key={r.titleId} className="text-sm">
-                <span className="font-bold text-[var(--text-accent)]">{"★".repeat(r.rating)}</span> {r.titleName}
+                <span className="font-medium text-[var(--text-accent)]">{"★".repeat(r.rating)}</span> {r.titleName}
                 {r.comment && <p className="mt-0.5 text-[var(--text-muted)]">{r.comment}</p>}
               </div>
             ))}

@@ -102,7 +102,7 @@ export function TitleDetailPage() {
 
         <div>
           <h1 className="text-3xl font-semibold sm:text-4xl">{title.name}</h1>
-          <p className="mt-1 text-sm font-bold text-[var(--text-muted)]">
+          <p className="mt-1 text-sm font-medium text-[var(--text-muted)]">
             {title.releaseYear} · {title.type.toUpperCase()}
             {title.seasons ? ` · ${title.seasons} season${title.seasons > 1 ? "s" : ""}` : ""}
             {title.episodes ? ` · ${title.episodes} episodes` : ""}
@@ -119,7 +119,7 @@ export function TitleDetailPage() {
 
           {tagProfile && Object.keys(tagProfile).length > 0 && (
             <div className="surface mt-4 flex flex-col items-center gap-1 bg-[var(--bg-elevated)] p-4 sm:w-fit">
-              <p className="text-xs font-bold tracking-wide text-[var(--text-muted)]">Why this matches you</p>
+              <p className="text-xs font-medium tracking-wide text-[var(--text-muted)]">Why this matches you</p>
               <TasteRadarChart userProfile={tagProfile} tags={title.tags as any} size={200} />
             </div>
           )}
@@ -145,7 +145,7 @@ export function TitleDetailPage() {
           <div className="mt-4 flex items-center gap-2 text-sm">
             <span className="font-semibold">Community rating:</span>
             {ratingSummary?.average ? (
-              <span className="font-bold">
+              <span className="font-medium">
                 ★ {ratingSummary.average.toFixed(1)} ({ratingSummary.count})
               </span>
             ) : (
@@ -157,19 +157,19 @@ export function TitleDetailPage() {
             <div className="mt-6 flex flex-wrap gap-3">
               <button
                 onClick={() => handleAction("like")}
-                className="surface-interactive bg-accent-500 px-4 py-2.5 text-sm font-semibold text-[var(--on-accent)]"
+                className="surface-interactive bg-accent-500 px-4 py-2.5 text-sm font-medium text-[var(--on-accent)]"
               >
                 Add to watchlist
               </button>
               <button
                 onClick={() => handleAction("super_like")}
-                className="surface-interactive bg-amber-400 px-4 py-2.5 text-sm font-semibold text-[var(--ink)]"
+                className="surface-interactive bg-gold-400 px-4 py-2.5 text-sm font-medium text-[var(--ink)]"
               >
                 ★ Super-like
               </button>
               <button
                 onClick={() => handleAction("pass")}
-                className="surface-interactive bg-[var(--bg-elevated)] px-4 py-2.5 text-sm font-semibold"
+                className="surface-interactive bg-[var(--bg-elevated)] px-4 py-2.5 text-sm font-medium"
               >
                 Not interested
               </button>
@@ -177,25 +177,25 @@ export function TitleDetailPage() {
           )}
           {confirmingRegret && (
             <div className="surface mt-3 flex flex-wrap items-center gap-3 bg-[var(--bg-elevated)] p-3">
-              <p className="text-sm font-semibold">
+              <p className="text-sm font-normal">
                 Heads up — this is tagged {conflictingGenres.join(", ")}, which you said you'd rather
                 avoid. Still want to super-like it?
               </p>
               <button
                 onClick={() => handleAction("super_like")}
-                className="surface-interactive bg-accent-500 px-3 py-1.5 text-xs font-semibold text-[var(--on-accent)]"
+                className="surface-interactive bg-accent-500 px-3 py-1.5 text-xs font-medium text-[var(--on-accent)]"
               >
                 Yes, super-like it
               </button>
               <button
                 onClick={() => setConfirmingRegret(false)}
-                className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-semibold"
+                className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-medium"
               >
                 Cancel
               </button>
             </div>
           )}
-          {status && <p className="mt-2 text-sm font-bold text-[var(--text-accent)]">{status}</p>}
+          {status && <p className="mt-2 text-sm font-medium text-[var(--text-accent)]">{status}</p>}
         </div>
       </div>
 
@@ -224,7 +224,7 @@ export function TitleDetailPage() {
           <button
             onClick={handleRate}
             disabled={myRating < 1}
-            className="surface-interactive mt-3 bg-accent-500 px-4 py-2.5 text-sm font-semibold text-[var(--on-accent)] disabled:opacity-40"
+            className="surface-interactive mt-3 bg-accent-500 px-4 py-2.5 text-sm font-medium text-[var(--on-accent)] disabled:opacity-40"
           >
             Submit rating
           </button>
@@ -255,7 +255,7 @@ export function TitleDetailPage() {
       {similar.length > 0 && <TitleCarousel heading="More like this" titles={similar} />}
 
       <div className="mx-auto max-w-4xl">
-      <Link to="/swipe" className="mt-10 inline-block text-sm font-bold text-[var(--text-accent)] hover:underline">
+      <Link to="/swipe" className="mt-10 inline-block text-sm font-medium text-[var(--text-accent)] hover:underline">
         ← Back to swipe deck
       </Link>
       </div>

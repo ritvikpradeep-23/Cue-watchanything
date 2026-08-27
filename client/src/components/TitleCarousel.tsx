@@ -55,7 +55,7 @@ function CarouselCard({ title }: { title: DeckTitle }) {
   return (
     <Link
       to={`/titles/${title.id}`}
-      className="surface group relative z-0 block w-40 shrink-0 overflow-hidden transition-transform duration-200 ease-out will-change-transform hover:z-20 hover:scale-105 focus-visible:z-20 focus-visible:scale-105 sm:w-48"
+      className="poster-card group relative z-0 block w-40 shrink-0 transition-transform duration-200 ease-spring will-change-transform hover:z-20 hover:scale-105 focus-visible:z-20 focus-visible:scale-105 sm:w-48"
     >
       <div className="relative aspect-[2/3] w-full overflow-hidden">
         <PosterImage src={title.posterUrl} alt={title.name} className="h-full w-full" />
@@ -67,7 +67,7 @@ function CarouselCard({ title }: { title: DeckTitle }) {
 
         {/* Netflix-style hover reveal — slides up over the bottom of the poster, staying within
          * the card's own footprint so it's never clipped by the row's horizontal-scroll overflow. */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 translate-y-full bg-gradient-to-t from-black/95 via-black/80 to-transparent p-2.5 pt-8 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:pointer-events-auto group-focus-visible:translate-y-0 group-focus-visible:opacity-100">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 translate-y-full bg-gradient-to-t from-black/95 via-black/80 to-transparent p-2.5 pt-8 opacity-0 transition-all duration-200 ease-spring group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:pointer-events-auto group-focus-visible:translate-y-0 group-focus-visible:opacity-100">
           <p className="truncate text-sm font-medium text-white">{title.name}</p>
           <div className="mt-1 flex flex-wrap gap-1">
             {title.tags.genre.slice(0, 2).map((g) => (

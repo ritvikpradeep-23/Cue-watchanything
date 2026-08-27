@@ -107,7 +107,7 @@ export function ProfilePage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-10">
       <h1 className="mb-1 text-3xl font-semibold sm:text-4xl">Profile</h1>
-      <p className="mb-8 text-sm font-bold text-[var(--text-muted)]">{data.user.email}</p>
+      <p className="mb-8 text-sm font-medium text-[var(--text-muted)]">{data.user.email}</p>
 
       <div className="surface bg-[var(--bg-elevated)] p-6">
         <h2 className="mb-3 text-xl font-semibold tracking-tight sm:text-2xl">Your taste profile</h2>
@@ -117,7 +117,7 @@ export function ProfilePage() {
           <div className="flex flex-col gap-2">
             {data.topTags.map((t) => (
               <div key={t.tag} className="flex items-center gap-3">
-                <span className="w-32 shrink-0 text-sm font-bold">{t.tag.replace(/-/g, " ")}</span>
+                <span className="w-32 shrink-0 text-sm font-medium">{t.tag.replace(/-/g, " ")}</span>
                 <div className="h-3 flex-1 overflow-hidden rounded-full border-2 border-[var(--ink)] bg-[var(--bg-sunken)]">
                   <div
                     className="h-full bg-accent-500"
@@ -166,7 +166,7 @@ export function ProfilePage() {
           />
           <button
             onClick={saveSocialSettings}
-            className="surface-interactive bg-accent-500 px-4 py-2 text-sm font-semibold text-[var(--on-accent)]"
+            className="surface-interactive bg-accent-500 px-4 py-2 text-sm font-medium text-[var(--on-accent)]"
           >
             Save
           </button>
@@ -181,15 +181,15 @@ export function ProfilePage() {
             </button>
           )}
         </div>
-        {socialError && <p className="mt-2 text-sm font-bold text-red-600">{socialError}</p>}
-        {socialSaved && <p className="mt-2 text-sm font-bold text-[var(--text-accent)]">Saved</p>}
+        {socialError && <p className="mt-2 text-sm font-medium text-[var(--text-accent)]">{socialError}</p>}
+        {socialSaved && <p className="mt-2 text-sm font-medium text-[var(--text-accent)]">Saved</p>}
       </div>
 
       <div className="surface mt-6 bg-[var(--bg-elevated)] p-6">
         <h2 className="mb-1 text-xl font-semibold tracking-tight sm:text-2xl">Change password</h2>
         <p className="mb-4 text-sm font-medium text-[var(--text-muted)]">
           Enter your current password and a new one. Locked out instead?{" "}
-          <Link to="/forgot-password" className="font-semibold text-[var(--text-accent)] hover:underline">
+          <Link to="/forgot-password" className="font-medium text-[var(--text-accent)] hover:underline">
             Use the email reset link
           </Link>{" "}
           from the login page.
@@ -221,13 +221,13 @@ export function ProfilePage() {
           <button
             onClick={handleChangePassword}
             disabled={changingPassword || !currentPassword || newPassword.length < 8}
-            className="surface-interactive self-start bg-accent-500 px-4 py-2 text-sm font-semibold text-[var(--on-accent)] disabled:opacity-50"
+            className="surface-interactive self-start bg-accent-500 px-4 py-2 text-sm font-medium text-[var(--on-accent)] disabled:opacity-50"
           >
             {changingPassword ? "Updating…" : "Update password"}
           </button>
         </div>
-        {passwordError && <p className="mt-2 text-sm font-bold text-red-600">{passwordError}</p>}
-        {passwordSaved && <p className="mt-2 text-sm font-bold text-[var(--text-accent)]">Password updated</p>}
+        {passwordError && <p className="mt-2 text-sm font-medium text-[var(--text-accent)]">{passwordError}</p>}
+        {passwordSaved && <p className="mt-2 text-sm font-medium text-[var(--text-accent)]">Password updated</p>}
       </div>
 
       {blocked && blocked.length > 0 && (
@@ -236,10 +236,10 @@ export function ProfilePage() {
           <div className="flex flex-col gap-2">
             {blocked.map((b) => (
               <div key={b.id} className="flex items-center justify-between text-sm">
-                <span className="font-bold">{b.username ?? "(no username)"}</span>
+                <span className="font-medium">{b.username ?? "(no username)"}</span>
                 <button
                   onClick={() => unblock(b.id)}
-                  className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1 text-xs font-semibold"
+                  className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1 text-xs font-medium"
                 >
                   Unblock
                 </button>
@@ -262,18 +262,18 @@ export function ProfilePage() {
           </p>
         ) : confirmingReset ? (
           <div className="flex flex-wrap items-center gap-3">
-            <p className="text-sm font-bold">Are you sure? This can't be undone.</p>
+            <p className="text-sm font-medium">Are you sure? This can't be undone.</p>
             <button
               onClick={handleReset}
               disabled={resetting}
-              className="surface-interactive bg-accent-500 px-4 py-2 text-sm font-semibold text-[var(--on-accent)] disabled:opacity-50"
+              className="surface-interactive bg-accent-500 px-4 py-2 text-sm font-medium text-[var(--on-accent)] disabled:opacity-50"
             >
               {resetting ? "Resetting…" : "Yes, reset it"}
             </button>
             <button
               onClick={() => setConfirmingReset(false)}
               disabled={resetting}
-              className="surface-interactive bg-[var(--bg-elevated)] px-4 py-2 text-sm font-semibold"
+              className="surface-interactive bg-[var(--bg-elevated)] px-4 py-2 text-sm font-medium"
             >
               Cancel
             </button>
@@ -281,7 +281,7 @@ export function ProfilePage() {
         ) : (
           <button
             onClick={() => setConfirmingReset(true)}
-            className="surface-interactive bg-[var(--bg-elevated)] px-4 py-2 text-sm font-semibold"
+            className="surface-interactive bg-[var(--bg-elevated)] px-4 py-2 text-sm font-medium"
           >
             Reset watch history
           </button>

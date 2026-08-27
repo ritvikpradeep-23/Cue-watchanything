@@ -18,7 +18,7 @@ export function PersonPhoto({ src, name, className = "" }: PersonPhotoProps) {
       .toUpperCase();
     return (
       <div
-        className={`flex items-center justify-center bg-[var(--bg-sunken)] text-2xl font-semibold text-[var(--text-muted)] ${className}`}
+        className={`flex items-center justify-center bg-[var(--bg-sunken)] text-2xl font-normal text-[var(--text-muted)] ${className}`}
         aria-label={`${name} (photo not yet available)`}
       >
         {initials || "?"}

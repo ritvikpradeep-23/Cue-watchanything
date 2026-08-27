@@ -119,38 +119,40 @@ export function SwipeCard({ title, stackIndex, onSwipe, onOpenDetail }: SwipeCar
             src={title.posterUrl}
             alt={title.name}
             active={drag.active || !!exiting}
-            className="poster-image--active h-full w-full"
+            className="h-full w-full"
           />
 
           {isFront && (
             <>
               <div
-                className="absolute inset-0 bg-emerald-500/30"
+                className="absolute inset-0 bg-success-500/30"
                 style={{ opacity: likeOpacity }}
               />
               <div
-                className="absolute inset-0 bg-rose-500/30"
+                className="absolute inset-0 bg-dismiss-500/30"
                 style={{ opacity: passOpacity }}
               />
               <div
-                className="absolute inset-0 bg-amber-400/30"
+                className="absolute inset-0 bg-gold-400/30"
                 style={{ opacity: superOpacity }}
               />
 
+              {/* Stamps: border-2 (was border-4) and a contained rotation, not the full pop-era
+               * rubber-stamp treatment — reads as a restrained status label instead of a sticker. */}
               <div
-                className="absolute left-6 top-8 -rotate-12 rounded-lg border-4 border-emerald-400 px-3 py-1 text-2xl font-semibold tracking-widest text-emerald-400"
+                className="absolute left-6 top-8 -rotate-6 rounded-lg border-2 border-[var(--text-success)] px-3 py-1 text-2xl font-semibold tracking-wide text-[var(--text-success)]"
                 style={{ opacity: likeOpacity }}
               >
                 LIKED
               </div>
               <div
-                className="absolute right-6 top-8 rotate-12 rounded-lg border-4 border-rose-400 px-3 py-1 text-2xl font-semibold tracking-widest text-rose-400"
+                className="absolute right-6 top-8 rotate-6 rounded-lg border-2 border-[var(--text-dismiss)] px-3 py-1 text-2xl font-semibold tracking-wide text-[var(--text-dismiss)]"
                 style={{ opacity: passOpacity }}
               >
                 PASS
               </div>
               <div
-                className="absolute left-1/2 top-8 -translate-x-1/2 rounded-lg border-4 border-amber-300 px-3 py-1 text-2xl font-semibold tracking-widest text-amber-300"
+                className="absolute left-1/2 top-8 -translate-x-1/2 rounded-lg border-2 border-[var(--text-gold)] px-3 py-1 text-2xl font-semibold tracking-wide text-[var(--text-gold)]"
                 style={{ opacity: superOpacity }}
               >
                 ★ SUPER

@@ -125,7 +125,7 @@ export function NotSureFab() {
 
             {mode === "error" && (
               <div className="p-10 text-center">
-                <p className="font-bold text-red-600">{error}</p>
+                <p className="font-medium text-[var(--text-accent)]">{error}</p>
               </div>
             )}
 
@@ -176,14 +176,14 @@ export function NotSureFab() {
                         <Link
                           to={`/titles/${t.id}`}
                           onClick={() => setOpen(false)}
-                          className="line-clamp-2 text-xs font-semibold hover:text-[var(--text-accent)]"
+                          className="line-clamp-2 text-xs font-normal hover:text-[var(--text-accent)]"
                         >
                           {t.name}
                         </Link>
                         {result.swappable && (
                           <button
                             onClick={() => handleSwap(t.id)}
-                            className="surface-interactive mt-2 w-full bg-[var(--bg-elevated)] px-2 py-1 text-[10px] font-bold"
+                            className="surface-interactive mt-2 w-full bg-[var(--bg-elevated)] px-2 py-1 text-[10px] font-medium"
                           >
                             Swap
                           </button>

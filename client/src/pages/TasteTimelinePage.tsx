@@ -51,15 +51,15 @@ export function TasteTimelinePage() {
   const pathD = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10">
+    <div className="mx-auto max-w-6xl px-4 py-10">
       <h1 className="mb-1 text-3xl font-semibold sm:text-4xl">Taste Timeline</h1>
-      <p className="mb-8 text-sm font-bold text-[var(--text-muted)]">See where your taste has taken you.</p>
+      <p className="mb-8 text-sm font-medium text-[var(--text-muted)]">See where your taste has taken you.</p>
 
       {sessions.length === 0 ? (
         <div className="surface p-6 text-center">
-          <p className="font-semibold text-[var(--text-muted)]">
+          <p className="font-normal text-[var(--text-muted)]">
             No sessions yet.{" "}
-            <Link to="/quiz" className="font-bold text-[var(--text-accent)] underline">
+            <Link to="/quiz" className="font-medium text-[var(--text-accent)] underline">
               Take the quiz
             </Link>{" "}
             to start your journey.
@@ -91,7 +91,7 @@ export function TasteTimelinePage() {
                     className="surface absolute -translate-x-1/2 bg-[var(--bg-elevated)] p-2.5"
                     style={{ left: p.x, top: above ? p.y - CARD_ABOVE_OFFSET : p.y + CARD_BELOW_OFFSET, width: CARD_WIDTH }}
                   >
-                    <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wide text-[var(--text-muted)]">
+                    <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wide text-[var(--text-muted)]">
                       {p.kind === "onboarding" ? "Onboarding" : "Pick next show"} · {new Date(p.createdAt).toLocaleDateString()}
                     </p>
                     {p.milestoneTitles.length > 0 && (
@@ -117,7 +117,7 @@ export function TasteTimelinePage() {
         </div>
       )}
 
-      <Link to="/profile" className="mt-8 inline-block text-sm font-bold text-[var(--text-accent)] hover:underline">
+      <Link to="/profile" className="mt-8 inline-block text-sm font-medium text-[var(--text-accent)] hover:underline">
         ← Back to profile
       </Link>
     </div>

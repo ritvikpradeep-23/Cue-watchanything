@@ -45,7 +45,7 @@ function TitleCard({ title, onOpenDetail }: { title: DeckTitle; onOpenDetail: (i
   return (
     <button
       onClick={() => onOpenDetail(title.id)}
-      className="surface-interactive group relative block w-full overflow-hidden bg-[var(--bg-elevated)] text-left"
+      className="poster-card group relative z-0 block w-full text-left transition-transform duration-200 ease-spring will-change-transform hover:z-20 hover:scale-105 focus-visible:z-20 focus-visible:scale-105"
     >
       <div className="relative aspect-[2/3] w-full overflow-hidden">
         <PosterImage src={title.posterUrl} alt={title.name} className="h-full w-full" />
@@ -59,8 +59,8 @@ function TitleCard({ title, onOpenDetail }: { title: DeckTitle; onOpenDetail: (i
           {added ? "✓" : "+"}
         </button>
       </div>
-      <div className="border-t border-[var(--border)]/10 p-1.5">
-        <p className="truncate text-xs font-semibold">{title.name}</p>
+      <div className="border-t border-[var(--border)]/10 bg-[var(--bg-elevated)] p-1.5">
+        <p className="truncate text-xs font-normal">{title.name}</p>
       </div>
     </button>
   );
@@ -87,7 +87,7 @@ export function PersonDetailPage({ kind }: PersonDetailPageProps) {
   if (notFound) {
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center">
-        <p className="surface p-6 font-bold text-[var(--text-muted)]">
+        <p className="surface p-6 font-medium text-[var(--text-muted)]">
           {kind === "actor" ? "Actor" : "Director"} not found.
         </p>
       </div>
@@ -118,7 +118,7 @@ export function PersonDetailPage({ kind }: PersonDetailPageProps) {
             ))}
           </div>
           {person.knownForStyles && person.knownForStyles.length > 0 && (
-            <p className="mt-2 text-sm font-bold text-[var(--text-accent)]">
+            <p className="mt-2 text-sm font-medium text-[var(--text-accent)]">
               Known for: {person.knownForStyles.map((s) => s.replace(/-/g, " ")).join(", ")}
             </p>
           )}
@@ -151,7 +151,7 @@ export function PersonDetailPage({ kind }: PersonDetailPageProps) {
       )}
 
       {data.topHits.length === 0 && data.filmography.length === 0 ? (
-        <p className="surface p-4 text-sm font-semibold text-[var(--text-muted)]">
+        <p className="surface p-4 text-sm font-normal text-[var(--text-muted)]">
           No titles in this genre.
         </p>
       ) : (
@@ -182,7 +182,7 @@ export function PersonDetailPage({ kind }: PersonDetailPageProps) {
 
       <TitleDetailModal titleId={detailTitleId} onClose={() => setDetailTitleId(null)} />
 
-      <Link to={`/${kind}s`} className="mt-10 inline-block text-sm font-bold text-[var(--text-accent)] hover:underline">
+      <Link to={`/${kind}s`} className="mt-10 inline-block text-sm font-medium text-[var(--text-accent)] hover:underline">
         ← Back to {kind === "actor" ? "Actors" : "Directors"}
       </Link>
     </div>

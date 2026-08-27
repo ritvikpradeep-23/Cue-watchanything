@@ -15,7 +15,7 @@ function StatTile({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="surface bg-[var(--bg-elevated)] p-4 text-center">
       <p className="text-2xl font-semibold">{value}</p>
-      <p className="mt-1 text-xs font-bold tracking-wide text-[var(--text-muted)]">{label}</p>
+      <p className="mt-1 text-xs font-medium tracking-wide text-[var(--text-muted)]">{label}</p>
     </div>
   );
 }
@@ -23,14 +23,14 @@ function StatTile({ label, value }: { label: string; value: string | number }) {
 function RankedList({ title, items }: { title: string; items: { name: string; count: number }[] }) {
   return (
     <div className="surface bg-[var(--bg-elevated)] p-5">
-      <h3 className="mb-3 text-sm font-semibold tracking-wide">{title}</h3>
+      <h3 className="mb-3 text-sm font-medium tracking-wide">{title}</h3>
       {items.length === 0 ? (
         <p className="text-sm text-[var(--text-muted)]">Not enough activity yet.</p>
       ) : (
         <ol className="flex flex-col gap-2">
           {items.map((item, i) => (
             <li key={item.name + i} className="flex items-center justify-between text-sm">
-              <span className="font-bold">
+              <span className="font-medium">
                 {i + 1}. {item.name}
               </span>
               <span className="chip bg-accent-500 px-2 py-0.5 text-[10px] text-[var(--on-accent)]">{item.count}</span>
@@ -55,7 +55,7 @@ export function AdminDashboardPage() {
   if (error) {
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center">
-        <p className="surface p-6 font-bold text-red-600">{error}</p>
+        <p className="surface p-6 font-medium text-[var(--text-accent)]">{error}</p>
       </div>
     );
   }
@@ -74,7 +74,7 @@ export function AdminDashboardPage() {
   return (
     <div>
       <h1 className="mb-1 text-3xl font-semibold sm:text-4xl">Admin dashboard</h1>
-      <p className="mb-8 text-sm font-bold text-[var(--text-muted)]">Internal-only — not visible to regular users.</p>
+      <p className="mb-8 text-sm font-medium text-[var(--text-muted)]">Internal-only — not visible to regular users.</p>
 
       <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatTile label="Total users" value={stats.totalUsers} />
@@ -91,7 +91,7 @@ export function AdminDashboardPage() {
       </div>
 
       <div className="surface mb-8 bg-[var(--bg-elevated)] p-5">
-        <h3 className="mb-3 text-sm font-semibold tracking-wide">Signups (last 14 days with activity)</h3>
+        <h3 className="mb-3 text-sm font-medium tracking-wide">Signups (last 14 days with activity)</h3>
         {recentSignups.length === 0 ? (
           <p className="text-sm text-[var(--text-muted)]">No signups recorded yet.</p>
         ) : (
@@ -102,7 +102,7 @@ export function AdminDashboardPage() {
                   className="w-full rounded-t-md bg-accent-500"
                   style={{ height: `${Math.max(6, (d.count / maxSignups) * 80)}px` }}
                 />
-                <span className="text-[9px] font-bold text-[var(--text-muted)]">{d.day.slice(5)}</span>
+                <span className="text-[9px] font-medium text-[var(--text-muted)]">{d.day.slice(5)}</span>
               </div>
             ))}
           </div>

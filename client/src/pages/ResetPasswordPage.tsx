@@ -38,9 +38,9 @@ export function ResetPasswordPage() {
     return (
       <div className="mx-auto flex min-h-[70vh] max-w-sm flex-col justify-center px-4 py-16 text-center">
         <div className="surface bg-[var(--bg-elevated)] p-6">
-          <p className="text-sm font-semibold">
+          <p className="text-sm font-normal">
             This reset link is missing its token. Request a new one from the{" "}
-            <Link to="/forgot-password" className="font-semibold text-[var(--text-accent)] hover:underline">
+            <Link to="/forgot-password" className="font-medium text-[var(--text-accent)] hover:underline">
               forgot password
             </Link>{" "}
             page.
@@ -53,16 +53,16 @@ export function ResetPasswordPage() {
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-sm flex-col justify-center px-4 py-16">
       <h1 className="mb-1 text-3xl font-semibold sm:text-4xl">Set a new password</h1>
-      <p className="mb-6 text-sm font-bold text-[var(--text-muted)]">At least 8 characters.</p>
+      <p className="mb-6 text-sm font-medium text-[var(--text-muted)]">At least 8 characters.</p>
 
       {done ? (
         <div className="surface bg-[var(--bg-elevated)] p-6">
-          <p className="text-sm font-semibold">Password updated. Taking you to log in…</p>
+          <p className="text-sm font-normal">Password updated. Taking you to log in…</p>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="surface flex flex-col gap-4 bg-[var(--bg-elevated)] p-6">
           <div>
-            <label className="mb-1 block text-xs font-semibold">New password</label>
+            <label className="mb-1 block text-xs font-normal">New password</label>
             <input
               type="password"
               required
@@ -73,7 +73,7 @@ export function ResetPasswordPage() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-semibold">Confirm new password</label>
+            <label className="mb-1 block text-xs font-normal">Confirm new password</label>
             <input
               type="password"
               required
@@ -84,7 +84,7 @@ export function ResetPasswordPage() {
             />
           </div>
 
-          {error && <p className="text-sm font-bold text-red-600">{error}</p>}
+          {error && <p className="text-sm font-medium text-[var(--text-accent)]">{error}</p>}
 
           <button
             type="submit"

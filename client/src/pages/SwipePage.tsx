@@ -87,7 +87,7 @@ export function SwipePage() {
   if (error) {
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center">
-        <p className="text-red-500">{error}</p>
+        <p className="text-[var(--text-accent)]">{error}</p>
       </div>
     );
   }
@@ -103,10 +103,10 @@ export function SwipePage() {
   return (
     <div className="mx-auto flex max-w-md flex-col items-center px-4 py-10">
       <h1 className="mb-1 text-3xl font-semibold sm:text-4xl">Swipe deck</h1>
-      <p className="mb-1 text-sm font-bold text-[var(--text-muted)]">
+      <p className="mb-1 text-sm font-medium text-[var(--text-muted)]">
         {deck.length > 0 ? `${deck.length} left in this batch` : "You've been through the whole batch"}
       </p>
-      <p className="mb-4 text-xs font-semibold text-[var(--text-muted)]">
+      <p className="mb-4 text-xs font-normal text-[var(--text-muted)]">
         Drag the card, use the buttons below, or the arrow keys.
       </p>
 
@@ -123,7 +123,7 @@ export function SwipePage() {
       <div className="relative h-[520px] w-full">
         {deck.length === 0 ? (
           <div className="surface flex h-full flex-col items-center justify-center p-8 text-center">
-            <p className="mb-4 font-semibold text-[var(--text-muted)]">
+            <p className="mb-4 font-normal text-[var(--text-muted)]">
               That's everything scored highly for your taste profile right now.
             </p>
             <button
@@ -154,14 +154,14 @@ export function SwipePage() {
           <button
             onClick={() => handleSwipe("pass")}
             aria-label="Pass"
-            className="surface-interactive flex h-14 w-14 items-center justify-center rounded-full bg-[var(--bg-elevated)] text-2xl text-rose-500"
+            className="surface-interactive flex h-14 w-14 items-center justify-center rounded-full bg-[var(--bg-elevated)] text-2xl text-[var(--text-dismiss)]"
           >
             ✕
           </button>
           <button
             onClick={() => handleSwipe("super_like")}
             aria-label="Super like"
-            className="surface-interactive flex h-12 w-12 items-center justify-center rounded-full bg-[var(--bg-elevated)] text-xl text-amber-500"
+            className="surface-interactive flex h-12 w-12 items-center justify-center rounded-full bg-[var(--bg-elevated)] text-xl text-[var(--text-gold)]"
           >
             ★
           </button>
@@ -177,21 +177,21 @@ export function SwipePage() {
 
       {regretWarning && (
         <div className="surface fixed inset-x-4 bottom-6 z-50 mx-auto flex max-w-md flex-col gap-2 bg-[var(--bg-elevated)] p-4 sm:inset-x-auto">
-          <p className="text-sm font-semibold">
-            Heads up — <span className="font-bold">{regretWarning.titleName}</span> is tagged{" "}
+          <p className="text-sm font-normal">
+            Heads up — <span className="font-medium">{regretWarning.titleName}</span> is tagged{" "}
             {regretWarning.conflictingGenres.map((g) => g.replace(/-/g, " ")).join(", ")}, which you
             said you'd rather avoid. Still want to super-like it?
           </p>
           <div className="flex gap-2">
             <button
               onClick={undoRegretSuperLike}
-              className="surface-interactive bg-accent-500 px-3 py-1.5 text-xs font-semibold text-[var(--on-accent)]"
+              className="surface-interactive bg-accent-500 px-3 py-1.5 text-xs font-medium text-[var(--on-accent)]"
             >
               Undo super-like
             </button>
             <button
               onClick={() => setRegretWarning(null)}
-              className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-semibold"
+              className="surface-interactive bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-medium"
             >
               Keep it
             </button>

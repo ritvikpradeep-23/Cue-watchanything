@@ -70,7 +70,7 @@ export function NextShowPage() {
     return (
       <div className="mx-auto max-w-4xl px-4 py-10">
         <h1 className="mb-1 text-3xl font-semibold sm:text-4xl">Your next 3</h1>
-        <p className="mb-8 text-sm font-bold text-[var(--text-muted)]">
+        <p className="mb-8 text-sm font-medium text-[var(--text-muted)]">
           {result.swappable ? "Not feeling one? Swap it out." : "Locked in — no swapping this round."}
         </p>
 
@@ -81,7 +81,7 @@ export function NextShowPage() {
                 <PosterImage src={t.posterUrl} alt={t.name} active className="aspect-[2/3] w-full" />
               </Link>
               <div className="flex flex-1 flex-col border-t border-[var(--border)]/10 p-4">
-                <Link to={`/titles/${t.id}`} className="font-semibold hover:text-[var(--text-accent)]">
+                <Link to={`/titles/${t.id}`} className="font-medium hover:text-[var(--text-accent)]">
                   {t.name}
                 </Link>
                 <p
@@ -99,7 +99,7 @@ export function NextShowPage() {
                 {result.swappable && (
                   <button
                     onClick={() => handleSwap(t.id)}
-                    className="surface-interactive mt-3 bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-semibold"
+                    className="surface-interactive mt-3 bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-medium"
                   >
                     Swap this one
                   </button>
@@ -117,7 +117,7 @@ export function NextShowPage() {
   if (error) {
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center">
-        <p className="text-red-500">{error}</p>
+        <p className="text-[var(--text-accent)]">{error}</p>
       </div>
     );
   }

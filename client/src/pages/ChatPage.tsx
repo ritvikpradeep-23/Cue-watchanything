@@ -72,8 +72,12 @@ function ChatPageInner() {
             <div className="h-6 w-6 animate-spin rounded-full border-2 border-accent-500 border-t-transparent" />
           </div>
         ) : conversations.length === 0 ? (
-          <p className="p-4 text-xs font-semibold text-[var(--text-muted)]">
-            No conversations yet. Message a taste twin from their profile.
+          <p className="p-4 text-xs font-normal text-[var(--text-muted)]">
+            No conversations yet. Message a{" "}
+            <Link to="/twins" className="font-medium text-[var(--text-accent)] hover:underline">
+              taste twin
+            </Link>{" "}
+            from their profile.
           </p>
         ) : (
           conversations.map((c) => (
@@ -85,7 +89,7 @@ function ChatPageInner() {
               }`}
             >
               <div className="min-w-0">
-                <p className="truncate text-sm font-bold">{c.partner.username}</p>
+                <p className="truncate text-sm font-medium">{c.partner.username}</p>
                 <p className="truncate text-xs text-[var(--text-muted)]">{c.lastMessage.content}</p>
               </div>
               {c.unread > 0 && (
@@ -98,14 +102,14 @@ function ChatPageInner() {
 
       <div className="surface flex flex-1 flex-col bg-[var(--bg-elevated)]">
         {!userId ? (
-          <div className="flex flex-1 items-center justify-center text-sm font-semibold text-[var(--text-muted)]">
+          <div className="flex flex-1 items-center justify-center text-sm font-normal text-[var(--text-muted)]">
             Select a conversation
           </div>
         ) : (
           <>
             {activePartner && (
               <div className="border-b border-[var(--border)]/10 p-3">
-                <Link to={`/twins/${activePartner.username}`} className="text-sm font-bold hover:text-[var(--text-accent)]">
+                <Link to={`/twins/${activePartner.username}`} className="text-sm font-medium hover:text-[var(--text-accent)]">
                   {activePartner.username}
                 </Link>
               </div>
@@ -130,7 +134,7 @@ function ChatPageInner() {
                           className="mb-1 flex items-center gap-2 rounded-lg bg-black/10 p-1.5"
                         >
                           <img src={m.sharedTitle.posterUrl} alt="" className="h-10 w-7 rounded object-cover" />
-                          <span className="text-xs font-bold">{m.sharedTitle.name}</span>
+                          <span className="text-xs font-medium">{m.sharedTitle.name}</span>
                         </Link>
                       )}
                       {m.content}
@@ -165,7 +169,7 @@ function ChatPageInner() {
                 />
                 <button
                   onClick={send}
-                  className="surface-interactive bg-accent-500 px-4 py-2 text-sm font-semibold text-[var(--on-accent)]"
+                  className="surface-interactive bg-accent-500 px-4 py-2 text-sm font-medium text-[var(--on-accent)]"
                 >
                   Send
                 </button>

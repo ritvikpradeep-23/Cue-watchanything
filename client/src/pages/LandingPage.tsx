@@ -7,47 +7,69 @@ import { PosterImage } from "../components/ui/PosterImage";
  * Text is left-anchored (right-anchored on the asset side gets real compositional weight
  * instead of a repeating grid), and the asset side is a curated, overlapping poster collage
  * plus a static mock of the actual swipe card — the one interaction Cue is built around,
- * which the previous hero never showed at all. Real dataset posters throughout (same
- * /posters/*.svg assets the rest of the app uses), not abstract tiles.
+ * which the previous hero never showed at all.
+ *
+ * Poster URLs, plot summaries, platforms, and genres below are copied verbatim from the real
+ * Title rows for these titles (queried directly from the database) — NOT the /posters/*.svg
+ * folder used elsewhere in this file's first draft, which turned out to be generated
+ * placeholder graphics (a flat color + a single initial), not real poster art. That first
+ * draft technically satisfied "use real dataset posters" by filename, but not by what actually
+ * rendered — this is the actual fix.
  */
 
 /** A handful of real, recognizable titles spanning the dataset's own industry spread — not a
  * dense uniform grid, a loose curated cluster. Position/rotation/z chosen by hand for a
- * collaged, non-grid feel (VARIANCE 7 — offset, overlapping, not symmetric). `tileOpacity`
- * becomes the --tile-opacity custom property the hero-tile-in animation resolves to (see
- * index.css) rather than a plain `opacity` style, so the entrance animation and each tile's
- * own dimmed resting state don't fight over the same CSS property. */
-const COLLAGE_TILES: { id: string; name: string; position: React.CSSProperties; size: string; tileOpacity: number }[] = [
-  { id: "parasite", name: "Parasite", size: "w-28", tileOpacity: 0.75, position: { top: "2%", left: "4%", rotate: "-7deg", zIndex: 1 } },
-  { id: "attack-on-titan", name: "Attack on Titan", size: "w-32", tileOpacity: 0.8, position: { top: "0%", left: "34%", rotate: "4deg", zIndex: 1 } },
-  { id: "stranger-things", name: "Stranger Things", size: "w-32", tileOpacity: 0.75, position: { top: "4%", right: "2%", rotate: "6deg", zIndex: 1 } },
-  { id: "oppenheimer", name: "Oppenheimer", size: "w-28", tileOpacity: 0.65, position: { bottom: "6%", left: "12%", rotate: "9deg", zIndex: 1 } },
-  { id: "demon-slayer", name: "Demon Slayer", size: "w-28", tileOpacity: 0.7, position: { bottom: "2%", right: "10%", rotate: "-5deg", zIndex: 1 } },
+ * collaged, non-grid feel (VARIANCE 7 — offset, overlapping, not symmetric). `tileOpacity` is
+ * applied on a separate outer wrapper from the entrance animation (see the render loop below
+ * and the index.css comment on .hero-tile-in) rather than as a CSS custom property read inside
+ * @keyframes, which didn't reliably resolve in testing. */
+const COLLAGE_TILES: { id: string; name: string; posterUrl: string; position: React.CSSProperties; size: string; tileOpacity: number }[] = [
+  { id: "parasite", name: "Parasite", posterUrl: "https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg", size: "w-28", tileOpacity: 0.85, position: { top: "2%", left: "4%", rotate: "-7deg", zIndex: 1 } },
+  { id: "attack-on-titan", name: "Attack on Titan", posterUrl: "https://image.tmdb.org/t/p/w500/hTP1DtLGFamjfu8WqjnuQdP1n4i.jpg", size: "w-32", tileOpacity: 0.9, position: { top: "0%", left: "34%", rotate: "4deg", zIndex: 1 } },
+  { id: "stranger-things", name: "Stranger Things", posterUrl: "https://image.tmdb.org/t/p/w500/uKYUR8GPkKRCksczYDJb3pwZauo.jpg", size: "w-32", tileOpacity: 0.85, position: { top: "4%", right: "2%", rotate: "6deg", zIndex: 1 } },
+  { id: "oppenheimer", name: "Oppenheimer", posterUrl: "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg", size: "w-28", tileOpacity: 0.75, position: { bottom: "6%", left: "12%", rotate: "9deg", zIndex: 1 } },
+  { id: "demon-slayer", name: "Demon Slayer", posterUrl: "https://image.tmdb.org/t/p/w500/xUfRZu2mi8jH6SzQEJGP6tjBuYj.jpg", size: "w-28", tileOpacity: 0.8, position: { bottom: "2%", right: "10%", rotate: "-5deg", zIndex: 1 } },
 ];
 
 /** Static preview of the real SwipeCard component — same classes (.surface, PosterImage, the
  * bottom gradient + chip tags), just not draggable. This is what "show the actual product"
  * means: a real miniature of the real UI, not a div-built fake screenshot. Money Heist, real
- * dataset title, real genre tags. */
+ * poster art, real plot summary (line-clamped exactly like the live swipe deck does), real
+ * platform + year + genre tags — everything here is a Title row's actual field values. */
 function MockSwipeCard() {
   return (
     <div
-      className="hero-tile-in absolute left-1/2 top-1/2 z-10 w-56 -translate-x-1/2 -translate-y-1/2"
+      className="hero-tile-in absolute left-1/2 top-1/2 z-10 w-72 -translate-x-1/2 -translate-y-1/2"
       style={{ animationDelay: "420ms" }}
     >
       <div className="surface rotate-[-3deg] overflow-hidden shadow-2xl">
         <div className="relative aspect-[2/3] w-full">
-          <PosterImage src="/posters/money-heist.svg" alt="" active className="h-full w-full" />
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-3 pt-8">
-            <h3 className="text-base font-semibold tracking-tight text-white">Money Heist</h3>
-            <div className="mt-1.5 flex flex-wrap gap-1">
-              {["thriller", "drama"].map((g) => (
+          <PosterImage
+            src="https://image.tmdb.org/t/p/w500/reEMJA1uzscCbkpeRJeTT2bjqUp.jpg"
+            alt=""
+            active
+            className="h-full w-full"
+          />
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/80 to-transparent p-4 pt-14">
+            <div className="mb-1.5 flex items-center gap-1.5 text-[10px] font-medium text-white/70">
+              <span>2017</span>
+              <span aria-hidden="true">·</span>
+              <span>Netflix</span>
+            </div>
+            <h3 className="text-lg font-semibold tracking-tight text-white">Money Heist</h3>
+            <p className="mt-1.5 line-clamp-2 text-xs font-normal leading-relaxed text-white/80">
+              A criminal mastermind assembles a team to pull off the biggest heist in history at
+              Spain's Royal Mint. Hostages, police sieges, and betrayals complicate the plan at
+              every step.
+            </p>
+            <div className="mt-2 flex flex-wrap gap-1">
+              {["thriller", "action"].map((g) => (
                 <span key={g} className="chip bg-accent-500 px-1.5 py-0.5 text-[9px] text-[var(--on-accent)]">
                   {g}
                 </span>
               ))}
             </div>
-            <div className="mt-2 flex gap-1.5">
+            <div className="mt-2.5 flex gap-1.5">
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/15 text-xs text-[var(--text-dismiss)]">
                 ✕
               </span>
@@ -119,7 +141,7 @@ export function LandingPage() {
                   className="hero-tile-in surface overflow-hidden"
                   style={{ animationDelay: `${i * 70}ms` }}
                 >
-                  <PosterImage src={`/posters/${t.id}.svg`} alt="" className="aspect-[2/3] w-full" />
+                  <PosterImage src={t.posterUrl} alt="" className="aspect-[2/3] w-full" />
                 </div>
               </div>
             ))}

@@ -228,6 +228,40 @@ select:focus-visible {
   animation: quiz-question-in 0.18s ease-out;
 }
 
+/* Landing hero entrance — a real content page shouldn't just appear, but this is deliberately
+ * a fade+rise, not a bounce: the sequencing itself (headline first, collage tiles cascading
+ * in staggered by animation-delay, the swipe-card mock arriving last) is what's motivated
+ * here — it draws the eye through the page in the order that tells the actual story, ending
+ * on the one thing this whole redesign exists to show: the real product. */
+@keyframes hero-rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-in {
+  animation: hero-rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Collage tiles animate a plain 0->1 fade. Each tile's dimmed resting opacity (0.65-0.8) is a
+ * separate, static, non-animated opacity on the tile's own OUTER wrapper — CSS opacity
+ * multiplies across nested elements, so the visible result is exactly restingOpacity *
+ * animatedOpacity, landing at the right final value without reading a custom property inside
+ * @keyframes (that path — `to { opacity: var(--tile-opacity) }`, set via inline style on the
+ * same element the animation runs on — did not reliably resolve in testing; a real browser
+ * quirk with custom properties set the same tick an animation starts, not a false lead worth
+ * re-attempting). Only opacity+scale animate here — never transform's rotate, since each tile
+ * also carries its own static `rotate` (the standalone CSS property, not transform: rotate())
+ * for its scattered collage angle; `rotate` and `transform` compose independently in modern
+ * CSS, so the two never fight for the same property. */
+@keyframes hero-tile-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.hero-tile-in {
+  animation: hero-tile-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 @keyframes skeleton-shimmer {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }

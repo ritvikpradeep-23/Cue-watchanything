@@ -1,11 +1,69 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../lib/auth-context";
+import { PosterImage } from "../components/ui/PosterImage";
 
-const POSTER_IDS = [
-  "breaking-bad", "stranger-things", "the-bear", "dune-2021", "parasite",
-  "attack-on-titan", "the-last-of-us", "barbie", "your-name", "oppenheimer",
-  "money-heist", "arcane", "spiderverse", "demon-slayer", "the-boys",
+/**
+ * Landing hero redesign — asymmetric split, not a centered-hero-over-tiled-background.
+ * Text is left-anchored (right-anchored on the asset side gets real compositional weight
+ * instead of a repeating grid), and the asset side is a curated, overlapping poster collage
+ * plus a static mock of the actual swipe card — the one interaction Cue is built around,
+ * which the previous hero never showed at all. Real dataset posters throughout (same
+ * /posters/*.svg assets the rest of the app uses), not abstract tiles.
+ */
+
+/** A handful of real, recognizable titles spanning the dataset's own industry spread — not a
+ * dense uniform grid, a loose curated cluster. Position/rotation/z chosen by hand for a
+ * collaged, non-grid feel (VARIANCE 7 — offset, overlapping, not symmetric). `tileOpacity`
+ * becomes the --tile-opacity custom property the hero-tile-in animation resolves to (see
+ * index.css) rather than a plain `opacity` style, so the entrance animation and each tile's
+ * own dimmed resting state don't fight over the same CSS property. */
+const COLLAGE_TILES: { id: string; name: string; position: React.CSSProperties; size: string; tileOpacity: number }[] = [
+  { id: "parasite", name: "Parasite", size: "w-28", tileOpacity: 0.75, position: { top: "2%", left: "4%", rotate: "-7deg", zIndex: 1 } },
+  { id: "attack-on-titan", name: "Attack on Titan", size: "w-32", tileOpacity: 0.8, position: { top: "0%", left: "34%", rotate: "4deg", zIndex: 1 } },
+  { id: "stranger-things", name: "Stranger Things", size: "w-32", tileOpacity: 0.75, position: { top: "4%", right: "2%", rotate: "6deg", zIndex: 1 } },
+  { id: "oppenheimer", name: "Oppenheimer", size: "w-28", tileOpacity: 0.65, position: { bottom: "6%", left: "12%", rotate: "9deg", zIndex: 1 } },
+  { id: "demon-slayer", name: "Demon Slayer", size: "w-28", tileOpacity: 0.7, position: { bottom: "2%", right: "10%", rotate: "-5deg", zIndex: 1 } },
 ];
+
+/** Static preview of the real SwipeCard component — same classes (.surface, PosterImage, the
+ * bottom gradient + chip tags), just not draggable. This is what "show the actual product"
+ * means: a real miniature of the real UI, not a div-built fake screenshot. Money Heist, real
+ * dataset title, real genre tags. */
+function MockSwipeCard() {
+  return (
+    <div
+      className="hero-tile-in absolute left-1/2 top-1/2 z-10 w-56 -translate-x-1/2 -translate-y-1/2"
+      style={{ animationDelay: "420ms" }}
+    >
+      <div className="surface rotate-[-3deg] overflow-hidden shadow-2xl">
+        <div className="relative aspect-[2/3] w-full">
+          <PosterImage src="/posters/money-heist.svg" alt="" active className="h-full w-full" />
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-3 pt-8">
+            <h3 className="text-base font-semibold tracking-tight text-white">Money Heist</h3>
+            <div className="mt-1.5 flex flex-wrap gap-1">
+              {["thriller", "drama"].map((g) => (
+                <span key={g} className="chip bg-accent-500 px-1.5 py-0.5 text-[9px] text-[var(--on-accent)]">
+                  {g}
+                </span>
+              ))}
+            </div>
+            <div className="mt-2 flex gap-1.5">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/15 text-xs text-[var(--text-dismiss)]">
+                ✕
+              </span>
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/15 text-xs text-[var(--text-gold)]">
+                ★
+              </span>
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-accent-500 text-xs text-[var(--on-accent)]">
+                ♥
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function LandingPage() {
   const { isAuthenticated } = useAuth();
@@ -13,67 +71,79 @@ export function LandingPage() {
   return (
     <div>
       <section className="relative overflow-hidden border-b border-[var(--border)]/10">
-        {/* grid-rows-3 (explicit) + h-full on the container, object-cover (never stretches —
-         * only crops) on each tile: fills the hero exactly, edge to edge, with zero distortion.
-         * A prior version here added aspect-[2/3] per tile to "fix" a distortion that was never
-         * actually happening (object-cover already prevents stretching) — that fixed height
-         * per tile didn't match the implicit grid's auto row height, so 3 rows of aspect-correct
-         * tiles needed ~1125px but the hero is only ~570px tall, and everything past the top
-         * ~1.5 rows was silently clipped by this section's overflow-hidden. Net effect: the
-         * poster wall read as sparse/empty instead of a dense atmospheric backdrop — this is
-         * the actual fix for that regression. */}
-        <div className="absolute inset-0 -z-10 grid h-full grid-cols-5 grid-rows-3 gap-1 opacity-60">
-          {POSTER_IDS.map((id) => (
-            <img key={id} src={`/posters/${id}.svg`} alt="" className="h-full w-full object-cover" />
-          ))}
-        </div>
-        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[var(--bg)]/70 via-[var(--bg)]/85 to-[var(--bg)]" />
-
-        <div className="mx-auto flex max-w-4xl flex-col items-center px-4 py-28 text-center">
-          <h1 className="text-4xl font-semibold leading-tight tracking-tight sm:text-6xl">
-            Stop scrolling.
-            <br />
-            <span className="text-[var(--text-accent)]">Start watching.</span>
-          </h1>
-          <p className="mt-6 max-w-xl text-lg font-normal leading-relaxed text-[var(--text-muted)]">
-            A quick quiz, a swipe deck, and a running list of what you actually want to watch —
-            shows, movies, and anime. No AI guessing, just tag-matched picks and legal streaming
-            labels.
-          </p>
-          <div className="mt-8 flex gap-3">
-            {isAuthenticated ? (
-              <Link to="/swipe" className="surface-interactive bg-accent-500 px-6 py-3 font-semibold text-[var(--on-accent)]">
-                Go to swipe deck
-              </Link>
-            ) : (
-              <>
-                <Link to="/signup" className="surface-interactive bg-accent-500 px-6 py-3 font-semibold text-[var(--on-accent)]">
-                  Get started
+        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-16 md:min-h-[560px] md:grid-cols-[3fr_2fr] md:items-center md:gap-6 md:py-20">
+          {/* Text column — left-anchored on desktop, not centered. Hero stack is exactly three
+           * elements (headline, subtext, CTAs) — no eyebrow, no trust strip, nothing extra. */}
+          <div className="hero-in relative z-10 text-center md:text-left">
+            <h1 className="text-4xl font-semibold leading-tight tracking-tight sm:text-6xl">
+              Stop scrolling.
+              <br />
+              <span className="text-[var(--text-accent)]">Start watching.</span>
+            </h1>
+            <p className="mx-auto mt-6 max-w-md text-lg font-normal leading-relaxed text-[var(--text-muted)] md:mx-0">
+              A quick quiz, a swipe deck, and a watchlist that's actually yours. Real streaming
+              data, no AI guessing.
+            </p>
+            <div className="mt-8 flex justify-center gap-3 md:justify-start">
+              {isAuthenticated ? (
+                <Link to="/swipe" className="surface-interactive bg-accent-500 px-6 py-3 font-semibold text-[var(--on-accent)]">
+                  Go to swipe deck
                 </Link>
-                <Link to="/login" className="surface-interactive bg-[var(--bg-elevated)] px-6 py-3 font-semibold">
-                  Log in
-                </Link>
-              </>
-            )}
+              ) : (
+                <>
+                  <Link to="/signup" className="surface-interactive bg-accent-500 px-6 py-3 font-semibold text-[var(--on-accent)]">
+                    Get started
+                  </Link>
+                  <Link to="/login" className="surface-interactive bg-[var(--bg-elevated)] px-6 py-3 font-semibold">
+                    Log in
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
+
+          {/* Asset column — the real visual weight the composition needs on this side, instead
+           * of empty space or a repeating tile pattern. Desktop only; mobile gets a simpler
+           * single-card teaser below (a scattered collage has no room to breathe under 768px). */}
+          <div className="relative hidden h-[420px] md:block">
+            {COLLAGE_TILES.map((t, i) => (
+              // Outer div: static resting opacity (never animated) + position/rotation. Inner
+              // div: the hero-tile-in entrance animates a plain 0->1 fade. CSS opacity
+              // multiplies across nested elements, so the visible result during the animation
+              // is exactly tileOpacity * animatedOpacity — same visual target as animating
+              // straight to tileOpacity, without needing a custom property read inside
+              // @keyframes (see index.css comment — that path didn't reliably resolve when the
+              // property was set via inline style the same tick the animation starts).
+              <div key={t.id} className={`absolute ${t.size}`} style={{ ...t.position, opacity: t.tileOpacity }}>
+                <div
+                  className="hero-tile-in surface overflow-hidden"
+                  style={{ animationDelay: `${i * 70}ms` }}
+                >
+                  <PosterImage src={`/posters/${t.id}.svg`} alt="" className="aspect-[2/3] w-full" />
+                </div>
+              </div>
+            ))}
+            <MockSwipeCard />
+          </div>
+        </div>
+
+        {/* Mobile teaser — just the product moment, not the full collage. */}
+        <div className="relative mx-auto h-64 max-w-6xl px-4 pb-12 md:hidden">
+          <MockSwipeCard />
         </div>
       </section>
 
-      {/* Borderless editorial columns, not the generic three-card-grid (no .surface box —
-       * hierarchy comes from spacing and a small accent numeral, not a bordered container).
-       * Section padding is deliberately generous (py-20/28) — this is the one page in the app
-       * that's a marketing surface rather than dense content, so it's the one place real
-       * macro-whitespace belongs. */}
-      {/* max-w-4xl, matching the hero section above — was max-w-5xl, an off-scale width that
-       * made the page's two centered columns not actually line up with each other. */}
+      {/* Borderless editorial columns, staggered vertically instead of three identical
+       * same-height columns — breaks the repeating parallel rhythm the flat 3-equal-column
+       * layout had even after the earlier pass removed its card chrome. */}
       <section className="mx-auto max-w-4xl px-4 py-20 sm:py-28">
         <div className="grid gap-12 sm:grid-cols-3">
           {[
-            { n: "01", title: "Answer a quick quiz", body: "Mood, pace, comfort level — an adaptive quiz that skips what doesn't apply to you." },
-            { n: "02", title: "Swipe through picks", body: "Left to pass, right to like, up to super-like. Every swipe sharpens your taste profile." },
-            { n: "03", title: "Track & rate", body: "Build a watchlist, mark things watched, and rate them for the community." },
+            { n: "01", title: "Answer a quick quiz", body: "Mood, pace, and comfort level feed an adaptive quiz that skips what doesn't apply to you.", offset: "" },
+            { n: "02", title: "Swipe through picks", body: "Left to pass, right to like, up to super-like. Every swipe sharpens your taste profile.", offset: "sm:mt-10" },
+            { n: "03", title: "Track & rate", body: "Build a watchlist, mark things watched, and rate them for the community.", offset: "sm:mt-20" },
           ].map((f) => (
-            <div key={f.title}>
+            <div key={f.title} className={f.offset}>
               <p className="mb-3 text-xs font-medium tracking-wide text-[var(--text-accent)]">{f.n}</p>
               <h3 className="mb-2 text-lg font-semibold">{f.title}</h3>
               <p className="text-sm font-normal text-[var(--text-muted)]">{f.body}</p>

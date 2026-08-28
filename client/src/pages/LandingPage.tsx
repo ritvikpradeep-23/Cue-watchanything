@@ -13,12 +13,18 @@ export function LandingPage() {
   return (
     <div>
       <section className="relative overflow-hidden border-b border-[var(--border)]/10">
-        {/* aspect-[2/3] per tile — was h-full + object-cover with no aspect constraint, which
-         * let the grid's auto row-sizing stretch/crop posters into whatever height the row
-         * happened to resolve to rather than their real proportions. */}
-        <div className="absolute inset-0 -z-10 grid grid-cols-5 gap-1 opacity-60">
+        {/* grid-rows-3 (explicit) + h-full on the container, object-cover (never stretches —
+         * only crops) on each tile: fills the hero exactly, edge to edge, with zero distortion.
+         * A prior version here added aspect-[2/3] per tile to "fix" a distortion that was never
+         * actually happening (object-cover already prevents stretching) — that fixed height
+         * per tile didn't match the implicit grid's auto row height, so 3 rows of aspect-correct
+         * tiles needed ~1125px but the hero is only ~570px tall, and everything past the top
+         * ~1.5 rows was silently clipped by this section's overflow-hidden. Net effect: the
+         * poster wall read as sparse/empty instead of a dense atmospheric backdrop — this is
+         * the actual fix for that regression. */}
+        <div className="absolute inset-0 -z-10 grid h-full grid-cols-5 grid-rows-3 gap-1 opacity-60">
           {POSTER_IDS.map((id) => (
-            <img key={id} src={`/posters/${id}.svg`} alt="" className="aspect-[2/3] w-full object-cover" />
+            <img key={id} src={`/posters/${id}.svg`} alt="" className="h-full w-full object-cover" />
           ))}
         </div>
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[var(--bg)]/70 via-[var(--bg)]/85 to-[var(--bg)]" />
